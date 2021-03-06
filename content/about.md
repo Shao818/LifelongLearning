@@ -3,7 +3,7 @@ date: "2017-08-20T21:38:52+08:00"
 lastmod: "2017-08-28T21:41:52+08:00"
 menu: main
 title: 关于
-weight: 60
+weight: 100
 ---
 <div align=center> 
 <font face="华文行楷" color=#BF5442 size=4>关于我</font>

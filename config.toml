@@ -48,6 +48,22 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   weight = 40
   identifier = "categories"
   url = "/categories/"
+[[menu.main]]
+  name = "宏观"
+  weight = 50
+  url = "/categories/数据科学/"
+[[menu.main]]
+  name = "行业"
+  weight = 60
+  url = "/categories/公司/"
+[[menu.main]]
+  name = "公司"
+  weight = 70
+  url = "/categories/公司/"
+[[menu.main]]
+  name = "计量"
+  weight = 80
+  url = "/categories/计量/"
 [params]
   version = "4.x"           # Used to give a friendly message when you have an incompatible update
   debug = false             # If true, load `eruda.min.js`. See https://github.com/liriliri/eruda
