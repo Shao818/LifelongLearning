@@ -13,11 +13,15 @@ tags:
 - preview
 - Theme preview
 - tag-3
-title: Theme preview
-weight: 10
+title: 主题使用说明
 ---
 
-> Based on [MarkdownPreview test.md](https://github.com/facelessuser/MarkdownPreview/blob/master/examples/test.md).
+{{% admonition note "EVEN主题介绍" false %}}
+对`Even`主题的使用做详细的介绍。
+
+{{% /admonition %}}
+
+<!--more-->
 
 # Markdown
 
