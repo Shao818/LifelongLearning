@@ -1,0 +1,32 @@
+/* A link that has not been visited */
+a:link {
+    color: darkblue;
+/*	text-decoration: underline */
+}
+/* A link that has been visited */
+a:visited {
+    color: grey;
+}
+/* A link that is hovered on */
+a:hover {
+    color: blue;
+}
+/* A link that is selected */
+a:active {
+    color: navy;
+}
+
+/* Colors for the footer */
+footer { background: white; }
+.footer, .footer a { color: darkslategray; }
+
+blockquote {
+font-family: STKaiti, "楷体","楷体_GB2312", Optima, Candara, Calibri, "Droid Sans", Arial, sans-serif;
+;
+/* font-size:20px;*/
+/* text-indent: 2em; */
+}
+
+h1, h2, h3 {
+  font-family: STHeiti, "黑体", Palatino, Book Antiqua, serif;
+}
