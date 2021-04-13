@@ -26,7 +26,7 @@ title: 主页
 <a href="http://finance.sina.com.cn/realstock/company/sz000566/nc.shtml" target="_blank">
 <img src="http://image.sinajs.cn/newchart/min/n/sz000566.gif" alt="美丰股票" height="400" width="900"></a></div>
 
->三聚氰胺价格持续上涨，主营业务作为其主要原材料价格有望上涨。
+>[三聚氰胺](https://www.sci99.com/monitormobile-94915214-0.html)价格持续上涨，主营业务作为其主要原材料价格有望上涨。
 
 
 <div class="sidebarLine">
