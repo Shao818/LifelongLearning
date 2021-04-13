@@ -8,6 +8,29 @@ title: 主页
 
 
 
+<div class="sidebarLine">
+<a href="http://finance.sina.com.cn/realstock/company/sh600093/nc.shtml" target="_blank">
+<img src="http://image.sinajs.cn/newchart/min/n/sh600093.gif" alt="美丰股票" height="400" width="900"></a></div>
+
+
+<div class="sidebarLine">
+<a href="http://finance.sina.com.cn/realstock/company/sh600340/nc.shtml" target="_blank">
+<img src="http://image.sinajs.cn/newchart/min/n/sh600340.gif" alt="美丰股票" height="400" width="900"></a></div>
+
+
+<div class="sidebarLine">
+<a href="http://finance.sina.com.cn/realstock/company/sz000566/nc.shtml" target="_blank">
+<img src="http://image.sinajs.cn/newchart/min/n/sz000566.gif" alt="美丰股票" height="400" width="900"></a></div>
+
+
+
+<div class="sidebarLine">
+<a href="http://finance.sina.com.cn/realstock/company/sz000731/nc.shtml" target="_blank">
+<img src="http://image.sinajs.cn/newchart/min/n/sz000731.gif" alt="美丰股票" height="400" width="900"></a></div>
+
+
+
+
 <center>
 <a href="https://msg2020.pzhao.org/">
   <img src="https://gitee.com/shao818/Figure/raw/master/%E6%9D%9C%E9%82%A6%E5%88%86%E6%9E%90%E5%9B%BE.png" style="zoom: 100%;" align="middle" alt="现代统计图形网站链接的二维码" />
