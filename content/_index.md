@@ -8,20 +8,25 @@ title: 主页
 
 
 
+>区块链龙头，区块链在供应链金融中的应用。
+
 <div class="sidebarLine">
 <a href="http://finance.sina.com.cn/realstock/company/sh600093/nc.shtml" target="_blank">
 <img src="http://image.sinajs.cn/newchart/min/n/sh600093.gif" alt="美丰股票" height="400" width="900"></a></div>
 
+>债务危机解决方案有望近期出炉，超跌反弹可期。
 
 <div class="sidebarLine">
 <a href="http://finance.sina.com.cn/realstock/company/sh600340/nc.shtml" target="_blank">
 <img src="http://image.sinajs.cn/newchart/min/n/sh600340.gif" alt="美丰股票" height="400" width="900"></a></div>
 
+>短期强势。
 
 <div class="sidebarLine">
 <a href="http://finance.sina.com.cn/realstock/company/sz000566/nc.shtml" target="_blank">
 <img src="http://image.sinajs.cn/newchart/min/n/sz000566.gif" alt="美丰股票" height="400" width="900"></a></div>
 
+>三聚氰胺价格持续上涨，主营业务作为其主要原材料价格有望上涨。
 
 
 <div class="sidebarLine">
