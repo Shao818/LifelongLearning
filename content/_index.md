@@ -11,8 +11,8 @@ title: 主页
 >区块链龙头，区块链在供应链金融中的应用。
 
 <div class="sidebarLine">
-<a href="http://finance.sina.com.cn/realstock/company/sh600093/nc.shtml" target="_blank">
-<img src="http://image.sinajs.cn/newchart/min/n/sh600093.gif" alt="美丰股票" height="400" width="900"></a></div>
+<a href="http://finance.sina.com.cn/realstock/company/sz002537/nc.shtml" target="_blank">
+<img src="http://image.sinajs.cn/newchart/min/n/sz002537.gif" alt="美丰股票" height="400" width="900"></a></div>
 
 >债务危机解决方案有望近期出炉，超跌反弹可期。
 
@@ -49,7 +49,22 @@ title: 主页
 
 >　　　　　　　　　　　　　　　　　　　　　　　　　　　　　          　　**<font size=4 >——《劝学》　荀子·先秦</font>**
         
+<div class="investor-content">
+            <div class="about-title">
+                <h3>易见股份</h3>
+                <div class="about-title-line"></div>
+            </div>
+            <div class="investor-chart clearfix">
+                <div class="investor-chart-left">
+                    <!--<img src="/Public/Home/images/chart1.jpg" alt="" id="first">-->
+                    <div id="sseinfo_hq_wrapper_intraday" style="height:400px;margin:0;"> <iframe src="http://open.sseinfo.com/ir/page/pub/intraday.htm#600093" name="http://www.easy-visible.com/investor/index.html" frameborder="0" scrolling="no" height="400" width="900"></iframe></div>
+                </div>
+                <div class="investor-chart-right">
+                    <!-- <img src="/Public/Home/images/chart2.jpg" alt="" id="secon">-->
+                    <div id="sseinfo_hq_wrapper_dayK" style="height:400px;margin:0;"> <iframe src="http://open.sseinfo.com/ir/page/pub/dayK.htm#600093" name="http://www.easy-visible.com/investor/index.html" frameborder="0" scrolling="no" height="400" width="900"></iframe></div>
+                 </div>
 
+           
 
 
 </font>
