@@ -14,14 +14,15 @@ tags:
 slug: firm-report
 weight: 00001
 ---
+<font face="思源宋体 CN" >
 
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
 ```{r include=FALSE}
-Firm_code<-"300429"
+Firm_code<-"楚江新材"
 ```
 
 ```{r include=FALSE}
@@ -65,19 +66,19 @@ Tushare_News_sina<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_sina 
 
 
 
-`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+　　`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
 
 
-`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+　　`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
 
 
-`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
+　　`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
 
 
 
-`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
+　　`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
 
-`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
+　　`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
 
 ### 东方财富
 
@@ -89,17 +90,17 @@ Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_
 
 
 
-`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+　　`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
 
 
-`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
+　　`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
 
 
-`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
+　　`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
 
-`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
+　　`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
 
-`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
+　　`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
 
 
 
@@ -116,52 +117,52 @@ Tushare_News_sina<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_sina 
 
 
 
-`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+　　`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
 
 
-`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+　　`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
 
 
-`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
-
-
-
+　　`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
 
 
 
-`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
 
-`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
 
-`r Tushare_News_sina[6,"时间"]`：`r str_sub(Tushare_News_sina[6,"内容"],1,str_length(Tushare_News_sina[6,"内容"]))`
 
-`r Tushare_News_sina[7,"时间"]`：`r str_sub(Tushare_News_sina[7,"内容"],1,str_length(Tushare_News_sina[7,"内容"]))`
+　　`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
 
-`r Tushare_News_sina[8,"时间"]`：`r str_sub(Tushare_News_sina[8,"内容"],1,str_length(Tushare_News_sina[8,"内容"]))`
+　　`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
 
-`r Tushare_News_sina[9,"时间"]`：`r str_sub(Tushare_News_sina[9,"内容"],1,str_length(Tushare_News_sina[9,"内容"]))`
+　　`r Tushare_News_sina[6,"时间"]`：`r str_sub(Tushare_News_sina[6,"内容"],1,str_length(Tushare_News_sina[6,"内容"]))`
 
-`r Tushare_News_sina[10,"时间"]`：`r str_sub(Tushare_News_sina[10,"内容"],1,str_length(Tushare_News_sina[10,"内容"]))`
+　　`r Tushare_News_sina[7,"时间"]`：`r str_sub(Tushare_News_sina[7,"内容"],1,str_length(Tushare_News_sina[7,"内容"]))`
 
-`r Tushare_News_sina[11,"时间"]`：`r str_sub(Tushare_News_sina[11,"内容"],1,str_length(Tushare_News_sina[11,"内容"]))`
+　　`r Tushare_News_sina[8,"时间"]`：`r str_sub(Tushare_News_sina[8,"内容"],1,str_length(Tushare_News_sina[8,"内容"]))`
 
-`r Tushare_News_sina[12,"时间"]`：`r str_sub(Tushare_News_sina[12,"内容"],1,str_length(Tushare_News_sina[12,"内容"]))`
+　　`r Tushare_News_sina[9,"时间"]`：`r str_sub(Tushare_News_sina[9,"内容"],1,str_length(Tushare_News_sina[9,"内容"]))`
 
-`r Tushare_News_sina[13,"时间"]`：`r str_sub(Tushare_News_sina[13,"内容"],1,str_length(Tushare_News_sina[13,"内容"]))`
+　　`r Tushare_News_sina[10,"时间"]`：`r str_sub(Tushare_News_sina[10,"内容"],1,str_length(Tushare_News_sina[10,"内容"]))`
 
-`r Tushare_News_sina[14,"时间"]`：`r str_sub(Tushare_News_sina[14,"内容"],1,str_length(Tushare_News_sina[14,"内容"]))`
+　　`r Tushare_News_sina[11,"时间"]`：`r str_sub(Tushare_News_sina[11,"内容"],1,str_length(Tushare_News_sina[11,"内容"]))`
 
-`r Tushare_News_sina[15,"时间"]`：`r str_sub(Tushare_News_sina[15,"内容"],1,str_length(Tushare_News_sina[15,"内容"]))`
+　　`r Tushare_News_sina[12,"时间"]`：`r str_sub(Tushare_News_sina[12,"内容"],1,str_length(Tushare_News_sina[12,"内容"]))`
 
-`r Tushare_News_sina[16,"时间"]`：`r str_sub(Tushare_News_sina[16,"内容"],1,str_length(Tushare_News_sina[16,"内容"]))`
+　　`r Tushare_News_sina[13,"时间"]`：`r str_sub(Tushare_News_sina[13,"内容"],1,str_length(Tushare_News_sina[13,"内容"]))`
 
-`r Tushare_News_sina[17,"时间"]`：`r str_sub(Tushare_News_sina[17,"内容"],1,str_length(Tushare_News_sina[17,"内容"]))`
+　　`r Tushare_News_sina[14,"时间"]`：`r str_sub(Tushare_News_sina[14,"内容"],1,str_length(Tushare_News_sina[14,"内容"]))`
 
-`r Tushare_News_sina[18,"时间"]`：`r str_sub(Tushare_News_sina[18,"内容"],1,str_length(Tushare_News_sina[18,"内容"]))`
+　　`r Tushare_News_sina[15,"时间"]`：`r str_sub(Tushare_News_sina[15,"内容"],1,str_length(Tushare_News_sina[15,"内容"]))`
 
-`r Tushare_News_sina[19,"时间"]`：`r str_sub(Tushare_News_sina[19,"内容"],1,str_length(Tushare_News_sina[19,"内容"]))`
+　　`r Tushare_News_sina[16,"时间"]`：`r str_sub(Tushare_News_sina[16,"内容"],1,str_length(Tushare_News_sina[16,"内容"]))`
 
-`r Tushare_News_sina[20,"时间"]`：`r str_sub(Tushare_News_sina[20,"内容"],1,str_length(Tushare_News_sina[20,"内容"]))`
+　　`r Tushare_News_sina[17,"时间"]`：`r str_sub(Tushare_News_sina[17,"内容"],1,str_length(Tushare_News_sina[17,"内容"]))`
+
+　　`r Tushare_News_sina[18,"时间"]`：`r str_sub(Tushare_News_sina[18,"内容"],1,str_length(Tushare_News_sina[18,"内容"]))`
+
+　　`r Tushare_News_sina[19,"时间"]`：`r str_sub(Tushare_News_sina[19,"内容"],1,str_length(Tushare_News_sina[19,"内容"]))`
+
+　　`r Tushare_News_sina[20,"时间"]`：`r str_sub(Tushare_News_sina[20,"内容"],1,str_length(Tushare_News_sina[20,"内容"]))`
 
 
 ### 东方财富
@@ -172,52 +173,52 @@ Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_
 ```
 
 
-`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+　　`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
 
 
-`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
+　　`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
 
 
-`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
-
-
-
+　　`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
 
 
 
-`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
 
-`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
 
-`r Tushare_News_eastmoney[6,"时间"]`：`r str_sub(Tushare_News_eastmoney[6,"内容"],1,str_length(Tushare_News_eastmoney[6,"内容"]))`
 
-`r Tushare_News_eastmoney[7,"时间"]`：`r str_sub(Tushare_News_eastmoney[7,"内容"],1,str_length(Tushare_News_eastmoney[7,"内容"]))`
+　　`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
 
-`r Tushare_News_eastmoney[8,"时间"]`：`r str_sub(Tushare_News_eastmoney[8,"内容"],1,str_length(Tushare_News_eastmoney[8,"内容"]))`
+　　`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
 
-`r Tushare_News_eastmoney[9,"时间"]`：`r str_sub(Tushare_News_eastmoney[9,"内容"],1,str_length(Tushare_News_eastmoney[9,"内容"]))`
+　　`r Tushare_News_eastmoney[6,"时间"]`：`r str_sub(Tushare_News_eastmoney[6,"内容"],1,str_length(Tushare_News_eastmoney[6,"内容"]))`
 
-`r Tushare_News_eastmoney[10,"时间"]`：`r str_sub(Tushare_News_eastmoney[10,"内容"],1,str_length(Tushare_News_eastmoney[10,"内容"]))`
+　　`r Tushare_News_eastmoney[7,"时间"]`：`r str_sub(Tushare_News_eastmoney[7,"内容"],1,str_length(Tushare_News_eastmoney[7,"内容"]))`
 
-`r Tushare_News_eastmoney[11,"时间"]`：`r str_sub(Tushare_News_eastmoney[11,"内容"],1,str_length(Tushare_News_eastmoney[11,"内容"]))`
+　　`r Tushare_News_eastmoney[8,"时间"]`：`r str_sub(Tushare_News_eastmoney[8,"内容"],1,str_length(Tushare_News_eastmoney[8,"内容"]))`
 
-`r Tushare_News_eastmoney[12,"时间"]`：`r str_sub(Tushare_News_eastmoney[12,"内容"],1,str_length(Tushare_News_eastmoney[12,"内容"]))`
+　　`r Tushare_News_eastmoney[9,"时间"]`：`r str_sub(Tushare_News_eastmoney[9,"内容"],1,str_length(Tushare_News_eastmoney[9,"内容"]))`
 
-`r Tushare_News_eastmoney[13,"时间"]`：`r str_sub(Tushare_News_eastmoney[13,"内容"],1,str_length(Tushare_News_eastmoney[13,"内容"]))`
+　　`r Tushare_News_eastmoney[10,"时间"]`：`r str_sub(Tushare_News_eastmoney[10,"内容"],1,str_length(Tushare_News_eastmoney[10,"内容"]))`
 
-`r Tushare_News_eastmoney[14,"时间"]`：`r str_sub(Tushare_News_eastmoney[14,"内容"],1,str_length(Tushare_News_eastmoney[14,"内容"]))`
+　　`r Tushare_News_eastmoney[11,"时间"]`：`r str_sub(Tushare_News_eastmoney[11,"内容"],1,str_length(Tushare_News_eastmoney[11,"内容"]))`
 
-`r Tushare_News_eastmoney[15,"时间"]`：`r str_sub(Tushare_News_eastmoney[15,"内容"],1,str_length(Tushare_News_eastmoney[15,"内容"]))`
+　　`r Tushare_News_eastmoney[12,"时间"]`：`r str_sub(Tushare_News_eastmoney[12,"内容"],1,str_length(Tushare_News_eastmoney[12,"内容"]))`
 
-`r Tushare_News_eastmoney[16,"时间"]`：`r str_sub(Tushare_News_eastmoney[16,"内容"],1,str_length(Tushare_News_eastmoney[16,"内容"]))`
+　　`r Tushare_News_eastmoney[13,"时间"]`：`r str_sub(Tushare_News_eastmoney[13,"内容"],1,str_length(Tushare_News_eastmoney[13,"内容"]))`
 
-`r Tushare_News_eastmoney[17,"时间"]`：`r str_sub(Tushare_News_eastmoney[17,"内容"],1,str_length(Tushare_News_eastmoney[17,"内容"]))`
+　　`r Tushare_News_eastmoney[14,"时间"]`：`r str_sub(Tushare_News_eastmoney[14,"内容"],1,str_length(Tushare_News_eastmoney[14,"内容"]))`
 
-`r Tushare_News_eastmoney[18,"时间"]`：`r str_sub(Tushare_News_eastmoney[18,"内容"],1,str_length(Tushare_News_eastmoney[18,"内容"]))`
+　　`r Tushare_News_eastmoney[15,"时间"]`：`r str_sub(Tushare_News_eastmoney[15,"内容"],1,str_length(Tushare_News_eastmoney[15,"内容"]))`
 
-`r Tushare_News_eastmoney[19,"时间"]`：`r str_sub(Tushare_News_eastmoney[19,"内容"],1,str_length(Tushare_News_eastmoney[19,"内容"]))`
+　　`r Tushare_News_eastmoney[16,"时间"]`：`r str_sub(Tushare_News_eastmoney[16,"内容"],1,str_length(Tushare_News_eastmoney[16,"内容"]))`
 
-`r Tushare_News_eastmoney[20,"时间"]`：`r str_sub(Tushare_News_eastmoney[20,"内容"],1,str_length(Tushare_News_eastmoney[20,"内容"]))`
+　　`r Tushare_News_eastmoney[17,"时间"]`：`r str_sub(Tushare_News_eastmoney[17,"内容"],1,str_length(Tushare_News_eastmoney[17,"内容"]))`
+
+　　`r Tushare_News_eastmoney[18,"时间"]`：`r str_sub(Tushare_News_eastmoney[18,"内容"],1,str_length(Tushare_News_eastmoney[18,"内容"]))`
+
+　　`r Tushare_News_eastmoney[19,"时间"]`：`r str_sub(Tushare_News_eastmoney[19,"内容"],1,str_length(Tushare_News_eastmoney[19,"内容"]))`
+
+　　`r Tushare_News_eastmoney[20,"时间"]`：`r str_sub(Tushare_News_eastmoney[20,"内容"],1,str_length(Tushare_News_eastmoney[20,"内容"]))`
 
 
 # 公司概况
@@ -237,37 +238,37 @@ colnames(ifind_firm_basic_information)
 
 ```
 
-**公司中文名称：**`r ifind_firm_basic_information$公司中文名称`
+　　**公司中文名称：**`r ifind_firm_basic_information$公司中文名称`
 
-**证券名称：**`r ifind_firm_basic_information$证券名称`
+　　**证券名称：**`r ifind_firm_basic_information$证券名称`
 
-**证券代码：**`r ifind_firm_basic_information$证券代码`
+　　**证券代码：**`r ifind_firm_basic_information$证券代码`
 
-**首发上市日期：**`r ifind_firm_basic_information$首发上市日期`
+　　**首发上市日期：**`r ifind_firm_basic_information$首发上市日期`
 
-**上市板块：**`r ifind_firm_basic_information$上市板块`
+　　**上市板块：**`r ifind_firm_basic_information$上市板块`
 
-**注册资本单位元：**`r ifind_firm_basic_information$注册资本单位元`
+　　**注册资本单位元：**`r ifind_firm_basic_information$注册资本单位元`
 
-**企业性质：**`r ifind_firm_basic_information$企业性质`
+　　**企业性质：**`r ifind_firm_basic_information$企业性质`
 
-**企业类型：**`r ifind_firm_basic_information$企业类型`
+　　**企业类型：**`r ifind_firm_basic_information$企业类型`
 
-**法人代表：**`r ifind_firm_basic_information$法人代表`
+　　**法人代表：**`r ifind_firm_basic_information$法人代表`
 
-**省份：**`r ifind_firm_basic_information$省份`，**地级市：**`r ifind_firm_basic_information$地级市`，**县级市：**`r ifind_firm_basic_information$县级市`
+　　**省份：**`r ifind_firm_basic_information$省份`，**地级市：**`r ifind_firm_basic_information$地级市`，**县级市：**`r ifind_firm_basic_information$县级市`
 
-**公司网站：**`r ifind_firm_basic_information$公司网站`
+　　**公司网站：**`r ifind_firm_basic_information$公司网站`
 
-**控股股东(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$控股股东截止日期最新`
+　　**控股股东(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$控股股东截止日期最新`
 
-**控股股东持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$ 控股股东持股比例截止日期最新单位`
+　　**控股股东持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$ 控股股东持股比例截止日期最新单位`
 
-**实际控制人(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人截止日期最新`
+　　**实际控制人(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人截止日期最新`
 
-**实际控制人持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$  实际控制人持股比例截止日期最新单位`
+　　**实际控制人持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$  实际控制人持股比例截止日期最新单位`
 
-**实际控制人类型(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人类型截止日期最新`
+　　**实际控制人类型(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人类型截止日期最新`
 
 ## 近期消息
 
@@ -281,18 +282,18 @@ Tushare_News_sina<-dbGetQuery(con,Tushare_News_sina_Query)
 
 
 
-`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+　　`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
 
 
-`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+　　`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
 
 
-`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
+　　`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
 
 
-`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
+　　`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
 
-`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
+　　`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
 
 
 ### 东方财富网
@@ -309,7 +310,7 @@ Tushare_News_eastmoney<-Tushare_News_eastmoney[!duplicated(Tushare_News_eastmone
 
 
 
-`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+　　`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
 
 
 `r if (!is.na(Tushare_News_eastmoney[1,"内容"])){
@@ -419,13 +420,13 @@ ggplot()+
 
 
 
-**经营范围：**`r str_replace_all(ifind_firm_basic_information$经营范围,"　","")`
+　　**经营范围：**`r str_replace_all(ifind_firm_basic_information$经营范围,"　","")`
 
-**公司简介：**`r str_replace_all(ifind_firm_basic_information$公司简介,"　","")`
+　　**公司简介：**`r str_replace_all(ifind_firm_basic_information$公司简介,"　","")`
 
-**主营业务(`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$主营业务截止日期最新`
+　　**主营业务(`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$主营业务截止日期最新`
 
-**所属概念(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$所属概念截止日期最新`
+　　**所属概念(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$所属概念截止日期最新`
 
 
 
@@ -461,3 +462,169 @@ kableExtra::kable_styling(x_html,bootstrap_options = "striped",
                           full_width = FALSE,
                           font_size = 10)
 ```
+# 财务分析
+
+
+
+
+　　基本面分析是从影响价格的因素出发去探究 价格的变化趋势。财务报表作为投资者最容易获取的信息，主要反映的是过去一段时间内 公司的财务状况和经营情况。通过合理的因子构建方法，财务质量因子可以用于反映企业 未来的经营趋势，能在很大程度上帮助我们去预测股票价格的变化趋势。
+
+
+
+```{r include=FALSE}
+#财务指标数据的提取
+QueryCondition<-paste("select * from tushare_firm_finance_index where 公司代码='",Firm_code,"'",sep="")
+tushare_firm_finance_index<-dbGetQuery(con,QueryCondition)
+colnames(tushare_firm_finance_index)
+```
+
+## 财务指标分析
+
+### 盈利能力
+
+
+
+
+　　盈利能力是指企业在一定时期内赚取利润的能力，它衡量的是企业利用资源实现收入的效 率。企业从事经营活动，在获取利润的前提下才能保证自身持续稳定的发展。因此盈利能 力直接反映了企业的经营业绩和内在价值。
+
+　　净资产收益率（Return on Equity），又称股东权益收益率，是净利润与股东权益 的百分比。该指标反映股东权益的收益水平，指标值越高，说明投资带来的收益越高。
+
+　　总资产回报率（Return onAssets），衡量的是企业一段时间内净利润和总资产的比值。ROA与ROE最大的区别在于分母的不同，ROA分母考虑到的是负债和股东权益， 而ROE分母只考虑了股东权益；对于举债经营的企业，可能会出现ROE虚高的情况。
+
+　　毛利率，反映的是收入和成本的差值占收入的比值。毛利率越高，意味着企业有可能存在较强盈利能力和成本控制能力，也可能意味着企业正处于新兴产业、市场竞争少，或者意味着企业具有某种高壁垒核心竞争力，在大多数情况下毛利率高不是 一件坏事。
+
+　　销售净利率，指的是净利润/营业收入，反映整个企业销售收入的收益 水平。销售净利率的值越大，说明从单位收入中获得净利润的水平越高，企业的盈利能力 越强。
+
+　　成本费用利润率，在Wind中该因子的具体定义是净利润/（营业成 本+销售费用+管理费用+财务费用），体现了公司投入的成本费用所带来的经营成果。成本费用利润率的值越大，说明从单位成本费用中获得利润的水平越高，企业的经济效益越好。
+
+　　投入资本回报率，是指生产经营活动中所有投入资本赚取的收益率，这些投入 资本既有债务也有权益。分子为企业如果完全按权益筹资所应报告的税后利润，分母则为 企业所有要求回报的现金来源的总和。该值能较好地体现企业的盈利能力。
+
+
+
+
+
+
+```{r echo=FALSE, fig.width=15}
+table_title<-paste("盈利能力指标:",ifind_firm_basic_information$公司中文名称,sep="")
+#提取所需要的数据
+Profitability_table<-tushare_firm_finance_index%>%
+  select(报告期,净资产收益率,净资产收益率扣除非经常损益,净资产收益率单季度,净资产单季度收益率扣除非经常损益) %>%
+  distinct(报告期,.keep_all = TRUE)
+
+x_html <- knitr:: kable(Profitability_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
+kableExtra::kable_styling(x_html,bootstrap_options = "striped",
+                          full_width = FALSE,
+                          font_size = 6)
+```
+
+### 成长能力
+
+
+
+　　企业成长能力是指企业未来发展趋势与发展速度，包括企业规模的扩大，利润和所有者权益的增加。企业成长能力是随着市场环境的变化，企业资产规模、盈利能力、市场占有率持续增长的能力，反映了企业未来的发展前景。
+
+　　营业收入指在一定时期内，商业企业销售商品或提供劳务所获得的货币收入。作为企业补偿生产经营耗费的资金来源，主要经营成果，取得利润的重要保障，以及现金流入量的重要组成部分
+
+　　毛利润指商业企业商品销售收入（售价）减去商品原进价后的余额，又称商品进销差价。影响最终利润的因素很多，对于不同的企业在不同的情况下差别很大，毛利润考虑对于该业务的主要支出。其意义在于，如果不做该（笔）业务，一些资源就会被浪费或仍然会消耗，利润就会变成负值；如果做该业务，就可能赢利或减少亏损。
+
+　　净利润指企业当期利润总额减去所得税后的金额，即企业的税后利润。净利润的多寡取决于两个因素，一是利润总额，其二就是所得税费用。净利润是一个企业经营的最终成果，净利润多，企业的经营效益就好；净利润少，企业的经营效益就差，是衡量一个企业经营效益的主要指标
+
+　　扣非净利润指在企业核算公司的利润过程中，不仅扣除了与公司经营支出有关的款项，还扣除了所有在经营过程中与经营无关的支出的费用。在核算扣非净利润之后，每个公司能够很直观的看到自己一个季度或者是一年的盈利状况。扣除了公司在经营过程中的支出以及与经营过程无关的支出，这样更加客观的看到一个公司的经营状况。
+
+
+
+```{r echo=FALSE}
+table_title<-paste("成长能力指标:",ifind_firm_basic_information$公司中文名称,sep="")
+#提取所需要的数据
+Growth_table<-tushare_firm_finance_index%>%
+  select(报告期,营业收入同比增长率,营业收入同比增长率单季度,营业利润环比增长率单季度,营业利润同比增长率,基本每股收益同比增长率)%>%
+  distinct(报告期,.keep_all = TRUE)
+
+
+x_html <- knitr:: kable(Growth_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
+kableExtra::kable_styling(x_html,bootstrap_options = "striped",
+                          full_width =FALSE,
+                          font_size =5)
+```
+
+### 营运能力
+
+
+
+　　营运能力主要是指企业营运资产的效率，即资产的周转率或周转速度。分析企业的营运能力能发现企业的资产运营中存在的问题。例如，存货周转率的提高反映了企业资产变现能力的提高，能够为其短期债务的偿还提供保障。反之，若企业应收账款周转率降低，企业可能存在账款回收上的困难，同时存在坏账的可能性。
+
+　　存货周转率，是衡量和评价企业购入存货、投入生产、销售收回等各环节管理状况的综合性指标。存货周转速度越快，存货的占用水平越低，流动性越强，存货转换为现金、应收账款的速度越快，企业的营运能力越强。
+
+　　总资产周转率，衡量企业利用资产产生收入的效率。
+
+　　流动资产周转率，指的是主营业务收入净额/平均流动资产总额，反映了企业流动资产的周转速度，是用于评价企业资产利用率的一个重要指标。
+
+　　应收账款周转率，指的是企业在一定时期内赊销净收入与平均应收账款余额之比，衡量企业应收账款周转速度及管理效率。
+
+　　应付账款周转率，反映企业应付账款的流动速度。
+
+
+```{r echo=FALSE}
+table_title<-paste("营运能力指标:",ifind_firm_basic_information$公司中文名称,sep="")
+#提取所需要的数据
+Operation_table<-tushare_firm_finance_index%>%
+  select(报告期,营业周期,流动资产周转率,固定资产周转率,总资产周转率,应收账款周转率) %>%
+  distinct(报告期,.keep_all = TRUE)
+x_html <- knitr:: kable(Operation_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
+kableExtra::kable_styling(x_html,bootstrap_options = "striped",
+                          full_width = FALSE,
+                          font_size = 6)
+```
+
+### 偿债能力
+
+
+
+　　即使是拥有很强盈利能力的公司，在举债经营时也可能因为资金调度不灵、不能及时偿还 债务而被迫面临清算破产。因此，企业偿还到期债务的能力是衡量企业能否长期稳定经营 下去的一个重要指标。根据债务期限，负债可以分成流动负债和长期负债两种类型。相应 地，偿债能力可以分为短期偿债能力和长期偿债能力。
+
+　　短期偿债能力是企业以流动资产偿还短期负债的能力，衡量了企业流动资产相对于短期负 债的充足程度，同时反映了企业的变现能力，常见的衡量指标有如流动比率、速动比率。长期偿债能力是指企业偿还长期债务的能力，它不仅反映了企业的违约风险，还提供了企 业资本结构和财务杠杆方面的信息，帮助我们评价企业的财务状况和控制企业的财务分析。
+
+　　流动比率，指流动资产/流动负债，用来评价流动资产总体变现能力。
+
+　　速动比率，指速动资产/流动负债，其中速动资产=流动资产-存货净额。从流动资 产中扣除存货部分，再除以流动负债，反映了企业对短期债务的支付偿还能力，能进一步 反映变现能力。
+
+　　现金比率，指的是现金及现金等价物和流动负债的比值。现金比率 以更为保守的方式采用现金及现金等价物来反映企业即刻变现偿还短期债务的能力。
+
+　　有形净值债务率，指的是负债总额/（归属母公司股东的权益-无 形资产-开发支出-商誉-长期待摊费用-递延所得税资产），主要衡量企业的风险程度和长期 偿债能力。有形净值债务率越大，表明风险越大，企业长期偿债能力越弱。
+
+　　利息保障倍数，指的是EBIT和利息费用的比值，不仅反映了企业盈利能力，还反映了其盈利能力对到期偿还债务的保障能力。
+```{r echo=FALSE}
+table_title <-paste("偿债能力指标:",ifind_firm_basic_information$公司中文名称,sep="")
+#提取所需要的数据
+pay_debt<-tushare_firm_finance_index%>%
+  select(报告期,流动比率,速动比率,保守速动比率,资产负债率,产权比率) %>%
+  distinct(报告期,.keep_all = TRUE)
+x_html <- knitr:: kable(pay_debt[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
+kableExtra::kable_styling(x_html,bootstrap_options = "striped",
+                          full_width =FALSE,
+                          font_size = 6)
+```
+
+## 杜邦分析
+
+### 杜邦分析思路
+
+
+
+![](https://gitee.com/shao818/Figure/raw/master/11111.png)
+
+### 杜邦分析指标
+
+```{r echo=FALSE}
+table_title<-paste("杜邦分析指标:",ifind_firm_basic_information$公司中文名称,sep="")
+#提取所需要的数据
+DuPont_analysis_table<-tushare_firm_finance_index%>%
+  select(报告期,净资产收益率,总资产净利率杜邦分析,权益乘数,销售净利率,总资产周转率,销售毛利率)
+DuPont_analysis_table<-DuPont_analysis_table[!duplicated(DuPont_analysis_table),]
+x_html <- knitr:: kable(DuPont_analysis_table[1:20,], format = "html",caption =table_title ,align='c',row.names = FALSE)
+kableExtra::kable_styling(x_html,bootstrap_options = "striped",
+                          full_width =FALSE,
+                          font_size = 6)
+```
+
+</font>
