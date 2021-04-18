@@ -1,0 +1,440 @@
+---
+author:
+  - 赵鹏
+title: '古统新修'
+# date: 2020-07-23
+slug: preface-zhao
+weight: 30
+---
+
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r include=FALSE}
+Firm_code<-"300429"
+```
+
+```{r include=FALSE}
+pacman::p_load(httr, readr, rjson,tidyverse,reshape2,openxlsx,ggplot2,
+               magrittr,showtextdb,sysfonts,showtext,xts,reticulate,
+               RODBC,RMySQL)
+#Mysql包登陆数据库------
+con <- dbConnect(MySQL(), host="", dbname="finance", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
+dbSendQuery(con,'SET NAMES gbk')
+```
+
+```{r include=FALSE}
+#转换公司名称为公司代码
+if (is.na(as.numeric(Firm_code))){
+  QueryCondition<-paste("select 公司代码 from ifind_firm_basic_information where 股票简称='",Firm_code,"'",sep="")
+  Firm_code<-dbGetQuery(con,QueryCondition)
+}
+```
+
+
+```{r include=FALSE}
+#提取公司股票简称
+
+QueryCondition<-paste("select 股票简称 from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
+Firm_abbreviation <-dbGetQuery(con,QueryCondition)
+
+```
+
+# 市场概况
+##  一周收盘播报
+
+### 新浪财经
+
+
+
+```{r}
+Tushare_News_sina<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_sina WHERE 内容 LIKE '%收评%' order by 时间 desc ")
+```
+
+
+
+
+
+`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+
+
+`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+
+
+`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
+
+
+
+
+
+
+`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
+
+`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
+
+`r Tushare_News_sina[6,"时间"]`：`r str_sub(Tushare_News_sina[6,"内容"],1,str_length(Tushare_News_sina[6,"内容"]))`
+
+`r Tushare_News_sina[7,"时间"]`：`r str_sub(Tushare_News_sina[7,"内容"],1,str_length(Tushare_News_sina[7,"内容"]))`
+
+`r Tushare_News_sina[8,"时间"]`：`r str_sub(Tushare_News_sina[8,"内容"],1,str_length(Tushare_News_sina[8,"内容"]))`
+
+`r Tushare_News_sina[9,"时间"]`：`r str_sub(Tushare_News_sina[9,"内容"],1,str_length(Tushare_News_sina[9,"内容"]))`
+
+`r Tushare_News_sina[10,"时间"]`：`r str_sub(Tushare_News_sina[10,"内容"],1,str_length(Tushare_News_sina[10,"内容"]))`
+
+`r Tushare_News_sina[11,"时间"]`：`r str_sub(Tushare_News_sina[11,"内容"],1,str_length(Tushare_News_sina[11,"内容"]))`
+
+`r Tushare_News_sina[12,"时间"]`：`r str_sub(Tushare_News_sina[12,"内容"],1,str_length(Tushare_News_sina[12,"内容"]))`
+
+`r Tushare_News_sina[13,"时间"]`：`r str_sub(Tushare_News_sina[13,"内容"],1,str_length(Tushare_News_sina[13,"内容"]))`
+
+`r Tushare_News_sina[14,"时间"]`：`r str_sub(Tushare_News_sina[14,"内容"],1,str_length(Tushare_News_sina[14,"内容"]))`
+
+`r Tushare_News_sina[15,"时间"]`：`r str_sub(Tushare_News_sina[15,"内容"],1,str_length(Tushare_News_sina[15,"内容"]))`
+
+`r Tushare_News_sina[16,"时间"]`：`r str_sub(Tushare_News_sina[16,"内容"],1,str_length(Tushare_News_sina[16,"内容"]))`
+
+`r Tushare_News_sina[17,"时间"]`：`r str_sub(Tushare_News_sina[17,"内容"],1,str_length(Tushare_News_sina[17,"内容"]))`
+
+`r Tushare_News_sina[18,"时间"]`：`r str_sub(Tushare_News_sina[18,"内容"],1,str_length(Tushare_News_sina[18,"内容"]))`
+
+`r Tushare_News_sina[19,"时间"]`：`r str_sub(Tushare_News_sina[19,"内容"],1,str_length(Tushare_News_sina[19,"内容"]))`
+
+`r Tushare_News_sina[20,"时间"]`：`r str_sub(Tushare_News_sina[20,"内容"],1,str_length(Tushare_News_sina[20,"内容"]))`
+
+### 东方财富
+
+
+
+```{r}
+Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_eastmoney WHERE 内容 LIKE '%收盘播报%' order by 时间 desc ")
+```
+
+
+
+`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+
+
+`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
+
+
+`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
+
+`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
+
+`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
+
+
+
+## 强势板块
+
+### 新浪财经
+
+
+
+
+```{r}
+Tushare_News_sina<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_sina WHERE 内容 LIKE '%涨价%' order by 时间 desc ")
+```
+
+
+
+`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+
+
+`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+
+
+`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
+
+
+
+
+
+
+`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
+
+`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
+
+`r Tushare_News_sina[6,"时间"]`：`r str_sub(Tushare_News_sina[6,"内容"],1,str_length(Tushare_News_sina[6,"内容"]))`
+
+`r Tushare_News_sina[7,"时间"]`：`r str_sub(Tushare_News_sina[7,"内容"],1,str_length(Tushare_News_sina[7,"内容"]))`
+
+`r Tushare_News_sina[8,"时间"]`：`r str_sub(Tushare_News_sina[8,"内容"],1,str_length(Tushare_News_sina[8,"内容"]))`
+
+`r Tushare_News_sina[9,"时间"]`：`r str_sub(Tushare_News_sina[9,"内容"],1,str_length(Tushare_News_sina[9,"内容"]))`
+
+`r Tushare_News_sina[10,"时间"]`：`r str_sub(Tushare_News_sina[10,"内容"],1,str_length(Tushare_News_sina[10,"内容"]))`
+
+`r Tushare_News_sina[11,"时间"]`：`r str_sub(Tushare_News_sina[11,"内容"],1,str_length(Tushare_News_sina[11,"内容"]))`
+
+`r Tushare_News_sina[12,"时间"]`：`r str_sub(Tushare_News_sina[12,"内容"],1,str_length(Tushare_News_sina[12,"内容"]))`
+
+`r Tushare_News_sina[13,"时间"]`：`r str_sub(Tushare_News_sina[13,"内容"],1,str_length(Tushare_News_sina[13,"内容"]))`
+
+`r Tushare_News_sina[14,"时间"]`：`r str_sub(Tushare_News_sina[14,"内容"],1,str_length(Tushare_News_sina[14,"内容"]))`
+
+`r Tushare_News_sina[15,"时间"]`：`r str_sub(Tushare_News_sina[15,"内容"],1,str_length(Tushare_News_sina[15,"内容"]))`
+
+`r Tushare_News_sina[16,"时间"]`：`r str_sub(Tushare_News_sina[16,"内容"],1,str_length(Tushare_News_sina[16,"内容"]))`
+
+`r Tushare_News_sina[17,"时间"]`：`r str_sub(Tushare_News_sina[17,"内容"],1,str_length(Tushare_News_sina[17,"内容"]))`
+
+`r Tushare_News_sina[18,"时间"]`：`r str_sub(Tushare_News_sina[18,"内容"],1,str_length(Tushare_News_sina[18,"内容"]))`
+
+`r Tushare_News_sina[19,"时间"]`：`r str_sub(Tushare_News_sina[19,"内容"],1,str_length(Tushare_News_sina[19,"内容"]))`
+
+`r Tushare_News_sina[20,"时间"]`：`r str_sub(Tushare_News_sina[20,"内容"],1,str_length(Tushare_News_sina[20,"内容"]))`
+
+
+### 东方财富
+
+
+```{r}
+Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_eastmoney WHERE 内容 LIKE '%涨价%' order by 时间 desc ")
+```
+
+
+`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+
+
+`r Tushare_News_eastmoney[2,"时间"]`：`r str_sub(Tushare_News_eastmoney[2,"内容"],1,str_length(Tushare_News_eastmoney[2,"内容"]))`
+
+
+`r Tushare_News_eastmoney[3,"时间"]`：`r str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))`
+
+
+
+
+
+
+`r Tushare_News_eastmoney[4,"时间"]`：`r str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))`
+
+`r Tushare_News_eastmoney[5,"时间"]`：`r str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))`
+
+`r Tushare_News_eastmoney[6,"时间"]`：`r str_sub(Tushare_News_eastmoney[6,"内容"],1,str_length(Tushare_News_eastmoney[6,"内容"]))`
+
+`r Tushare_News_eastmoney[7,"时间"]`：`r str_sub(Tushare_News_eastmoney[7,"内容"],1,str_length(Tushare_News_eastmoney[7,"内容"]))`
+
+`r Tushare_News_eastmoney[8,"时间"]`：`r str_sub(Tushare_News_eastmoney[8,"内容"],1,str_length(Tushare_News_eastmoney[8,"内容"]))`
+
+`r Tushare_News_eastmoney[9,"时间"]`：`r str_sub(Tushare_News_eastmoney[9,"内容"],1,str_length(Tushare_News_eastmoney[9,"内容"]))`
+
+`r Tushare_News_eastmoney[10,"时间"]`：`r str_sub(Tushare_News_eastmoney[10,"内容"],1,str_length(Tushare_News_eastmoney[10,"内容"]))`
+
+`r Tushare_News_eastmoney[11,"时间"]`：`r str_sub(Tushare_News_eastmoney[11,"内容"],1,str_length(Tushare_News_eastmoney[11,"内容"]))`
+
+`r Tushare_News_eastmoney[12,"时间"]`：`r str_sub(Tushare_News_eastmoney[12,"内容"],1,str_length(Tushare_News_eastmoney[12,"内容"]))`
+
+`r Tushare_News_eastmoney[13,"时间"]`：`r str_sub(Tushare_News_eastmoney[13,"内容"],1,str_length(Tushare_News_eastmoney[13,"内容"]))`
+
+`r Tushare_News_eastmoney[14,"时间"]`：`r str_sub(Tushare_News_eastmoney[14,"内容"],1,str_length(Tushare_News_eastmoney[14,"内容"]))`
+
+`r Tushare_News_eastmoney[15,"时间"]`：`r str_sub(Tushare_News_eastmoney[15,"内容"],1,str_length(Tushare_News_eastmoney[15,"内容"]))`
+
+`r Tushare_News_eastmoney[16,"时间"]`：`r str_sub(Tushare_News_eastmoney[16,"内容"],1,str_length(Tushare_News_eastmoney[16,"内容"]))`
+
+`r Tushare_News_eastmoney[17,"时间"]`：`r str_sub(Tushare_News_eastmoney[17,"内容"],1,str_length(Tushare_News_eastmoney[17,"内容"]))`
+
+`r Tushare_News_eastmoney[18,"时间"]`：`r str_sub(Tushare_News_eastmoney[18,"内容"],1,str_length(Tushare_News_eastmoney[18,"内容"]))`
+
+`r Tushare_News_eastmoney[19,"时间"]`：`r str_sub(Tushare_News_eastmoney[19,"内容"],1,str_length(Tushare_News_eastmoney[19,"内容"]))`
+
+`r Tushare_News_eastmoney[20,"时间"]`：`r str_sub(Tushare_News_eastmoney[20,"内容"],1,str_length(Tushare_News_eastmoney[20,"内容"]))`
+
+
+# 公司概况
+
+
+
+
+## 基本信息
+
+
+
+
+```{r include=FALSE}
+QueryCondition<-paste("select * from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
+ifind_firm_basic_information<-dbGetQuery(con,QueryCondition)
+colnames(ifind_firm_basic_information)
+
+```
+
+**公司中文名称：**`r ifind_firm_basic_information$公司中文名称`
+
+**证券名称：**`r ifind_firm_basic_information$证券名称`
+
+**证券代码：**`r ifind_firm_basic_information$证券代码`
+
+**首发上市日期：**`r ifind_firm_basic_information$首发上市日期`
+
+**上市板块：**`r ifind_firm_basic_information$上市板块`
+
+**注册资本单位元：**`r ifind_firm_basic_information$注册资本单位元`
+
+**企业性质：**`r ifind_firm_basic_information$企业性质`
+
+**企业类型：**`r ifind_firm_basic_information$企业类型`
+
+**法人代表：**`r ifind_firm_basic_information$法人代表`
+
+**省份：**`r ifind_firm_basic_information$省份`，**地级市：**`r ifind_firm_basic_information$地级市`，**县级市：**`r ifind_firm_basic_information$县级市`
+
+**公司网站：**`r ifind_firm_basic_information$公司网站`
+
+**控股股东(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$控股股东截止日期最新`
+
+**控股股东持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$ 控股股东持股比例截止日期最新单位`
+
+**实际控制人(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人截止日期最新`
+
+**实际控制人持股比例(截止:`r ifind_firm_basic_information$截止日期`,最新单位:%)：**`r ifind_firm_basic_information$  实际控制人持股比例截止日期最新单位`
+
+**实际控制人类型(截止:`r ifind_firm_basic_information$截止日期`)：**`r ifind_firm_basic_information$实际控制人类型截止日期最新`
+
+## 近期消息
+
+###  新浪财经
+
+```{r}
+Tushare_News_sina_Query<-paste("select 时间,内容 from  Tushare_News_sina WHERE 内容 LIKE '%",Firm_abbreviation,"%' order by 时间 desc limit 10",sep="")
+
+Tushare_News_sina<-dbGetQuery(con,Tushare_News_sina_Query)
+```
+
+
+
+`r Tushare_News_sina[1,"时间"]`：`r str_sub(Tushare_News_sina[1,"内容"],1,str_length(Tushare_News_sina[1,"内容"]))`
+
+
+`r Tushare_News_sina[2,"时间"]`：`r str_sub(Tushare_News_sina[2,"内容"],1,str_length(Tushare_News_sina[2,"内容"]))`
+
+
+`r Tushare_News_sina[3,"时间"]`：`r str_sub(Tushare_News_sina[3,"内容"],1,str_length(Tushare_News_sina[3,"内容"]))`
+
+
+`r Tushare_News_sina[4,"时间"]`：`r str_sub(Tushare_News_sina[4,"内容"],1,str_length(Tushare_News_sina[4,"内容"]))`
+
+`r Tushare_News_sina[5,"时间"]`：`r str_sub(Tushare_News_sina[5,"内容"],1,str_length(Tushare_News_sina[5,"内容"]))`
+
+
+### 东方财富网
+
+
+
+```{r}
+Tushare_News_eastmoney_Query<-paste("select 时间,内容 from  Tushare_News_eastmoney WHERE 内容 LIKE '%",Firm_abbreviation,"%' order by 时间 desc limit 10",sep="")
+
+Tushare_News_eastmoney<-dbGetQuery(con,Tushare_News_eastmoney_Query)
+Tushare_News_eastmoney<-Tushare_News_eastmoney[!duplicated(Tushare_News_eastmoney$时间),]
+# Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_eastmoney WHERE 内容 LIKE '%收盘播报%' order by 时间 desc ")
+```
+
+
+
+`r Tushare_News_eastmoney[1,"时间"]`：`r str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))`
+
+
+`r if (!is.na(Tushare_News_eastmoney[1,"内容"])){
+  paste("",Tushare_News_eastmoney[1,"时间"],"：",sep="")}` `r if (!is.na(Tushare_News_eastmoney[1,"内容"])){
+    str_sub(Tushare_News_eastmoney[1,"内容"],1,str_length(Tushare_News_eastmoney[1,"内容"]))
+  }`
+
+
+`r if (!is.na(Tushare_News_eastmoney[3,"内容"])){
+  paste("",Tushare_News_eastmoney[3,"时间"],"：",sep="")}` `r if (!is.na(Tushare_News_eastmoney[3,"内容"])){
+    str_sub(Tushare_News_eastmoney[3,"内容"],1,str_length(Tushare_News_eastmoney[3,"内容"]))
+  }`
+
+`r if (!is.na(Tushare_News_eastmoney[4,"内容"])){
+  paste("",Tushare_News_eastmoney[4,"时间"],"：",sep="")}` `r if (!is.na(Tushare_News_eastmoney[4,"内容"])){
+    str_sub(Tushare_News_eastmoney[4,"内容"],1,str_length(Tushare_News_eastmoney[4,"内容"]))
+  }`
+
+`r if (!is.na(Tushare_News_eastmoney[5,"内容"])){
+  paste("",Tushare_News_eastmoney[5,"时间"],"：",sep="")}` `r if (!is.na(Tushare_News_eastmoney[5,"内容"])){
+    str_sub(Tushare_News_eastmoney[5,"内容"],1,str_length(Tushare_News_eastmoney[5,"内容"]))
+  }`
+
+
+## 近一年市场表现
+
+
+
+
+```{r echo=FALSE, fig.align="center", fig.cap="近一年股票价格走势", fig.height=6, fig.width=10, message=FALSE, warning=FALSE, , fig.showtext=TRUE, paged.print=FALSE}
+library(reshape2)
+library(openxlsx)
+library(ggplot2)
+library(magrittr)
+library(showtextdb)
+library(sysfonts)
+library(showtext)
+left_title<-paste(ifind_firm_basic_information$公司中文名称,"(红色)",sep="")
+# table_title<-paste("近一年股票价格走势:",ifind_firm_basic_information$公司中文名称,sep="")
+# table_title<-paste(table_title,"VS沪深3000指数",sep="")
+#账号登录
+font_add("sim", "SourceHanSerifCN-Regular.otf")
+pacman::p_load(httr, readr, rjson,tidyverse,reshape2,openxlsx,ggplot2,
+               magrittr,showtextdb,sysfonts,showtext,xts,reticulate,
+               RODBC,RMySQL)
+setwd("E:/Mirror/聚宽数据研究/聚宽账号")
+source("JKData18673110818.r")#18673110818
+#request('get_query_count',list=T)
+if (str_sub(Firm_code,1,1)=="3"|str_sub(Firm_code,1,1)=="0"){
+  Firm_code1<-paste(Firm_code,".XSHE",sep="")
+}else{
+  Firm_code1<-paste(Firm_code,".XSHG",sep="")
+}
+
+#股票数据
+Firm_stock_price<- request('get_price',code=Firm_code1,count=360,unit='1d',end_date=Sys.Date())[,c("date","close")]
+colnames(Firm_stock_price)<-c("date","Firm_stock_price")
+
+#指数数据
+Index_price<- request('get_price',code='000300.XSHG',count=360,unit='1d',end_date=Sys.Date())[,c("date","close")]
+colnames(Index_price)<-c("date","Index_price")
+
+#数据合并
+Firm_stock_price_Index_price<-merge(Firm_stock_price,Index_price,by="date")
+
+#股票数据
+
+Firm_stock_price_ceiling<-ceiling(range(Firm_stock_price_Index_price$Firm_stock_price)[2])
+Firm_stock_price_floor<-floor(range(Firm_stock_price_Index_price$Firm_stock_price)[1])
+Firm_stock_price_interval<-(Firm_stock_price_ceiling-Firm_stock_price_floor)/10
+
+#指数数据
+Index_ceiling<-ceiling(range(Firm_stock_price_Index_price$Index_price)[2])
+Index_floor<-floor(range(Firm_stock_price_Index_price$Index_price)[1])
+Index_interval<-(Index_ceiling-Index_floor)/10
+
+#乘子
+multiplicator<-Index_ceiling/Firm_stock_price_ceiling
+
+
+ggplot()+
+  geom_line(data=Firm_stock_price_Index_price,aes(x=date,y=Firm_stock_price),stat="identity",size=0.5,color="red")+
+  geom_line(data=Firm_stock_price_Index_price,aes(x=date,y=Index_price/multiplicator),size=0.5,color="blue")+
+  scale_y_continuous(limits = c(Firm_stock_price_floor, Firm_stock_price_ceiling),
+                     breaks = c(seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval)),
+                     label=seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval),
+                     sec.axis=sec_axis(~./0.99,name="沪深300指数(蓝色)",
+                                       breaks =c(seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval)),
+                                       label=seq(round(Index_floor,2),Index_ceiling,Index_interval)))+
+  #设置X轴的标签
+  scale_x_date(limits = c(Firm_stock_price$date[1],Sys.Date()),date_labels = "%Y-%m-%d",date_breaks = "6 week")+
+
+  labs(x = "日期", y = left_title,title ="",fill="")+
+  theme_test()+
+  theme(
+    text=element_text(size=8,color="black",family="sim"),
+    plot.title=element_text(size=8,hjust=.5,color="black"),
+    #修改图例格式
+    legend.box.background = element_rect(color=NA),
+    legend.title=element_blank(),
+    legend.position = "bottom",
+    legend.box = "horizontal")
+```
