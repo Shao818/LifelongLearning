@@ -230,6 +230,9 @@ Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_
 
 
 
+[^1]: <div class="sidebarLine">
+  <a href="http://finance.sina.com.cn/realstock/company/sz002171/nc.shtml" target="_blank">
+  <img src="http://image.sinajs.cn/newchart/min/n/sh600340.gif" alt="美丰股票" height="300" width="400"></a></div>
 
 ```{r include=FALSE}
 QueryCondition<-paste("select * from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
@@ -238,7 +241,7 @@ colnames(ifind_firm_basic_information)
 
 ```
 
-　　**公司中文名称：**`r ifind_firm_basic_information$公司中文名称`
+　　**公司中文名称：**`r ifind_firm_basic_information$公司中文名称`[^1]
 
 　　**证券名称：**`r ifind_firm_basic_information$证券名称`
 
