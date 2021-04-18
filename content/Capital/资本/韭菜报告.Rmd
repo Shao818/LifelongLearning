@@ -6,13 +6,14 @@ date: 2021-04-18
 categories:
   - 资本市场
   - 公司
-  - 强力新材
+  - 楚江新材
 tags:
   - 资本市场
   - 公司
-  - 强力新材
+  - 楚江新材
 slug: firm-report
-weight: 00001
+weight: 0002
+description: 动态韭菜研究。
 ---
 <font face="思源宋体 CN" >
 
@@ -22,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"楚江新材"
+Firm_code<-"600093"
 ```
 
 ```{r include=FALSE}
