@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"600093"
+Firm_code<-"楚江新材"
 ```
 
 ```{r include=FALSE}
@@ -233,7 +233,7 @@ Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_
 
 [^1]: <div class="sidebarLine">
   <a href="http://finance.sina.com.cn/realstock/company/sz002171/nc.shtml" target="_blank">
-  <img src="http://image.sinajs.cn/newchart/min/n/sh600340.gif" alt="美丰股票" height="300" width="400"></a></div>
+  <img src="http://image.sinajs.cn/newchart/min/n/sz002171.gif" alt="美丰股票" height="300" width="400"></a></div>
 
 ```{r include=FALSE}
 QueryCondition<-paste("select * from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
@@ -464,7 +464,7 @@ tushare_firm_main_business_composition_table[,3:5]<-
 x_html <- knitr:: kable(tushare_firm_main_business_composition_table[1:20,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
                           full_width = FALSE,
-                          font_size = 10)
+                          font_size = 15)
 ```
 # 财务分析
 
@@ -518,7 +518,7 @@ Profitability_table<-tushare_firm_finance_index%>%
 x_html <- knitr:: kable(Profitability_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
                           full_width = FALSE,
-                          font_size = 6)
+                          font_size = 15)
 ```
 
 ### 成长能力
@@ -547,7 +547,7 @@ Growth_table<-tushare_firm_finance_index%>%
 
 x_html <- knitr:: kable(Growth_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
-                          full_width =FALSE,
+                          full_width =TRUE,
                           font_size =5)
 ```
 
@@ -577,7 +577,7 @@ Operation_table<-tushare_firm_finance_index%>%
 x_html <- knitr:: kable(Operation_table[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
                           full_width = FALSE,
-                          font_size = 6)
+                          font_size = 15)
 ```
 
 ### 偿债能力
@@ -605,8 +605,8 @@ pay_debt<-tushare_firm_finance_index%>%
   distinct(报告期,.keep_all = TRUE)
 x_html <- knitr:: kable(pay_debt[1:12,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
-                          full_width =FALSE,
-                          font_size = 6)
+                          full_width =TRUE,
+                          font_size = 15)
 ```
 
 ## 杜邦分析
@@ -627,8 +627,8 @@ DuPont_analysis_table<-tushare_firm_finance_index%>%
 DuPont_analysis_table<-DuPont_analysis_table[!duplicated(DuPont_analysis_table),]
 x_html <- knitr:: kable(DuPont_analysis_table[1:20,], format = "html",caption =table_title ,align='c',row.names = FALSE)
 kableExtra::kable_styling(x_html,bootstrap_options = "striped",
-                          full_width =FALSE,
-                          font_size = 6)
+                          full_width =TRUE,
+                          font_size = 15)
 ```
 
 </font>
