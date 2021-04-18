@@ -1,0 +1,272 @@
+---
+author:
+  - 韭菜
+title: '加入控制变量后结果悲催了！'
+categories:
+  - R
+  - Stata
+  - 控制变量
+tags:
+  - R
+  - Stata
+  - 控制变量
+date: 2021-04-18
+slug: RStata
+weight: 001
+description: <font face="思源宋体 CN" >在大家做实证分析的最初阶段，经常会有一个困扰：原本主效应很符合预期目标，但加入了一个或几个控制变量后，主效应要么符号变了，要么不显著了。可是，关键控制变量不加入的话，审稿人必然会提出质疑。这是怎么回事了？ 要回答这个问题，让我们先从条件期望说起。</font>
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p><font face="思源宋体 CN" ></p>
+<div id="背景" class="section level1">
+<h1>背景</h1>
+<div id="问题的引入" class="section level2">
+<h2>问题的引入</h2>
+<p>　　两小儿辩车</p>
+<blockquote>
+<p>王小儿：我发现车越长越贵，比如，奥迪 A6L 就比 A4L 贵多了；</p>
+</blockquote>
+<blockquote>
+<p>李小儿：那也未必，奥迪 R8 只有 4 米 4，但可以买两辆 A6L了。 还有，我二爸开的那个公交车，12 米，才 30 万！</p>
+</blockquote>
+<p>　　为什么车长与价格之间的关系并不“固定”？也就是说，如果用价格对车长回归，那么 R8，A6L，公交车会有显著的差异。</p>
+<p>　　在大家做实证分析的最初阶段，经常会有一个困扰：原本主效应很符合预期目标，但加入了一个或几个控制变量后，主效应要么符号变了，要么不显著了。可是，关键控制变量不加入的话，审稿人必然会提出质疑。这是怎么回事了？ 要回答这个问题，让我们先从条件期望说起。</p>
+</div>
+<div id="什么是条件期望" class="section level2">
+<h2>什么是条件期望</h2>
+<ul>
+<li><strong>教育与收入的关系</strong></li>
+</ul>
+<p>　　春节临近，如何应对亲戚的“问候杀”，是一个亟待解决的现实问题。试想，举国欢庆的日子，大家齐坐一堂，面对读硕读博归家的你，七大姑问到：“大闺女，老大不小了，该干点正事谈个对象什么的呢，读那么多书干嘛呀”，你咽了咽口水“读书好啊，以后可以多挣钱孝敬您老人家”，话音未落，八大姑道：“哎呀瞎说，你看隔壁二狗子，高中没读完去做生意，现在赚老多钱了”….气氛顿时尴尬了，除了咽口水外，该怎么“杠”回去…</p>
+<p>　　那就要了解条件期望的概念了：条件期望函数记为<span class="math inline">\(E(Y_{i}|X_{i})\)</span> ，是关于<span class="math inline">\(X_{i})\)</span>的函数，考虑到 是随机的，所以条件期望函数也是随机的。比如给定<span class="math inline">\(X\)</span>为受教育水平的一个定值，如<span class="math inline">\(X=12\)</span>，那么 就是表示所有读 12 年书的个体，其收入水平的期望值。</p>
+<ul>
+<li><strong>用图说明</strong></li>
+</ul>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418191321.png" /></p>
+<p>　　图中，横轴表示受教育水平，纵轴则为收入，在每一个给定的受教育水平下（如：受教育年限 12 年），收入服从一个近似正态的随机分布。可以看到，由于存在着无法忽视的个体差异，使得某些低教育者的收入要高于某些高教育者的收入，但通常而言，教育水平高的人赚的更多。</p>
+<p>　　看到这里，学习过初级计量经济学的同学肯定会想到，对，是“个人能力”的影响，是“个人能力”让二狗子和大闺女产生了收入的差异。确实如此，那么“个人能力”便是一个需要控制的重要变量。</p>
+</div>
+</div>
+<div id="stata" class="section level1">
+<h1>Stata</h1>
+<div id="回到原例" class="section level2">
+<h2>回到原例</h2>
+<p>　　让我们回到“小儿辩车”的引子。调入官方自带的汽车数据，研究汽车长度 <strong>length</strong> 对汽车价格 <strong>price</strong> 的影响。在多元回归中，加入的控制变量分别为里程数 <strong>mpg</strong> 和汽车重量 <strong>weight</strong></p>
+<p>　　利用外部命令 <code>reganat</code> (Filoso, <a href="https://www.lianxh.cn/news/(https://journals.sagepub.com/doi/pdf/10.1177/1536867X1301300107)">2013</a>) 或 <code>reganat2</code> 对多元回归模型的系数进行图示：</p>
+<pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
+sysuse &quot;auto.dta&quot;, clear
+cap eststo clear
+eststo: reg price length
+eststo: reg price length mpg weight
+esttab, nogap 
+reganat price length mpg weight, dis(length) biscat biline scheme(s2color)
+graph export &quot;boxplot.png&quot;, replace</code></pre>
+<pre><code>## 
+## 
+## . sysdir set PLUS &quot;D:\soft\stata\ado\pl. sysuse &quot;auto.dta&quot;, clear
+## (1978 Automobile Data)
+## 
+## . cap eststo clear
+## 
+## . eststo: reg price length
+## 
+##       Source |       SS           df       MS      Number of obs   =        74
+## -------------+----------------------------------   F(1, 72)        =     16.50
+##        Model |   118425867         1   118425867   Prob &gt; F        =    0.0001
+##     Residual |   516639529        72  7175549.01   R-squared       =    0.1865
+## -------------+----------------------------------   Adj R-squared   =    0.1752
+##        Total |   635065396        73  8699525.97   Root MSE        =    2678.7
+## 
+## ------------------------------------------------------------------------------
+##        price |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+## -------------+----------------------------------------------------------------
+##       length |   57.20224   14.08047     4.06   0.000     29.13332    85.27115
+##        _cons |  -4584.899   2664.437    -1.72   0.090    -9896.357     726.559
+## ------------------------------------------------------------------------------
+## (est1 stored)
+## 
+## . eststo: reg price length mpg weight
+## 
+##       Source |       SS           df       MS      Number of obs   =        74
+## -------------+----------------------------------   F(3, 70)        =     12.98
+##        Model |   226957412         3  75652470.6   Prob &gt; F        =    0.0000
+##     Residual |   408107984        70  5830114.06   R-squared       =    0.3574
+## -------------+----------------------------------   Adj R-squared   =    0.3298
+##        Total |   635065396        73  8699525.97   Root MSE        =    2414.6
+## 
+## ------------------------------------------------------------------------------
+##        price |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+## -------------+----------------------------------------------------------------
+##       length |  -104.8682   39.72154    -2.64   0.010    -184.0903   -25.64607
+##          mpg |  -86.78928   83.94335    -1.03   0.305     -254.209    80.63046
+##       weight |   4.364798   1.167455     3.74   0.000     2.036383    6.693213
+##        _cons |   14542.43   5890.632     2.47   0.016      2793.94    26290.93
+## ------------------------------------------------------------------------------
+## (est2 stored)
+## 
+## . esttab, nogap 
+## 
+## --------------------------------------------
+##                       (1)             (2)   
+##                     price           price   
+## --------------------------------------------
+## length              57.20***       -104.9*  
+##                    (4.06)         (-2.64)   
+## mpg                                -86.79   
+##                                   (-1.03)   
+## weight                              4.365***
+##                                    (3.74)   
+## _cons             -4584.9         14542.4*  
+##                   (-1.72)          (2.47)   
+## --------------------------------------------
+## N                      74              74   
+## --------------------------------------------
+## t statistics in parentheses
+## * p&lt;0.05, ** p&lt;0.01, *** p&lt;0.001
+## 
+## . reganat price length mpg weight, dis(length) biscat biline scheme(s2color)
+## Dependent variable: price
+## Independent variables: length mpg weight
+## Plotting: length
+## 
+## . graph export &quot;boxplot.png&quot;, replace
+## (file boxplot.png written in PNG format)</code></pre>
+<pre class="r"><code>library(sketcher)
+im = im_load(&quot;boxplot.png&quot;)
+plot(im)</code></pre>
+<p><img src="/R/加入控制变量后结果悲催了！_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>　　对比 length 的系数可见，在一元回归时该系数显著为正（57.2），而加入控制变量后，系数为负（-104.9）并在 10% 的水平下显著。</p>
+<p>　　原因分析若真实的回归模型为</p>
+<p><span class="math display">\[ Y_{i}=\alpha_{1}+\beta_{1}x_{1}+\beta_{2}x_{2}+\xi_{1} \tag{1}\]</span></p>
+<p><span class="math display">\[ Y_{i}=\alpha_{2}+\theta_{1}x_{1}+\xi_{2} \tag{2}\]</span>
+　　此时的<span class="math inline">\(\xi_{2}=\beta_{2}x_{2}+\xi_{1}\)</span>，若<span class="math inline">\(x_{1}\)</span>与<span class="math inline">\(x_{2}\)</span>相关，<span class="math inline">\(corr(x_{1},\xi_{2} \neq 0)\)</span>，出现了内生性问题。若<span class="math inline">\(x_{1}\)</span>与<span class="math inline">\(x_{2}\)</span>无关，是否加入<span class="math inline">\(x_{2}\)</span>并不影响<span class="math inline">\(x_{1}\)</span>的系数。</p>
+</div>
+<div id="通过实例演示" class="section level2">
+<h2>通过实例演示</h2>
+<p>　　先进行正常的多元回归，加入主效应变量 length 和控制变量 mpg weight</p>
+<p>　　接着，我们利用解构回归（regression anatomy）（参考《基本无害的计量经济学》）来“解读”正常的多元回归：<br />
+　　
+- 1.先用 length 对控制变量 mpg weight 进行回归，然后可以得到一个残差项。
+-2. 再用被解释变量对上一步的残差项进行回归。</p>
+<pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
+sysuse auto.dta, clear
+reg price length mpg weight
+est store m1
+reg length mpg weight
+predict e, res
+reg price e
+est store m2
+esttab m1 m2 , nogap  </code></pre>
+<pre><code>## 
+## 
+## . sysdir set PLUS &quot;D:\soft\stata\ado\pl. sysuse auto.dta, clear
+## (1978 Automobile Data)
+## 
+## . reg price length mpg weight
+## 
+##       Source |       SS           df       MS      Number of obs   =        74
+## -------------+----------------------------------   F(3, 70)        =     12.98
+##        Model |   226957412         3  75652470.6   Prob &gt; F        =    0.0000
+##     Residual |   408107984        70  5830114.06   R-squared       =    0.3574
+## -------------+----------------------------------   Adj R-squared   =    0.3298
+##        Total |   635065396        73  8699525.97   Root MSE        =    2414.6
+## 
+## ------------------------------------------------------------------------------
+##        price |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+## -------------+----------------------------------------------------------------
+##       length |  -104.8682   39.72154    -2.64   0.010    -184.0903   -25.64607
+##          mpg |  -86.78928   83.94335    -1.03   0.305     -254.209    80.63046
+##       weight |   4.364798   1.167455     3.74   0.000     2.036383    6.693213
+##        _cons |   14542.43   5890.632     2.47   0.016      2793.94    26290.93
+## ------------------------------------------------------------------------------
+## 
+## . est store m1
+## 
+## . reg length mpg weight
+## 
+##       Source |       SS           df       MS      Number of obs   =        74
+## -------------+----------------------------------   F(2, 71)        =    312.22
+##        Model |  32497.5726         2  16248.7863   Prob &gt; F        =    0.0000
+##     Residual |  3695.08956        71  52.0435149   R-squared       =    0.8979
+## -------------+----------------------------------   Adj R-squared   =    0.8950
+##        Total |  36192.6622        73  495.789893   Root MSE        =    7.2141
+## 
+## ------------------------------------------------------------------------------
+##       length |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+## -------------+----------------------------------------------------------------
+##          mpg |  -.3554659   .2472287    -1.44   0.155    -.8484259     .137494
+##       weight |    .024967   .0018404    13.57   0.000     .0212973    .0286366
+##        _cons |   120.1162    10.3219    11.64   0.000     99.53492    140.6975
+## ------------------------------------------------------------------------------
+## 
+## . predict e, res
+## 
+## . reg price e
+## 
+##       Source |       SS           df       MS      Number of obs   =        74
+## -------------+----------------------------------   F(1, 72)        =      4.92
+##        Model |  40636131.6         1  40636131.6   Prob &gt; F        =    0.0297
+##     Residual |   594429265        72  8255962.01   R-squared       =    0.0640
+## -------------+----------------------------------   Adj R-squared   =    0.0510
+##        Total |   635065396        73  8699525.97   Root MSE        =    2873.3
+## 
+## ------------------------------------------------------------------------------
+##        price |      Coef.   Std. Err.      t    P&gt;|t|     [95% Conf. Interval]
+## -------------+----------------------------------------------------------------
+##            e |  -104.8682   47.26845    -2.22   0.030    -199.0961   -10.64024
+##        _cons |   6165.257   334.0165    18.46   0.000     5499.407    6831.107
+## ------------------------------------------------------------------------------
+## 
+## . est store m2
+## 
+## . esttab m1 m2 , nogap  
+## 
+## --------------------------------------------
+##                       (1)             (2)   
+##                     price           price   
+## --------------------------------------------
+## length             -104.9*                  
+##                   (-2.64)                   
+## mpg                -86.79                   
+##                   (-1.03)                   
+## weight              4.365***                
+##                    (3.74)                   
+## e                                  -104.9*  
+##                                   (-2.22)   
+## _cons             14542.4*         6165.3***
+##                    (2.47)         (18.46)   
+## --------------------------------------------
+## N                      74              74   
+## --------------------------------------------
+## t statistics in parentheses
+## * p&lt;0.05, ** p&lt;0.01, *** p&lt;0.001</code></pre>
+<p>　　可以看到，最后得到的主效应估计结果一致，均为 -104.9 。在用 length 对控制变量 mpg weight 回归后得到的残差项，表示 length 剔除了其他解释变量对自己的影响的“结果”，将其再与被解释变量的回归就是一个“净”的效应。</p>
+</div>
+</div>
+<div id="总结" class="section level1">
+<h1>总结</h1>
+<p>　　可见，加入控制变量后，我们关心的估计系数是否会产生变化，取决于与控制变量之间的独立性。</p>
+<p>　　我们列出将会出现的四种情形</p>
+<ul>
+<li>与控制变量之间完全独立，则加入控制变量对估计系数无影响（情形 1）</li>
+</ul>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418200853.png" /></p>
+<ul>
+<li>与控制变量之间相关，且完全通过控制变量的“途径”来影响被解释变量，则估计系数不显著（情形 2）</li>
+</ul>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418200914.png" /></p>
+<ul>
+<li>与控制变量之间高度相关，则加入控制变量后，估计系数都不显著（情形 3）</li>
+</ul>
+<center>
+<img src="https://gitee.com/shao818/Figure/raw/master/20210418200935.png" />
+</center>
+<ul>
+<li>与控制变量之间相关，则加入控制变量后，主要解释变量的估计系数会出现大小和符号变化。具体变化取决于与控制变量间的正负相关性。（情形4）</li>
+</ul>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418200951.png" /></p>
+<p>　　若需进一步分析各个解释变量的相对重要性，可以参考 <a href="https://www.lianxh.cn/news/845b935d8d599.html">「R2分解：相对重要性分析 (Dominance Analysis)」</a> (<a href="https://mp.weixin.qq.com/s/WeHdsaO4nFjC-l0A6a1d8Q">微信版</a>)，以及<a href="https://www.lianxh.cn/news/02622336fe183.html">「连玉君-如何比较解释变量的系数相对大小？」</a>。</p>
+<p></font></p>
+</div>

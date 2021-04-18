@@ -44,7 +44,7 @@ menu:
 
 params:
   homePosts: 10
-  mainSections: ["Capital"]
+  mainSections: ["Capital","R"]
   editLink: "https://github.com/pzhaonet/msg2020/edit/master/content/"
 #  editLink: "https://github.com/yihui/hugo-prose/edit/master/exampleSite/content/"
   authorDelimiter: " / "
