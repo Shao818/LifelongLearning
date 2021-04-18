@@ -26,6 +26,11 @@ menu:
       identifier: menu-search
     - name: 订阅
       url: "index.xml"
+    - name: 分类
+      url: "/categories/"
+    - name: 标签
+      url: "/tags/"
+
   footer:
 #    - name: 联系
 #      url: "/404.html"
