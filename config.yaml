@@ -3,7 +3,7 @@ baseurl: "https://lifelonglearn.netlify.app/"
 languageCode: "zh-cn"
 # defaultContentLanguage: "en"
 defaultContentLanguage: "zh"
-title: "现代统计图形"
+title: "终身学习"
 theme: "hugo-prose"
 publishdir: "docs"
 googleAnalytics: "UA-192936648-1"
@@ -26,6 +26,11 @@ menu:
       identifier: menu-search
     - name: 订阅
       url: "index.xml"
+    - name: 类别
+      url: "/categories/"
+      weight: 2
+    - name: 标签
+      url: "/tags/"
   footer:
 #    - name: 联系
 #      url: "/404.html"
