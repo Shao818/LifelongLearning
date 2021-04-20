@@ -153,10 +153,11 @@ plot(im)</code></pre>
 <div id="通过实例演示" class="section level2">
 <h2>通过实例演示</h2>
 <p>　　先进行正常的多元回归，加入主效应变量 length 和控制变量 mpg weight</p>
-<p>　　接着，我们利用解构回归（regression anatomy）（参考《基本无害的计量经济学》）来“解读”正常的多元回归：<br />
-　　
-- 1.先用 length 对控制变量 mpg weight 进行回归，然后可以得到一个残差项。
--2. 再用被解释变量对上一步的残差项进行回归。</p>
+<p>　　接着，我们利用解构回归（regression anatomy）（参考《基本无害的计量经济学》）来“解读”正常的多元回归：</p>
+<ul>
+<li><p>1.先用 length 对控制变量 mpg weight 进行回归，然后可以得到一个残差项。</p></li>
+<li><p>2.再用被解释变量对上一步的残差项进行回归。</p></li>
+</ul>
 <pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
 sysuse auto.dta, clear
 reg price length mpg weight

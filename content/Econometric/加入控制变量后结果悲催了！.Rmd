@@ -98,10 +98,14 @@ $$ Y_{i}=\alpha_{2}+\theta_{1}x_{1}+\xi_{2} \tag{2}$$
 　　先进行正常的多元回归，加入主效应变量 length 和控制变量 mpg weight
 
 
-　　接着，我们利用解构回归（regression anatomy）（参考《基本无害的计量经济学》）来"解读"正常的多元回归：  
-　　
-- 1.先用 length 对控制变量 mpg weight 进行回归，然后可以得到一个残差项。
--2. 再用被解释变量对上一步的残差项进行回归。
+　　接着，我们利用解构回归（regression anatomy）（参考《基本无害的计量经济学》）来"解读"正常的多元回归：     
+
+
+
+
+- 1.先用 length 对控制变量 mpg weight 进行回归，然后可以得到一个残差项。  
+
+- 2.再用被解释变量对上一步的残差项进行回归。
 
 
 ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
