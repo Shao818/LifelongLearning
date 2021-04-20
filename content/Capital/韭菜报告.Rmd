@@ -53,7 +53,7 @@ Firm_abbreviation <-dbGetQuery(con,QueryCondition)
 ```
 
 # 市场概况
-##  一周收盘播报
+
 
 ### 新浪财经
 
