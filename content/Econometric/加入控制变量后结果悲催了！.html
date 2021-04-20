@@ -40,11 +40,18 @@ description: <font face="思源宋体 CN" >在大家做实证分析的最初阶�
 <li><strong>教育与收入的关系</strong></li>
 </ul>
 <p>　　春节临近，如何应对亲戚的“问候杀”，是一个亟待解决的现实问题。试想，举国欢庆的日子，大家齐坐一堂，面对读硕读博归家的你，七大姑问到：“大闺女，老大不小了，该干点正事谈个对象什么的呢，读那么多书干嘛呀”，你咽了咽口水“读书好啊，以后可以多挣钱孝敬您老人家”，话音未落，八大姑道：“哎呀瞎说，你看隔壁二狗子，高中没读完去做生意，现在赚老多钱了”….气氛顿时尴尬了，除了咽口水外，该怎么“杠”回去…</p>
-<p>　　那就要了解条件期望的概念了：条件期望函数记为<span class="math inline">\(E(Y_{i}|X_{i})\)</span> ，是关于<span class="math inline">\(X_{i})\)</span>的函数，考虑到 是随机的，所以条件期望函数也是随机的。比如给定<span class="math inline">\(X\)</span>为受教育水平的一个定值，如<span class="math inline">\(X=12\)</span>，那么 就是表示所有读 12 年书的个体，其收入水平的期望值。</p>
+<p>　　那就要了解条件期望的概念了：条件期望函数记为<span class="math inline">\(E(Y_{i}|X_{i})\)</span> ，是关于<span class="math inline">\(X_{i}\)</span>的函数，考虑到 是随机的，所以条件期望函数也是随机的。比如给定<span class="math inline">\(X\)</span>为受教育水平的一个定值，如<span class="math inline">\(X=12\)</span>，那么 就是表示所有读 12 年书的个体，其收入水平的期望值。</p>
 <ul>
 <li><strong>用图说明</strong></li>
 </ul>
-<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418191321.png" /></p>
+<center>
+<div class="quote-right">
+<div class="figure">
+<img src="https://gitee.com/shao818/Figure/raw/master/20210418191321.png" alt="" />
+<p class="caption">图1</p>
+</div>
+</div>
+</center>
 <p>　　图中，横轴表示受教育水平，纵轴则为收入，在每一个给定的受教育水平下（如：受教育年限 12 年），收入服从一个近似正态的随机分布。可以看到，由于存在着无法忽视的个体差异，使得某些低教育者的收入要高于某些高教育者的收入，但通常而言，教育水平高的人赚的更多。</p>
 <p>　　看到这里，学习过初级计量经济学的同学肯定会想到，对，是“个人能力”的影响，是“个人能力”让二狗子和大闺女产生了收入的差异。确实如此，那么“个人能力”便是一个需要控制的重要变量。</p>
 </div>
@@ -260,9 +267,7 @@ esttab m1 m2 , nogap  </code></pre>
 <ul>
 <li>与控制变量之间高度相关，则加入控制变量后，估计系数都不显著（情形 3）</li>
 </ul>
-<center>
-<img src="https://gitee.com/shao818/Figure/raw/master/20210418200935.png" />
-</center>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210418200935.png" /></p>
 <ul>
 <li>与控制变量之间相关，则加入控制变量后，主要解释变量的估计系数会出现大小和符号变化。具体变化取决于与控制变量间的正负相关性。（情形4）</li>
 </ul>
