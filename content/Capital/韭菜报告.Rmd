@@ -1,7 +1,7 @@
 ---
 author:
   - 韭菜园
-title: '三盛教育公司研报'
+title: '张家界公司研报'
 date: 2021-04-18
 categories:
   - 资本市场
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"三盛教育"
+Firm_code<-"张家界"
 ```
 
 ```{r include=FALSE}
