@@ -43,3 +43,14 @@
 - id: cardsListTitle
   translation: "Cards"
 
+- id: CapitalListTitle
+  translation: "Capital"
+
+- id: CapitalsListTitle
+  translation: "Capitals"
+
+- id: EconometricListTitle
+  translation: "Econometric"
+
+- id: EconometricsListTitle
+  translation: "Econometric"

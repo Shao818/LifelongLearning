@@ -25,12 +25,13 @@ menu:
       url: "#"
       identifier: menu-search
     - name: 订阅
-      url: "index.xml"
+      url: "https://lifelonglearn.netlify.app/"
     - name: 类别
       url: "/categories/"
       weight: 2
     - name: 标签
       url: "/tags/"
+      weight: 3
   footer:
 #    - name: 联系
 #      url: "/404.html"
@@ -48,7 +49,7 @@ menu:
 
 params:
   homePosts: 10
-  mainSections: ["Capital","Econometric"]  #"post", "work"
+  mainSections: ["Capital","Econometric"]  #"post", "work"，"post",
   editLink: "https://github.com/pzhaonet/msg2020/edit/master/content/"
 #  editLink: "https://github.com/yihui/hugo-prose/edit/master/exampleSite/content/"
   authorDelimiter: " / "
@@ -56,7 +57,7 @@ params:
   description: >
     《现代统计图形》主页。
   footer: >
-    &copy; 版权所有，转载请注明出处和作者。<br>
+    <font face="思源宋体 CN" >&copy; 版权所有，转载请注明出处和作者</font>。<br>
     <font face="思源宋体 CN" >致谢：本站采用[Hugo](https://gohugo.io/)框架、[Prose](https://prose.yihui.org/about/)主题、[R blogdown](https://bookdown.org/yihui/blogdown/)包搭建，[GitHub](https://bookdown.org/yihui/blogdown/)托管、[Netlify](https://app.netlify.com/)部署。</font>
 
   license: >
