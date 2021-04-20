@@ -1,16 +1,16 @@
 ---
 author:
   - 韭菜园
-title: '张家界公司研报'
+title: '张家界'
 date: 2021-04-18
 categories:
   - 资本市场
   - 公司
-  - 三盛教育
+  - 张家界
 tags:
   - 资本市场
   - 公司
-  - 三盛教育
+  - 张家界
 slug: firm-report
 weight: 0002
 description: 动态韭菜研究。
@@ -54,6 +54,7 @@ Firm_abbreviation <-dbGetQuery(con,QueryCondition)
 
 # 市场概况
 
+## 一周播报
 
 ### 新浪财经
 
