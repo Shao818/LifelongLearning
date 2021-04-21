@@ -21,17 +21,17 @@ outputs:
 # some menu items were added via the `menu` option in YAML in posts
 menu:
   header:
-    - name: 搜索
-      url: "#"
-      identifier: menu-search
-    - name: 订阅
-      url: "https://lifelonglearn.netlify.app/"
     - name: 类别
       url: "/categories/"
       weight: 2
     - name: 标签
       url: "/tags/"
       weight: 3
+    - name: 搜索
+      url: "#"
+      identifier: menu-search
+    - name: 订阅
+      url: "https://lifelonglearn.netlify.app/"
   footer:
 #    - name: 联系
 #      url: "/404.html"
@@ -49,7 +49,7 @@ menu:
 
 params:
   homePosts: 10
-  mainSections: ["Capital","Econometric"]  #"post", "work"，"post",
+  mainSections: ["Capital","Econometric"]#"post", "work"
   editLink: "https://github.com/pzhaonet/msg2020/edit/master/content/"
 #  editLink: "https://github.com/yihui/hugo-prose/edit/master/exampleSite/content/"
   authorDelimiter: " / "
@@ -57,8 +57,8 @@ params:
   description: >
     《现代统计图形》主页。
   footer: >
-    <font face="思源宋体 CN" >&copy; 版权所有，转载请注明出处和作者</font>。<br>
-    <font face="思源宋体 CN" >致谢：本站采用[Hugo](https://gohugo.io/)框架、[Prose](https://prose.yihui.org/about/)主题、[R blogdown](https://bookdown.org/yihui/blogdown/)包搭建，[GitHub](https://bookdown.org/yihui/blogdown/)托管、[Netlify](https://app.netlify.com/)部署。</font>
+    &copy; 版权所有，转载请注明出处和作者。<br>
+    致谢：本站采用 [Hugo](https://gohugo.io/) 框架、[Prose](https://prose.yihui.org/about/) 主题、[R blogdown](https://bookdown.org/yihui/blogdown/) 包搭建，[GitHub](https://bookdown.org/yihui/blogdown/) 和 [Vercel](https://vercel.com/) 托管。
 
   license: >
     本文文字和图表使用知识共享许可协议 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，[源文件](https://github.com/pzhaonet/msg2020)采用 MIT 协议。

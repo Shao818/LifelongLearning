@@ -13,12 +13,12 @@
         {{ i18n "postsListTitle" }}
     {{ else if (eq .Key "card") }}
         {{ i18n "cardsListTitle" }}
+    {{ else if (eq .Key "card") }}
+        {{ i18n "cardsListTitle" }}
     {{ else if (eq .Key "Capital") }}
         {{ i18n "CapitalsListTitle" }}
     {{ else if (eq .Key "Econometric") }}
         {{ i18n "EconometricsListTitle" }}
-
-
     {{ else }}
       {{ .Key | pluralize | title }}
     {{ end }}

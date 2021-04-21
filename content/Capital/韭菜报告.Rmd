@@ -1,8 +1,8 @@
 ---
 author:
   - 韭菜园
-title: '张家界'
-date: 2021-04-18
+title: '张家界研究报告'
+date: 2021-04-20
 categories:
   - 资本市场
   - 公司
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"张家界"
+Firm_code<-"桂林旅游"
 ```
 
 ```{r include=FALSE}
