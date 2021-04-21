@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"桂林旅游"
+Firm_code<-"张家界"
 ```
 
 ```{r include=FALSE}
@@ -233,8 +233,8 @@ Tushare_News_eastmoney<-dbGetQuery(con,"select 时间,内容 from  Tushare_News_
 
 
 [^1]: <div class="sidebarLine">
-  <a href="http://finance.sina.com.cn/realstock/company/sz002171/nc.shtml" target="_blank">
-  <img src="http://image.sinajs.cn/newchart/min/n/sz002171.gif" alt="美丰股票" height="300" width="400"></a></div>
+  <a href="http://finance.sina.com.cn/realstock/company/sz000430/nc.shtml" target="_blank">
+  <img src="http://image.sinajs.cn/newchart/min/n/sz000430.gif" alt="美丰股票" height="300" width="400"></a></div>
 
 ```{r include=FALSE}
 QueryCondition<-paste("select * from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
