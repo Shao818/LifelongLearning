@@ -1,0 +1,1858 @@
+---
+author:
+  - 韭菜
+title: '广义矩估计（GMM）'
+categories:
+  - R
+  - Stata
+  - 广义矩估计
+  - GMM
+tags:
+  - R
+  - Stata
+  - 广义矩估计
+  - GMM
+date: 2021-04-21
+slug: GMM
+weight: 001
+description: <font face="思源宋体 CN" >广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE 通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)</font>
+---
+<font face="思源宋体 CN" >
+
+# 为何要使用 GMM ？
+
+## 过度识别且存在异方差
+
+
+　　传统的工具变量法2SLS，因为它操作方便，且同时适用于恰好识别与过度识别的情形。然而，**2SLS仅在扰动项同方差的情况下，才是最有效率的**。理由很简单，如果每位个体的扰动项方差不相同（比如，大企业的方差一般不同于小企业的方差），则方差小的个体观测值所包含的信息量更大，而2SLS却对所有数据等量齐观地进行处理，故在异方差的情况下不是最有效率的。  
+　　
+　　在过度识别且存在异方差的情况下，更有效率的做法是**“广义矩估计”**（Generalized Method of Moments，简记 GMM）。该方法由芝加哥大学的 Lars Peter Hansen 教授所提出 (Hansen, 1982[^1])，已成为最流行的计量方法之一，Hansen也因此获得 2013年的诺贝尔经济学奖。
+[^1]:![Lars Peter Hansen](https://gitee.com/shao818/Figure/raw/master/20210421184457.png)　　
+　　假设待估参数的个数为 ，矩条件的个数为 。当$L=K$时，称为“恰好识别”，当$L>K$时，称为 “过度识别”。
+
+**<font color = blue>　　GMM是矩估计（MM）的推广。在恰好识别情况下，目标函数的最小值等于 0 ，GMM 估计量与 MM 估计量等价；然而在过度识别情况下，MM 不再适用，GMM 可以有效地组合矩条件，使 GMM 比 MM 更有效。</font>**
+GMM 建立在期望值和样本平均值的基础上。矩条件是用真实矩指定模型参数的期望值。
+
+
+
+## 动态面板数据      
+
+　　GMM的经典用法在动态面板数据(Dynamic Panel data, DPD)分析中，所指的是分析中采用如下的回归方程：
+$$
+Y_{i, t}=\alpha Y_{i, t-1}+\beta X_{i t}+u_{i}+\varepsilon_{i t} \tag{1}
+$$
+
+　　 其中，$Y_{i,t-1}$是因变量的滞后项，$u_{i}$是个体$i$的固定效应。<font color=red> 因变量的滞后项和固定效应同时存在，是动态面板数据分析特殊性的关键。</font>如果固定效应不存在，那么回归方程变为:
+$$
+Y_{i, t}=\alpha Y_{i, t-1}+\beta X_{i t}+\varepsilon_{i t}  \tag{2}
+$$
+　　 这时，用OLS或者随机效应模型回归分析即可。如果因变量的滞后项 $\alpha Y_{i,t-1}$不存在，那么回归方程变为：
+$$
+Y_{i, t}=\beta X_{i t}+u_{i}+\varepsilon_{i t} \tag{3}
+$$
+　　 对于该模型，用固定效应模型分析即可。如果因变量的滞后项和固定效应都存在，那么对于（1）式这样的回归方程，如果采用<font color=blue >**OLS或者FE均存在内生性问题（即系数的估计值是有偏的）**</font>。如果使用OLS估计，由于以下公式（4）和公式（1）均存在固定项$u_{i}$,即存在内生性：
+　　 
+$$
+Y_{i, t-1}=\beta X_{i t-1}+u_{i}+\varepsilon_{i t-1} \tag{4}
+$$
+　　 
+　　 如果采用差分方法去掉固定效应，会得到如下的结果:
+$$
+\Delta Y_{i,t}=\alpha \Delta Y_{i,t-1}+\beta\Delta X_{i,t}+\Delta \epsilon_{i,t}  \tag{5}
+$$
+　　 其中，$\Delta Y_{i, t}=Y_{i, t}-Y_{i, t-1}$, $\quad \Delta Y_{i, t-1}=Y_{i, t-1}-Y_{i, t-2}$, $\quad \Delta X_{i, t}=X_{i, t}-X_{i, t-1}$, $\quad \Delta \varepsilon_{i, t}=\varepsilon_{i, t}-\varepsilon_{i, t-1}$。如果（1）式代表了真实的变量之间关系，那么$\Delta Y_{i, t-1}$和$\Delta \varepsilon_{i, t}$之间必有相关性，因为：
+$$
+\Delta Y_{i, t-1}=Y_{i, t-1}-Y_{i, t-2}=(\alpha-1) Y_{i, t-2}+\beta X_{i, t-1}+\varepsilon_{i, t-1}\tag{6}
+$$
+　　 $cov(\Delta Y_{i,t-1},\Delta \epsilon_{i,t})$显然不会等于0，因为两者都有$\varepsilon_{i, t-1}$这一项。通常所用的固定效应模型实际上就是对（1）式差分，得到类似于（5）式的差分回归方程，然后做OLS。对于现在的情况，由于$\Delta Y_{i, t-1}$和$\Delta \varepsilon_{i, t}$之间的相关性，再用OLS只会得到有偏误的回归系数。所以传统的统计方法无法实现对此类方程的估计，需要用GMM方法。
+
+> 　　<font face="思源宋体 CN" >需要注意的是（2）的模型（包含滞后项的OLS）和（3）的模型（不包含滞后项的FE，固定效应）尽管都有偏误,但好处是一个偏大,一个偏小(具体哪个大,哪个小要看变量之间的关系),所以这两个估计系数应该界定了真实参数的范围（Angrist and Pischke，2009:246页；Roodman，2009）。也就是说，你最后用GMM方法估计出来的参数应该落到这个区间。</font>
+
+
+
+　　
+
+# 基本思想  
+
+　　广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE 通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)。
+
+
+　　
+
+#  矩 (Moment)  
+
+　　何为矩？简单说，矩就是**<font color = blue>随机变量之函数的期望</font>**。比如，对于随机变量  ，其一阶原点矩为其期望$E(x)$ ，二阶中心矩为其方差$\operatorname{Var} \equiv \mathrm{E}[x-\mathrm{E}(x)]^{2}$，以此类推。
+
+　　更一般地，考虑随机变量$x$的函数$f(x)$。显然，$f(x)$仍为随机变量，其期望$E[f(x)]$
+ 也称为“矩”（moment）。
+
+　　进一步推广，随机向量$x$的函数$f(x)$之期望$E[f(x)]$，也称为 “矩”。总之，矩可以视为**随<font color = blue>机变（向）量的某种特征**</font>。
+
+# 矩估计量（MM估计估计量）
+
+## 期望与方差的矩估计
+
+$$
+E(\mathrm{y}-\mu)=0 \rightarrow \frac{1}{N} \sum_{i=1}^{N}\left(y_{i}-\hat{\mu}\right)=0 \rightarrow \hat{\mu}=\frac{1}{N} \sum_{i=1}^{N} y_{i}\tag{7}
+$$
+
+　　其中， $N$表示样本数， $y_{i}$表示 $y$ 的第 $i$ 个观察值 。此处，估计量$\hat{\mu}$ 被称为矩估计量( the method of moments estimator )，简称 MM 估计量。这是因为，该估计量的构造以母体矩条件( population moment condition )为基础，进而用其样本矩条件（依赖于我们使用的数据）做等价代换。因为我们从总体矩条件开始，然后运用类比原理得到一个依赖于观测数据的估计量。
+ 我们想要估计随机变量 ${Y}$的均值，即 $\mu=E[\mathrm{y}]$，其中“母体矩条件( PMC )”为：
+$$
+ E[\mathrm{y}]-\mu=0  \tag{8}
+$$
+
+
+　　$\left\{y_{1}, y_{2}, \dots, y_{n}\right\}$为从这个母体中随机抽取的一组样本观察值，则对应的“样本矩条件( SMC )”为
+$$
+\frac{1}{N} \sum_{i=1}^{N} y_{i}-\hat{\mu}=0 \tag{9}
+$$
+　　因此，我们可知母体矩条件的样本均值估计为： $\mu=E[\mathrm{y}]$ ，样本矩条件的样本均值估计为： $\hat{\mu}=\frac{1}{N} \sum_{i=1}^{N} y_{i}$ 。
+
+> 例子：
+
+　　自由度为 $k$的 $\chi^{2}$ 随机变量的均值为 $k$，方差为 $2k$，因此两个母体矩条件( PMC )如下：
+$$
+E[Y-k]=0 \qquad \tag{10a}
+$$
+
+$$
+E\left[(Y-k)^{2}-2 k\right]=0 \qquad \tag{10b}
+$$
+
+
+　　这个母体中随机抽取的一组样本观察值 $\left\{y_{1}, y_{2}, \ldots, y_{n}\right\}$，对应的样本矩条件( SMC )为：
+$$
+\frac{1}{N} \sum_{i=1}^{N}\left(y_{i}-\hat{k}\right)=0 \quad \tag{11a}
+$$
+
+
+$$
+\frac{1}{N} \sum_{i=1}^{N}\left[\left(y_{i}-\hat{k}\right)^{2}-2 \hat{k}\right]=0 \tag{11b}
+$$
+
+
+
+> 　　矩估计法是用样本的 $k$阶矩作为总体的 $k$阶矩的估计量，建立含待估计参数的方程，从而可解出待估计参数。一般地，不论总体服从什么分布，总体期望 $\mu$ 与方差 $\sigma^{2}$ 存在，则根据据估计法，它们的矩估计量分别为：
+
+$$２
+\hat{\mu}=\frac{1}{n} \sum_{i=1}^{n} X_{i}=\overline{X} \tag{12a}
+$$
+
+$$
+\hat{\sigma}^{2}=\frac{1}{n} \sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)^{2} \tag{12b}
+$$
+
+## 简单线性回归的矩估计
+
+### 简单线性回归的矩条件
+
+　　LS 估计可以视为矩估计的一个特例。OLS 估计的公式为：
+$$
+y_{i}=\beta x_{i}+\mu_{i} \tag{13}
+$$
+　　其中，$x_{i}$与 $\mu_{i}$不相关，则有 $E\left[\mu_{i} | x_{i}\right]=0$。因此，
+$$
+E\left[\mu_{i} | x_{i}\right]=0 \rightarrow E\left[y_{i}-\beta x_{i} | x_{i}\right]=0 \rightarrow E\left[x_{i}\left(y_{i}-\beta x_{i}\right)\right]=0 \tag{14}
+$$
+　　其中，$E\left[x_{i}\left(y_{i}-\beta x_{i}\right)\right]=0$ 是母体矩条件，对应的样本矩条件为：
+$$
+\frac{1}{N} \sum_{i=1}^{N}\left[x_{i}\left(y_{i}-\hat{\beta}^{M M} x_{i}\right)\right]=0 \tag{15}
+$$
+　　求解即可得到 OLS 估计下的 $\hat{\beta}^{M M}$ 。
+
+### Stata实现
+
+- OLS估计
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+regress mpg gear_ratio turn,vce(robust)
+
+```
+- GMM估计
+
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+gmm (mpg - {b1}*gear_ratio - {b2}*turn - {b0}),instruments(gear_ratio turn)
+
+```
+
+- 利用线性组合的简单线性GMM估计
+
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+gmm (mpg - {xb:gear_ratio turn} - {b0}), instruments(gear_ratio turn)
+
+```
+
+
+
+##   工具变量法的MM估计
+
+### 工具变量法的原理
+
+　　工具变量的思想其实很简单。虽然内生变量$x$是“坏”的变量（与扰动项相关），但仍可能有“好”的部分（与扰动项不相关的部分），正如坏人通常也有好的一面。如果能将内生变量*$x$*分解为内生部分与外生部分之和，则可能使用其外生部分得到一致估计。
+
+　　而要实现这种分离，通常需要借助另一变量，比如**$z$**，称为 “工具变量”（Instrumental Variable，简记 IV），因为它起着工具性的作用。
+
+　　显然，并非任何变量都可以作为工具变量。首先，变量$z$要能够帮助内生变量$x$分离出一个外生部分，则变量$z$自身必须是“干净”的，即满足“外生性”（$z$与扰动项$\varepsilon$不相关）：
+$$
+Cov(z_{i},\varepsilon_{i})=0 \tag{16}
+$$
+其次，变量$z$还须与$x$有一定关系，即满足“相关性”:
+$$
+Cov(z_{i},x_{i})\not =0  \tag{17}
+$$
+
+>- 工具变量法中，假设待估参数的个数为  $k$，矩条件的个数为 $l$：
+>- 1.无法识别（unidentified）：当 $k > l$ 时，即工具变量个数少于内生变量个数，则无法进行2SLS 估计，称为“不可识别”（unidentified），因为无法得到对模型参数的一致估计；
+>- 2.恰好识别( just or exactly identified )：当 $k = l$ 时；
+>- 3.过度识别( overidentified )：当 $k < l$时，即待估参数个数小于工具变量的个数。
+
+### 工具变量法的矩条件
+
+> 在恰好识别的情况下，可将矩估计运用于工具变量法。
+
+　　考虑以下多元回归模型，共有个$K$个未知参数，
+$$
+\mathrm{y}_{i}=\beta_{1} x_{i 1}+\cdots+\beta_{\mathrm{K}} x_{i \mathrm{x}}+\varepsilon_{i} \quad(i=1, \ldots, n) \tag{18}
+$$
+
+　　 其中，第一个解释变量一般为常数项，即$x_{i,t}\equiv1$。更紧凑地，此方程可写为：
+$$
+\mathbf{y_{i}}=\mathbf{x_{i}}^{'} \boldsymbol{\beta}+\boldsymbol{\varepsilon_{i}} \tag{19}
+$$
+　　其中，$\mathbf{x_{i}}^{\prime}$与$\boldsymbol{\beta}$均为$K$维列向量。在恰好识别的情况下，记由所有工具变量所构成的向量为$\mathbf{z_{i}}^{'}$（可以与$\mathbf{x_{i}}^{\prime}$有重叠，即外生变量作为自己的工具变量），也是$K$维列向量。由这些工具变量所提供的识别模型的总体矩条件为：
+
+　　 **工具变量方法也可以用矩估计的思路实现。由于过程略复杂，此处仅给出简要步骤，详细的推导可以参考（Roodman，2009）。**需要回归的方程为：
+$$
+\mathrm{E}\left(\mathbf{z}_{i} \varepsilon_{i}\right)=\mathrm{E}\left[\left(\begin{array}{c}
+z_{11} \\
+\vdots \\
+z_{i k}
+\end{array}\right) \varepsilon_{i}\right]=\left(\begin{array}{c}
+0 \\
+\vdots \\
+0
+\end{array}\right)=0    \tag{20}
+$$
+　　 此**总体矩条件也被称为“正交条件”（orthogonality conditions）**。**在数理统计中，如果两个随机变量的乘积之期望为0，则称这两个随机变量正交。**
+
+　　 显然，**如果两个随机变量中包含一个随机扰动项，则 “两个随机变量不相关” 就等价于 “两个随机变量正交”**，比如
+$$
+0=\operatorname{Cov}\left(z_{i }, \varepsilon_{i}\right)=\mathrm{E}\left(z_{i } \varepsilon_{i}\right)-\mathrm{E}\left(z_{i }\right) \underbrace{\mathrm{E}\left(\varepsilon_{i}\right)}_{=0}=\mathrm{E}\left(z_{i } \varepsilon_{i}\right)=0
+$$
+　　其中，扰动项$\varepsilon_{i}$的期望为0（只要回归方程有常数项，总可以将扰动项的非零期望归入常数项）。由于$\varepsilon_{i}={y_{i}}-\mathbf{x_{i}}^{'} \boldsymbol{\beta}$，将此表达式代入上式的正交条件，可得更便于估计的总体矩条件：
+$$
+\mathrm{E}\left[\mathbf{z}_{i}\left(y_{i}-\mathbf{x}_{i}^{\prime} \beta\right)\right]=\mathbf{0} \tag{21}
+$$
+　　以样本矩替代总体矩可得：
+$$
+\mathbf{g}_{n}(\hat{\beta}) \equiv \frac{1}{n} \sum_{i=1}^{n}\left[\mathbf{z}_{i}\left(y_{i}-\mathbf{x}_{i}^{\prime} \hat{\beta}\right)\right]=\mathbf{0}  \tag{22}
+$$
+　　这是一个由$K$个方程（$\mathbf{z_{i}}$的维度）、$K$个未知数（$\beta$）的维度）所构成的线性联立方程组，故一般情况下存在唯一解，即矩估计量（Method of Moments，简记MM）。<font color=red> 可以证明，此MM 估计量等价于2SLS。</font>
+
+
+### 工具变量法：两阶段最小二乘估计（2SLS）
+
+>　　  **两阶段最小二乘法其本质上是属于工具变量，回归分两个阶段进行，因此而得名。具体机理是：**
+>
+>   - 第一步，将结构方程先转换为简化式模型（约简型方程），简化式模型里的每一个方程都不存在随机解释变量问题，可以直接采用普通最小二乘法进行估计。
+>   - 第二步，由第一步得出的 $\hat{Y}$的估计量替换 $Y$。该方程中不存在随机解释变量问题，也可以直接用普通最小二乘法进行估计。
+
+　　例子：一般 IV 回归模型为：
+$$
+Y_{i}=\beta_{0}+\beta_{1} X_{1 i}+\ldots+\beta_{k} X_{k i}+\beta_{k+1} W_{1 i}+\ldots+\beta_{k+r} W_{r i}+u_{i} (i=1,2, \ldots, n) \tag{23}
+$$
+
+   -  其中：
+      - $Y_{i}$为因变量；
+      - $u_{i}$为误差项，表示测量误差和/或遗漏因素；
+      - $X_{1 i} , X_{2 i} , \ldots , X_{k i}$表示k个内生回归变量，可能与 $u_{i}$相关；
+      - $W_{1 i} , W_{2 i}, \ldots , W_{r i}$ 表示 r 个包含的外生变量，与 $u_{i}$ 不相关；
+      - $\beta_{0} , \beta_{1} , \ldots , \beta_{k+r}$ 为未知回归系数；
+      - $Z_{1 i} , Z_{2 i} , \ldots , Z_{m i}$为 $m$ 个工具变量。
+
+　　以单内生回归变量的 2SLS 为例，当只有一个内生回归变量 $X$和一些其他的包含的外生变量时，感兴趣的方程为：
+$$
+Y_{i}=\beta_{0}+\beta_{1} X_{i}+\beta_{2} W_{1 i}+\ldots+\beta_{k+r} W_{r i}+u_{i} \tag{24}
+$$
+　　其中同前 $X_{i}$ 可能与误差项相关，但 $W_{1 i}, W_{2 i}, \ldots, W_{r i}$与误差项不相关。
+
+　　2SLS 的总体第一阶段回归将 $X$ 与外生变量 $W$和工具变量（$Z$）联系在了一起：
+$$
+X_{i}=\pi_{0}+\pi_{1} Z_{1 i}+\ldots+\pi_{m} Z_{m i}+\pi_{m+1} W_{1 i}+\ldots+\pi_{m+r} W_{r i}+v_{i}  \tag{25}
+$$
+　　其中 $\pi_{0} , \pi_{1} , \ldots , \pi_{m}$为未知回归系数， $v_{i}$为误差项。
+
+　　在 2SLS 的第一阶段中，可用 OLS 估计（ 24）式中的未知系数，并记由该回归得到的预测值为$\hat{X}_{1}, \hat{X}_{2}, \ldots, \hat{X}_{n}$ 。
+
+　　在 2SLS 的第二阶段中，用 OLS 估计的 $X_{i}$ 的预测值替换（ 23）式。也就是用 OLS 估计 $Y_{i}$关于 $\hat{X}_{i}$，$W_{1 i}, W_{2 i}, \ldots, W_{r i}$的回归。得到的 $\beta_{0}, \beta_{1}, \ldots, \beta_{1+r}$估计量就是 2SLS 估计量。
+
+　　当存在多个内生回归变量 $X_{1 i}, X_{2 i}, \dots, X_{k i}$时，除了每个内生回归变量都需要自己的第一阶段回归以外， 2SLS 的算法是类似的。其中每个内生回归变量的第一阶段回归形式同（ 24 ）式，即因变量是某个 $X$，回归变量是所有工具变量（ $Z$）和所有包含的外生变量（$W$）。所有这些第一阶段回归一起得到了每个内生回归变量的预测值。
+
+　　在 2SLS 的第二阶段中，用 OLS 估计内生回归变量（$X$），分别用其预测值（$\hat{X}$）替换后的（22）式。得到的$\beta_{0}, \beta_{1}, \beta_{2}, \dots, \beta_{k+r}$估计量即为2SLS估计量。
+
+> 　　如果扰动项为球形扰动项（满足同方差、无自相关），则2SLS为最有效率的工具变量法。如果担心扰动项存在异方差，则依然可使用稳健标准误（robust standard errors）进行统计推断。
+
+
+### 工具变量法：广义矩估计（GMM）
+
+> 　　在恰好识别情况下，目标函数的最小值等于 0 ，GMM 估计量与 MM 估计量等价；然而，在过度识别的情况下，却无法使用传统的矩估计。这是因为，此时$\mathbf{z_{i}}$的维度大于$\beta$的维度，对参数向量$\beta$有过多的约束，使得方程个数大于未知数个数，导致此线性方程组无解。  
+
+> 　　由于在恰好识别的情况下，矩估计等价于2SLS；而在过度识别的情况下，矩估计不适用而2SLS依然可行，故传统上工具变量法一般用2SLS。  
+
+> <font color=blue>  　　然而在过度识别情况下，MM 不再适用，GMM 可以有效地组合矩条件，使 GMM 比 MM 更有效。</font>
+  
+####  Lars Hansen的脑筋急转弯
+
+　　看似已走入死胡同的矩估计，却被 Lars Hansen起死回生了。假设工具变量$\mathbf{z_{i}}$的维度$L$，且严格大于参数向量$\beta$$\beta$的维度 。如上所述，此时样本矩的线性方程组无解。这意味着，找不到$\hat{\beta}$，能够使得上述样本矩等于0向量。　　
+
+　　但Lars Hansen来了个脑筋急转弯：虽然无法找到$\hat{\beta}$，使得样本矩等于0，但总可以让样本矩尽量接近于0。由于样本矩$\mathbf{g}_{n}(\hat{\beta})$为$L$维列向量，故可用二次型来衡量它到0向量的距离，比如最小化如下目标函数：　　
+
+
+$$
+\min _{\hat{\beta}}\left(\mathbf{g}_{i}(\beta)\right)\left(\mathbf{g}_{n}(\beta)\right) \tag{26}
+$$
+　　这个脑筋急转弯价值不菲，三十多年后为Lars　Hansen带来了诺贝尔奖。更一般地，可用一个“权重矩阵”（weightingmatrix）（可依赖于样本）来构成二次型，定义最小化的目标函数为：  
+　　
+$$
+\min _{\tilde{\beta}} J(\beta, \mathbf{W}) \equiv n\left(\mathbf{g}_{n}(\beta)\right) \mathbf{W}\left(\mathbf{g}_{n}(\beta)\right) \tag{27}
+$$
+　　其中，因子$n$不影响最小化。这是一个无约束的最优化问题，目标函数$J(\hat{\beta}, \widehat{\mathbf{W}})$是$\hat{\beta}$的二次（型）函数，故可得到其解析解（推导方法类似于 OLS），即 “GMM估计量”。  
+
+　　在恰好识别的情况下，目标函数的最小值正好为0，故GMM估计量等价于MM估计量（故也等价于 2SLS），因此 GMM 确实是 MM 的推广。
+
+#### 矩条件的强弱
+
+　　显然，GMM 估计量取决于权重矩阵。对于$\widehat{\mathbf{W}}$的灵活选择是GMM 的最大优点之一，因为不同矩条件的强弱程度一般不同。矩条件只是说明$\mathrm{E}(z_{i } \varepsilon_{i})=0$，但每个矩条件的方差$\mathrm{Var}(z_{i } \varepsilon_{i})$可以不同，参见右图[^2]。
+  
+[^2]:![矩条件的强弱](https://gitee.com/shao818/Figure/raw/master/null/image-20201118160559634.png)
+
+
+$$
+\mathbf{Y}=\mathbf{X} \boldsymbol{\beta}+\boldsymbol{\varepsilon}
+$$
+      一个强的矩条件意味着其对应的方差较小（上图实线，矩条件1），是一个比较紧的约束，包含更大的信息量，故会通过$\widehat{\mathbf{W}}$  得到较大的权重，使得GMM估计量更有效率。具体来说，矩条件的协方差矩阵可写为：  
+      
+$$
+\mathbf{S} \equiv \operatorname{Var}\left(\mathbf{z}_{i} \varepsilon_{i}\right)=\mathrm{E}\left(\varepsilon_{i}^{2} \mathbf{z} \mathbf{z}_{i}^{\prime}\right) \tag{28}
+$$
+     以残差（比如$e_{i}$，2SLS残差，因为2SLS也是一致的）替代上式的扰动项$\varepsilon_{i}$，并以样本均值替代总体期望，可得对此协方差矩阵的一致估计
+$$
+\hat{\mathbf{S}} \equiv \frac{1}{n} \sum_{i=1}^{n} e_{i}^{2} \mathbf{z} \mathbf{z}_{i} \tag{29}
+$$
+    Hansen (1982)证明，如果让$\widehat{\mathbf{W}}=\hat{\mathbf{S}}^{-1}$  （方差矩阵的逆矩阵或“倒数”），则可使得 GMM 估计量的渐近方差最小化，其相应的GMM估计量称为“最优GMM”（optimal GMM）。自然地，既然存在最优GMM，一般就不会使用其他的权重矩阵了，故一般所说的GMM估计量默认就是最优GMM。
+
+- 更详细的解释：
+
+$$
+\mathbf{Y}=\mathbf{X} \boldsymbol{\beta}+\boldsymbol{\varepsilon}  \tag{30}
+$$
+
+　　其中， $Z$是工具变量，$E(\varepsilon|Z）=0。X=(x_{1},x_{2},...,x_{k}))$ ，是 $k$个自变量向量，$Z=(z_{1},z_{2},...,z_{k})$是 个工具变量向量。相应的，待估计的系数 $\beta$是$k$维向量。定义$E=Y-X\beta$为误差向量，对于任意估计出来的参数 $\hat{\beta}$ ，残差项为$\hat{E}=Y-X\hat{\beta}$。
+
+　　根据工具变量的含义，它应该和误差项$\epsilon$独立：$E(Z^{'}\varepsilon)=0$，这就是我们需要的矩条件。计算的时候，理论上应该利用 $E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right) \equiv \frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}=0$求解，注意到，我们有$j$ 个工具变量，也就是$j$个矩条件（$j$个方程）。理论上，需要根据这$j$个方程求解$k$个待估计的参数。但是不幸的是，如果工具变量的数量 小于待估计的参数数量 ，方程是不可识别的——通常不可能通过2个方程解出3个未知数。如果工具变量等于待估计的参数，是恰好可识别的，但这种情况在GMM中很难碰到。最常见的是工具变量多于待估计的参数，即 $j>k$，这意味着要找$k$个参数，让$j$个方程同时等于零。这难度相当大，实际上大多数时候找不到，怎么办呢？在矩估计里面，采用的办法是，找$k$个参数，让$E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right) \equiv \frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}$和零之间的距离最小。实际计算的时候，需要借助一个半正定的矩阵 $A$，计算向量 $E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right) \equiv \frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}$的模：
+$$
+\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{\mathbf{A}} \equiv\left\|\frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}\right\|_{\mathbf{A}}=N\left(\frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}\right)^{\prime} \mathbf{A}\left(\frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}\right)=\frac{1}{N} \hat{\mathbf{E}}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z}^{\prime} \hat{\mathbf{E}}  \tag{31}
+$$
+　　目标变成，寻找参数向量$\hat{\boldsymbol{\beta}}_{\mathbf{A}}=\arg \min \left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{\mathbf{A}}$，这就要用到一阶条件等于零：
+$$
+\frac{d\left\|E_{N}\left(\mathbf{Z}^{\prime} \varepsilon\right)\right\|_{A}}{d \hat{\beta}}=\ldots=\frac{2}{N} \hat{\mathbf{E}}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z}^{\prime}(-\mathbf{X})=0  \tag{32}
+$$
+　　计算的过程利用到了连锁规则和向量求导的公式。继续推导，把$\hat{E}=Y-X\hat{\beta}$带入，得
+
+到：
+$$
+\begin{array}{c}
+0=\hat{\mathbf{E}}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z} \mathbf{X}=(\mathbf{Y}-\mathbf{X} \hat{\boldsymbol{\beta}})^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z} \mathbf{X}=\mathbf{Y}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z}^{\prime} \mathbf{X}-\hat{\boldsymbol{\beta}}^{\prime} \mathbf{X}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z} \mathbf{X} \\
+\hat{\boldsymbol{\beta}}_{\mathbf{A}}=\left(\mathbf{X}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z} \mathbf{X}\right)^{-1} \mathbf{X}^{\prime} \mathbf{Z} \mathbf{A} \mathbf{Z}^{\prime} \mathbf{Y}
+\end{array}  \tag{33}
+$$
+　　这就是$\beta$的GMM估计量，这个估计量是有偏的，它的期望值不等于真实的$\beta$；然而它是一致的，当样本量足够大的时候，它会接近真实的$\beta$。这个估计量和$A$有关，但是$A$只影响参数估计的有效性——不同的A对应的参数 $\hat{\boldsymbol{\beta}}_{\mathbf{A}}$收敛的速度不同。这里的A其实是对不同的矩条件加以不同的权重，可以找到一个收敛最快的A，称为 $A_{EGMM}$，可以证明：$\mathbf{A}_{E G M M}=\operatorname{Var}(\mathbf{z} \varepsilon)^{-1}$。
+
+　　对于工具变量法常用的两阶段最小二乘法（2SLS），如果假定误差项是独立同分布，那么$\mathbf{A}_{E G M M}=\operatorname{Var}(\mathbf{z} \varepsilon)^{-1}=(Z^{'}Z)^{-1}$，此时
+$$
+\hat{\boldsymbol{\beta}}_{G M M}=\left(\mathbf{X}^{\prime} \mathbf{Z}(\mathbf{Z} \mathbf{Z})^{-1} \mathbf{Z} \mathbf{X}\right)^{-1} \mathbf{X}^{\prime} \mathbf{Z}(\mathbf{Z} \mathbf{Z})^{-1} \mathbf{Z}^{\prime} \mathbf{Y} \tag{34}
+$$
+　　这实际上就是传统通过两阶段最小二乘法（2SLS）估计出来的参数，殊途同归。
+
+
+
+
+
+
+### Stata实现
+
+#### 两阶段最小二乘估计(一步GMM估计)
+
+- 两阶段最小二乘估计(2SLS)
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+*工具变量两阶段最小二乘(2SLS)
+ivregress 2sls mpg gear_ratio (turn = weight length headroom)
+*过度识别检验
+estat overid
+```
+
+- 一步GMM估计
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+gmm (mpg - {b1}*turn - {b2}*gear_ratio - {b0}), instruments(gear_ratio weight length headroom) onestep
+```
+
+>　　可以看到，两阶段最小二乘( `ivregress 2sls` )与GMM的一步估计（`gmm onestep`）结果完全相同。
+
+#### 工具变量GMM估计（两步 GMM 估计）
+
+- 工具变量GMM估计
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+*工具变量GMM估计
+ivregress gmm mpg gear_ratio (turn = weight length headroom)
+*过度识别检验
+estat overid
+```
+
+- 两步 GMM 估计
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysuse auto,clear
+gmm (mpg - {b1}*turn - {b2}*gear_ratio - {b0}),  ///
+     instruments(gear_ratio weight length headroom) wmatrix(robust)
+```
+
+>可以看到，两阶段最小二乘的GMM估计( `ivregress gmm` )与GMM的二步估计（`gmm twostep`）结果完全相同。
+
+
+
+###  GMM 过程的 Stata 命令说明
+
+
+
+　　在 Stata 中， gmm 的一般命令形式为：
+
+```stata
+ gmm  ([reqname1:]rexp_1)  ([reqname2:]rexp_2) . . . [if] [in] [weight] [,options]
+```
+
+　　其中：
+
+- `reqname_j` 代表第 j 个剩余方程的表达式
+- `rexp_j` 是第 j 个残差方程的可替换表达式
+
+GMM 的矩估计命令形式为：
+
+```stata
+gmm moment_pro [if] [in] [weight],
+　　      {equations(namelist) | nequations(#)}
+　　      {parameters(namelist) | nparameters(#)}  [options]
+　　      [program_options]
+```
+
+　　其中，`moment_prog` 是以矩条件为基础构造的<font color=red> 矩估计表达式。</font>
+
+　　各个选项具体说明如下：
+
+- Model 选项
+  - `derivative([reqname|#]/name=dexp_jk)` ：指定 `reqname （或 # ）` 对参数名的导数；可指定多于一次；
+  - `twostep` ：使用两步 GMM 估计；
+  - `onestep` ：使用一步 GMM 估计；
+  - `igmm` ：使用迭代 GMM 估计；
+  - `variables ( varlist )` ：在模型中指定变量；
+  - `nocommonesample` ：不要限制所有方程的估计样本都是相同的。
+
+- Instruments 选项
+  - `instruments([reqlist:]varlist)[,noconstant])`： 是制定工具；可以被多次指定；
+  - `xtinstruments([reqlist:]varlist,lags(#_1/#_2))` ：是制定面板类工具变量；可以被多次指定。
+
+- Weight matrix 选项
+  - `wmatrix(wmtype[,independent])` ：指定权重矩阵; `wmtype` 可以是`robust` ,`cluster` `clustvar` , `hac kernel [lags]` ，或者 `unadjusted`；
+  - ``center`： 计算权重矩阵时的中心矩；
+  - `winitial(iwtype[, independent])`： 指定初始权重矩阵； `iwtype` 可以是`unadjested` , `identity` , `xt xtspec` ,或者 Stata 矩阵的名字。
+
+- SE/Robust 选项
+  - `vce(vcetype[,independent])`： 其中 `vcetype` 可以是 `robust` , `cluster` `clustvar` , `bootstrap` , `jackknife` , `hac kernel lags` ,或者 `unadjusted``
+  - ``quickderivatives`：采用VCE数值导数的另一种计算方法。
+
+- Reporting 选项 
+  - `level(#)` ：设置置信水平;默认是水平( 95 )  ；
+  - `title(string)` ：将字符串显示为参数估计表上方的标题；
+  - `title2(string)` ：显示字符串作为副标题；
+  - `display_options` ：控制列与列格式、行间距、行宽、显示省略的变量、基单元格与空单元格，以及因子-变量标记。
+
+- Optimization 选项  
+  - `from(initial_values)` ：参数的指定初始值；
+  - `igmmiterate(#)` ：指定迭代 GMM 估计的最大迭代次数；
+  - `igmmeps` ：迭代的 GMM 参数收敛准则指定为 # ；默认为 igmmeps(1e-6)；
+  - `igmmweps( # )` ：迭代的 GMM 权重矩阵收敛准则指定为 # ;默认是 igmmweps (1e-6)；
+  - `optimization_options` ：控制优化过程；很少使用；
+  - `coeflegend` ：显示图例而不是统计数据。
+
+
+### 工具变量法的过度识别检验
+
+>在过度识别的情况下，则可以进行 “过度识别检验”（overidentification test）。考虑以下原假设：
+>$$
+>H_{0}:所有工具变量都是外生
+>$$
+>其实，这就是检验总体矩条件是否成立：
+>$$
+>H_{0}:\mathrm{E}\left(z_{i } \varepsilon_{i}\right)=0
+>$$
+
+#### 2SLS过度识别检验
+
+- Sargan统计量　　
+
+　　上面提到了，只有恰好识别和过度识别才能用 IV 方法估计。假设待估参数的个数为 $k$，矩条件的个数为 $l$。当 $k=l$ 时，称为“恰好识别”，当 $k<l$时，称为 “过度识别”。
+
+<font color=red>　　一个很重要的命题是：只有过度识别情况下才能检验工具变量的外生性，而恰好识别情况下无法检验。</font>
+
+　　具体思路如下：工具变量的外生性意味着它们和 $\mathrm{u}_{\mathrm{i}}$不相关。这表明工具变量和 $\hat{\mathrm{u}}_{\mathrm{i}}^{2 \mathrm{SLS}}$ 近似不相关，其中
+$$
+\hat{\mathrm{u}}_{\mathrm{i}}^{2 S L S}=Y_{i}-\left(\hat{\beta}_{0}^{2 S L S}+\hat{\beta}_{1}^{2 S L S} X_{1 i}+\ldots+\hat{\beta}_{k+r}^{2 S L S} X_{r i}\right) \tag{32}
+$$
+　　为基于所有工具变量的 2SLS 回归估计残差（由于抽样变异性因此是近似的而不是精确地，注意到这些残差是利用 $X$ 值而不是用其第一阶段的预测值得到的。）
+
+　　于是，如果工具变量事实上是外生的，那么 $\hat{\mathrm{u}}_{\mathrm{i}}^{2 \mathrm{SLS}}$ 关于工具变量和包含的外生变量回归中工具变量的系数都应该等于零，而这个假设是可以检验的。
+
+　　过度识别约束检验（ J 统计量），又称为 Sargan 统计量。令 $\hat{\mathrm{u}}_{\mathrm{i}}^{2 \mathrm{SLS}}$为来自（22）式 2SLS 估计的残差。
+
+　　利用 OLS 估计下面的回归系数：
+$$
+\hat{u}_{i}^{2 S L S}=\delta_{0}+\delta_{1} Z_{1 i}+\ldots+\delta_{m} Z_{m i}+\delta_{n t+1} W_{1 i}+\ldots+\delta_{m+r} W_{n}+e_{i}  \tag{33}
+$$
+
+>  　　其中， $e_{i}$为回归误差项。令 F表示检验假设$\delta_{1}=\ldots=\delta_{m}=0$的同方差适用 F 统计量。则过度识别约束检验统计量为 $J=mF$。如果 $e_{i}$ 是同方差的，则在所有工具变量都是外生的原假设下， $J$服从 $\chi_{m-k}^{2}$分布，其中 $m-k$ 为“过度识别度”，也就是工具变量的个数减去内生回归变量的个数。
+
+- 沃尔德检验（Wald Test）
+
+　　记所有工具变量所构成的向量为$\mathbf{z_{i}}$（包含工具变量与外生解释变量），则所有工具变量皆外生的原假设可写为以下“总体矩条件”（population moment conditions）：
+$$
+H_{0}:\mathrm{E}\left(z_{i } \varepsilon_{i}\right)=0 \tag{34}
+$$
+　　即工具变量$\mathbf{z_{i}}$与扰动项$\varepsilon_{i}$正交。根据样本数据，可得其相应的“样本矩”（sample moments），记为$\mathbf{g}_{n}$其中下标$n$表示样本容量；而且如果总体矩条件正确，则样本矩也应该离0向量不远：
+$$
+\mathbf{g}_{n} \equiv \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i} e_{i} \approx \mathbf{0} \tag{35}
+$$
+　　为了度量此距离，可构造如下二次型来检验原假设：
+$$
+\mathbf{g}_{n}^{\prime}\left[\widehat{\operatorname{Var}\left(\mathbf{g}_{\mathrm{n}}\right)}\right]^{-1} \mathbf{g}_{n} \rightarrow \chi^{2}(L-K) \tag{36}
+$$
+　　其中，二次型矩阵为样本矩$\mathbf{g}_{n}$之协方差矩阵估计量的逆矩阵。
+
+>　　事实上，在过度识别的情况下，通常使用更有效率的广义矩估计（Generalized Method of Moments，简记 GMM）。故现在一般使用GMM的Hansen's J统计量来进行过度识别检验，原理与上述Wald检验类似。
+>
+>　　需要特别说明的是，无论使用何种过度识别检验，都有一个不检验的大前提（maintained hypothesis），即模型至少是恰好识别的。因此，即使检验结果接受了“所有工具变量皆外生”的原假设，也并不表示就证明了所有工具变量的外生性。它只是表明，在模型恰好识别的情况下，多余的那些工具变量也是外生的。
+>　　总之，根据目前的计量经济学，工具变量的外生性在本质上依然是不可检验的，学者们仍需围绕“排他性约束”而进行定性讨论，甚至无休止的争论。
+
+#### GMM方法的过度识别检验
+
+- Hansen统计量
+
+　　前文已经介绍，使用GMM方法的目标是选择参数，最小化$E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right) \equiv \frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}$和零之间的距离$\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{A}$。那么问题来了，多小算小呢？会不会是最小值也显著大于零？如果这样的话，方法的适用性就成问题。也就是说，根据你估计出来的参数，算出的残差项实际上和工具变量不是独立。Hansen检验和Sargan检验的逻辑就是，以$\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{A}$最小化为目标，估计出参数，然后把参数带入，看看它是否真的等于零。如果统计上不能拒绝它等于零，则所用工具变量可靠；如果统计上拒绝它等于零，则不可靠。
+
+　　如果零假设成立（即 $H_{0}$：工具变量是联合有效的），那么 $E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right) \equiv \frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}$应随机分布于零附近，它和零的距离应服从$\chi^{2}$分布：  
+$$
+\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{\mathbf{A}_{\mathrm{EGMM}}} \equiv\left\|\frac{1}{N} \mathbf{Z}^{\prime} \hat{\mathbf{E}}\right\|_{\mathbf{A}_{\mathrm{EGM}}}=\frac{1}{N} \hat{\mathbf{E}}^{\mathbf{\prime}} \mathbf{Z} \mathbf{A}_{\mathrm{EGMM}} \mathbf{Z}^{\prime} \hat{\mathbf{E}} \sim \chi^{2}_{j-k} \tag{37}
+$$
+　　这就是Hansen统计量，它服从自由度为$j-k$的$\chi^{2}$分布，这里自由度其实就是过度识别的维度。在实际使用中，不应该显著（p值小于0.1）；如果显著，则表明拒绝了零假设，工具变量不是联合有效的。
+
+> 　　 然而，需要注意的是，如果使用的工具变量太多，那么Hansen统计量会非常不显著，常常等于1。这是因为，$j-k$越大，意味着分布显$\chi^{2}$著的门槛越高（请查阅$\chi^{2}$分布的表格）。也就是说，工具变量太多，会让Hansen检验的效果变弱，这是需要注意的。通常Hansen检验的p值大于0.25就要小心了，这时需要考虑减少工具变量的数量。       
+
+- Sargan 检验的统计量
+
+　　 Sargan 检验的统计量类似，只不过把Hansen统计量中的$A_{EGMM}$ 替换成了 $(\mathbf{Z} \mathbf{Z})^{-1} $，即
+$$
+S=\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{\left(z^{\prime} z\right)^{-1}}=\frac{1}{N} \hat{\mathbf{E}}^{\prime} \mathbf{Z}(\mathbf{Z} \mathbf{Z})^{-1} \mathbf{Z}^{\prime} \hat{\mathbf{E}} \sim \chi_{j-k}^{2}\tag{38}
+$$
+
+> 　　 然而，该统计量有时候是不一致的，如果在命令中要求报告稳健的Sargan统计量，软件会做两阶段GMM估计（先找任意合理的H，令 $\mathbf{A}=\left(\mathbf{Z}^{\prime} \mathbf{H} \mathbf{Z}\right)^{-1}$，估计出第一步参数 $\hat{\beta_{1}}$；再根据$\hat{\beta_{1}}$，计算出残差项的方差-协方差矩阵$\hat{\Omega}_{\hat{\beta}_{1}}$ ，令 $\mathbf{A}=\left(\mathbf{Z}^{\prime} \hat{\Omega}_{\hat{\beta}_{1}} \mathbf{Z}\right)^{-1}$，估计出第二部参数 $\hat{\beta_{1}}$），根据第二步的参数结果，默默报告出Hansen统计量。整体上说，Hansen统计量好像更靠谱一点，所以报告的时候，更多关注Hansen统计量。
+
+# 动态面板数据模型（FD-GMM与SYS-GMM）
+
+　　 动态面板数据模型，是指通过在静态面板数据模型中引入滞后被解释变量以反映动态滞后效应的模型。<font color=blue> 这种模型的特殊性在于被解释变量的动态滞后项与随机误差组成部分中的个体效应相关，从而造成估计的内生性。</font>
+
+　　也就是说在动态面板模型允许使用过去的可观测值，考虑了过去结果对当前结果的影响。而实际上许多经济学问题本质上都是动态的，其中一些经济模型表明，当前的行为依赖于过去的行为，例如**就业模型**和**公司投资问题**。
+
+　　**现在回到我们的动态面板数据，对数据和 模型有如下假定：**  
+
+- 1、动态。模型中包含了因变量的滞后项；
+- 2、有个体的固定效应；
+- 3、可以有一些自变量是内生的；
+- 4、除了固定效应之外的误差项$\varepsilon_{i,t}$可以异方差，可以序列相关；
+- 5、不同个体之间的误差项$\varepsilon_{i,t}$和$\varepsilon_{j,t}$不会相关。
+- 6、可以有前定的（Predetermined）但不是完全外生的变量。
+- 7、“大N，小T”，即个体数量要足够多，但时间不用太长。如果时间足够长的话，动态面板误差不会太大，用固定效应即可。
+
+　　从上述要求可以看出，GMM方法特别适合宏观的面板数据分析，因为宏观变量中，很难找出绝对外生的变量，变量之间多少会互相影响。而GMM方法可以“有一些自变量是内生的”，这可能也是GMM方法在文献中这么常用的原因。此前已经说过，不能用传统的OLS方法或者固定效应模型进行动态面板数据的分析，那样会得到有偏的估计量。先要对数据进行一定的变换，然后根据不同的矩条件设定开展矩估计。其中数据变换有两种方法，矩条件的设定也有两种方法。
+
+　　**数据的变换方法：一阶差分还是垂直离差**
+
+　　为了消除动态面板数据中的固定效应，通常用的有两种方法：一阶差分(first difference)和垂直离差(orthogonal deviations)。一阶差分之前已经介绍过了，这种方法是difference GMM 中默认的方法。缺点是如果数据中有缺失值，那么最终的估计会缺失很多样本，原始数据缺一行往往会导致差分后的数据缺两行。一种替代的方案是用垂直离差（xtabond2 命令中用 orthogonal 选项实现），每个变量减去该变量未来所有观测值的平均值，即：  
+　　
+$$
+w_{i, t+1}^{\perp} \equiv c_{i t}\left(w_{i, t}-\frac{1}{T_{i t}} \sum_{s>t} w_{i s}\right) \tag{39}
+$$
+　　式子中，$c_{i t}=\sqrt{T_{i t} /\left(T_{i t}+1\right)}$为调整权重变量， $T_{i,t}$是从$t$期开始以后观测值的数量。对于非平衡面板，和数据有缺失的面板，这种方法避免了因缺失数据带来的样本损失，因为调整的时候只是把未来的平均值减去，样本数不会因缺失未来个别观测值而受损。然而，对于平衡面板数据，一阶差分和垂直离差估计出来的结果会完全一样。
+
+　　**Different GMM还是 System GMM**
+
+　　令数据变换之后的回归方程变为:
+$$
+Y_{i, t}^{*}=\alpha Y_{i, t-1}^{*}+\beta X_{i t}^{*}+\varepsilon_{i t}\tag{40}
+$$
+
+
+　　这种变换可以是一阶差分，也可以是垂直离差。Different GMM的逻辑是，如果是垂直离差变换，用 
+
+$Y_{i, t-2}$作为 $Y_{i, t-1}^{*}$的工具变量；如果是一阶差分变换，用$\Delta Y_{i, t-2}$作为 $Y_{i, t-1}^{*}$的工具变量，此时 $Y_{i, t-1}^{*}=\Delta Y_{i, t-2}$。$X_{i, t}^{*}$对应的工具变量也类似，如果是垂直离差，就用滞后一阶的，如果是差分就用滞后一阶的差分作为工具变量。在实现的时候，为了提高估计的有效性，通常还会加入更高阶的滞后项（滞后差分）作为工具变量。这些变量的加入利用了更多的信息，然而也会带来麻烦，让工具变量的数量随T平方成比例增加。为了控制工具变量的数量，一个选择就是采用collapse选项把这些工具变量变成一列。
+
+　　如果因变量的变化过程接近随机游走，那么Difference GMM的估计量会有较大偏差。
+
+system GMM的方法和Different GMM完全不同，它不需要对自变量和因变量进行数据变换。它假定工具变量的差分，即 $\Delta w_{i t}=w_{i t}-w_{i, t-1}$，应该外生于固定效应： $E\left(\Delta w_{i t}　　 u_{i}\right)=0$。如果 $w$是内生的，$\Delta w_{i t-1}$就可以作为工具变量，更高阶的差分也可以做工具变量。如果$w$是前定的但不是完全外生的， $\Delta w_{i t}$可以作为工具变量，更高阶的差分也可以做工具变量。当然，更高阶差分加入后，还是会增加工具变量数量，需要在具体计算时想办法控制。
+
+　　使用GMM方法的注意事项
+
+　　可以尝试先做（2）式的 OLS，再做（3）式的固定效应。当然这两个估计都是有偏误的，然而这两个估计的系数应该是真实系数的上限和下限，可以给最后的 GMM 估计限定参考范围。
+
+　　大 N小T，如果N太小了，则估计出来的标准差可能不太靠谱**。实际上如果用省际面板去做的话，不满足大N小T个条件，但中文文献中充斥着这样的研究。如果样本的 N较小，但还可以接受（比如 N=70），然而又想用此方法，那么加上small选项。
+
+　　解释变量中，放入时间虚拟变量。比如，数据有 10 年，则放入 9 个虚拟变量。加入后，可以让误差项 $\varepsilon_{i,t}$和$\varepsilon_{j,t}$不会相关这个条件更容易满足。
+
+　　如果数据中间有间隙，尽量利用垂直离差（对于每个变量，包括自变量和因变量， 减去它未来值的平均值，就是加上 orthogonal 选项，见 Roodman（2009）），这会减少样本量的损失。因为数据中间缺一行，一阶差分（$w_{i,t}-w_{i,t-1}$）后就会缺两行数据。但对平衡面板数据，两种数据变换方法结果一样。
+
+　　通常，每个自变量都要出现两次（除了系统外的工具变量）。先作为自变量出现在在xtabond2 命令中逗号的左边，再以某种形式作为工具变量出现在逗号右边。如果变量是完全外生的，那么放到 ivstyle(w)（表示直接作为工具变量）；如果 是前定的，但不是完全外生的，则放到 gmmstyle(w)（表示从滞后一期开始都作为工具变量）;如果 是内生的，则放到 gmmstyle(L.w)（表示从滞后两期开始都作为工具变量）。
+
+　　报告工具变量的数量。2如果按照上一条的做法，工具变量的数量会很多。这样会导致overidentification test 不准确，【一个标志就是 Hansen 统计量的 p 值变为 1，Hansen test的 p 值在（0.1,0.25）之外都要小心，太小表明拒绝工具变量有效的假设，太大表明选的工具变量太多，hansen检验变弱了】。通常，需要限制工具变量数量，可以用collapse选项，也可以用 laglimits()选项。习惯做法是，选择不同数量的工具变量以显示估计系数的稳健性。工具变量数量的上限就是模型中个体的数量（也就是 N），超出此上限，xtabond2 命令会报警。
+
+　　使用 system GMM 的时候要注意，能使用该模型的前提是，工具变量的变化$w_{i,t}-w_{i,t-1}$要和固定效应垂直。因此数据应该在稳态附近，否则这些变量的变化就会和固定效应关系比较大，从而不满足 system GMM 适用的条件。
+
+　　由于 GMM 方法有很多设定选项，在报告结果时，报告你的选项。System GMM 还是Difference GMM；是用垂直离差还是一阶差分；选用什么工具变量，滞后几期；选择什么样的 robust 标准差，等等。
+
+## 模型基本形式
+
+### AR(1) 模型
+
+$$
+y_{i,t}=\delta y_{i,t-1}+x'_{i,t} \beta+\alpha_{i}+\varepsilon_{i,t} \tag{41}
+$$
+
+$$
+i=1, \ldots, N \quad t=1, \ldots, T
+$$
+
+- 基本设定
+  - $y_{i,t}$是一个$n_{i} \times 1$的向量,由时间t上的样本中每个空间单位的被解释变量的一个观测值，$\delta$为其在时间上的滞后值$y_{i,t-1}$的响应参数；
+  - $x_{i,t}$是$n_{i}\times k$的外生解释变量矩阵，$\beta$为其响应参数向量；
+  - $\alpha_{i}$是特定效应，且有$\alpha_{i} \sim (0,\sigma_{\alpha}^2)$；
+  - $\epsilon_{i,t}$是服从 $i.i.d$ 分布的干扰项，且有$\epsilon_{i,t} \sim (0,\sigma_{\epsilon}^2)$
+
+　　这里就特定效应类型将模型分为两大类。
+
+### 固定效应模型(Fixed effect)
+
+　　通过消去特定效应项$\alpha_{i}$得到
+$$
+y_{i,t}-\overline{y}_{i}=\delta(y_{i,t-1}-\overline{y}_{i.-1})+(x_{i,t}-\overline{x}_{i})\beta+(\epsilon_{i,t}-\overline{\epsilon}_{i})\tag{42}
+$$
+
+$$
+\overline{y}_{i,-1}=\sum_{t=2}^{T}\frac{y_{i,t-1}}{T-1}
+$$
+
+　　但是此时$(y_{i,t-1}-\overline{y}_{i.-1})$与$(\epsilon_{i,t}-\overline{\epsilon}_{i})$相关，尽管是在$\epsilon_{i,t}$是序列不相关的的情况下。这是因为$y_{i,-1}$与$\overline{\epsilon}_{i}$相关，后一项的均值包含了$\epsilon_{i,t-1}$这一项，明显与$y_{i,t-1}$是相关的。这可以看出固定效应模型的估计是有偏的。
+
+### 随机效应模型(Random effect )
+
+　　若使用广义最小二乘法(GLS)，同理可知，$(y_{i,t-1}-\theta\overline{y}_{i.-1})$与$(\epsilon_{i,t}-\theta\overline{\epsilon}_{i})$是相关的。因此，可以看出，对于一个动态面板数据模型来说，若使用GLS估计方法，不管是固定效应模型还是随机效应模型，它的估计都是有偏且不一致连续的。且偏误$(bias)$的阶数是$\frac{1}{T}$,仅当$T\rightarrow0$时$bias\rightarrow0$。但是当 $T$ 很小，$N\rightarrow \infty$时可能会引起很大的偏误。
+
+- **提出问题：为什么当 $T$固定，$N\rightarrow \infty$时会出现偏误和不一致连续的情况？**
+
+  - 首先考虑没有外生向量的模型：
+    $$
+    y_{i,t}=\delta y_{i,t-1}+\alpha_{i}+\epsilon_{i,t} \quad \left| \delta\right|<1 \tag{43}
+    $$
+
+　　假设，对于向量 $y_{i,t}$ 我们在 $t=0,1,...,T$ 时有观测值，则固定效应模型的估计量为
+    $$
+    \hat{\delta_{FE}}=\frac{\sum_{i=1}^{N}\sum_{t=1}^{T}(y_{i,t}-\bar{y_{i}})(y_{i,t-1}-\bar{y_{i,-1}})}{\sum_{i=1}^{N}\sum_{t=1}^{T}(y_{i,t-1}-\bar{y_{i,-1}})^2 }\tag{44}
+    $$
+
+    $$
+    \bar{y_{i,t}}=\frac{1}{T}\sum_{t=1}^{T}y_{i,t-1} \ \& \ \bar{y_{i,-1}}=\frac{1}{T}\sum_{t=1}^{T}y_{i,t-1}
+    $$
+
+　　将等式(43)代入等式(44)中，可以得到估计量的特征：
+$$
+\hat{\delta_{FE}}=\delta+\frac{\frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}(\epsilon_{i,t}-\bar{\epsilon_{i}})(y_{i,t-1}-\bar{y_{i,-1}})}{\frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}(y_{i,t-1}-\bar{y_{i,-1}})^2}\tag{45}
+$$
+　　等式(45)中，当 $T$固定，$N\rightarrow \infty$的情况下，FE模型的估计值有偏且不一致。因为等式(45)右边最后一项的期望不为零，且在$N\rightarrow \infty$的情况下不收敛到零。Nickell (1981) 和 Hsia (2003) 曾提出过：
+$$
+plim_{n\rightarrow \infty}\frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}(\epsilon_{i,t}-\bar{\epsilon_{i}})(y_{i,t-1}-\bar{y_{i,-1}})=-\frac{\delta_{\epsilon}^2}{T^2}\times\frac{(T-1)-T_{\delta+\delta^T}}{(1-\delta)^2}\neq0 \tag{46}
+$$
+　　因此，对于固定的 $T$，我们有不一致的估计量，不过这与$\alpha_{i}$无关，$\alpha_{i}$已经在估计过程过被去掉了。这里的问题是被解释变量的动态滞后项与随机误差组成部分中的个体效应相关，如在等式(42)与(45)我们所遇到的问题，即$y_{i,-1}$与$\overline{\epsilon}_{i}$相关。但当$T\rightarrow \infty$时，等式(46)收敛到零，此时当$T\rightarrow \infty$ 和$N\rightarrow \infty$时，$\delta_{FE}$的估计是一致的。
+
+## 估计方法
+
+###  IV
+
+　　为了解决估计量不一致的问题，Anderson 和 Hsio (1981) 提出了**工具变量估计(IV)**。首先，我们考虑消去个体效应 $\alpha_{i}$，对此，做差分得：
+$$
+y_{i,t}-y_{i,t-1}=\delta(y_{i,t-1}-y_{i,t-2})+(\epsilon_{i,t}-\epsilon_{i,t-1}) \quad t=2,...,T\quad \tag{47}
+$$
+
+- 此处若使用**最小二乘法(OSL)**得到等式(47)的估计量是不一致的，尽管是在$T\rightarrow \infty$的情况下，这是因为$y_{i,t-1}$和$\epsilon_{i,t-1}$相关。
+
+- 转换规范等式(47)给出一个**IV估计**的方法，例如，$y_{i,t-2}$与$(y_{i,t-1}-y_{i,t-2})$相关，但与$\epsilon_{i,t-1}$不相关，所以选取$y_{i,t-2}$作为工具变量，给出了$\delta$的一个IV估计：
+  $$
+  \hat{y_{IV}}=\frac{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t}-y_{i,t-1})}{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t-1}-y_{i,t-2})} \tag{48}
+  $$
+
+
+　　对应的关于等式(8)的一致性条件为
+$$
+plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2}=0 \quad \tag{49}
+$$
+  $T\rightarrow \infty \ or \ N\rightarrow \infty \ or \ T\rightarrow \infty \ and \ N \rightarrow \infty$注意这里$(\epsilon_{i,t}-\epsilon_{i,t-1})$是MA(1)
+
+- Anderson 和 Hsio (1981) 　　又给出了另一个**IV估计**的方案，这里选择将$(y_{i,t-2}-y_{i,t-3})$作为工具变量。
+  $$
+  \hat{y_{IV}}^{(2)}=\frac{\sum_{i=1}^{N}\sum_{t=3}^{T}(y_{i,t-2}-y_{i,t-3})(y_{i,t}-y_{i,t-1})}{\sum_{i=1}^{N}\sum_{t=3}^{T}(y_{i,t-2}-y_{i,t-3})(y_{i,t-1}-y_{i,t-2})} \tag{50}
+  $$
+  同理，得到等式(10)的一致性条件为:
+  $$
+  plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})=0 \tag{51}
+  $$
+
+- 且只要$$\epsilon_{i,t}$$不是自相关的，等式(48)和(51)的一致性都得到了保障。
+
+　　可以看出，等式(50)构建工具变量时比等式(48)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(48)还是等式(50)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，MM估计可以统一所有的估计量且消去样本容量减少的缺点。
+
+### GMM
+
+　　可得等式(49)的矩条件为:
+$$
+plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2}=E[(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2} ]=0 \tag{52}
+$$
+　　同理，等式(51)的矩条件为
+$$
+plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})\\=E[(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})]=0 \tag{53}
+$$
+　　这两个IV估计值都在估计中附加了一个矩条件。但是，据我们所知，附加更多的矩条件则能增加估计值的效率。
+
+
+　　据此，Arellano 和 Bond (1991) 提出可以通过开发附加矩来扩大工具的列表并且使工具的数量随着 t 变化。首先，固定T，这里考虑 T=4。
+
+- t = 2 时，矩条件变为：$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$
+  这意味着变量$y_{i,0}$是有效的工具，因为它与$(y_{i,2}-y_{i,1})$高度相关而与$(\epsilon_{i,2}-\epsilon_{i,1})$不相关。
+- t = 3 时，同理可得，矩条件为：$E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}$同时也满足![E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0](https://math.jianshu.com/math?formula=E%5B(%5Cepsilon_%7Bi%2C2%7D-%5Cepsilon_%7Bi%2C1%7D)y_%7Bi%2C0%7D%5D%3D0)
+　　其中，$y_{i,0}\ y_{i,1}$与$(y_{i,2}-y_{i,1})$相关，而与$(\epsilon_{i,3}-\epsilon_{i,2})$不相关。
+- t = 4 时，我们将得到三组矩条件：$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$；$E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}$；  $E[(\epsilon_{i,4}-\epsilon_{i, 3})y_{i,2}]=0$
+
+　　一直继续这么添加矩条件之后，有效的工具集合变为$(y_{i0},y_{i2}...y_{i,T-2})$而所有的这些矩条件可以作为**广义矩估计(GMM)**的一个框架。对于一般的样本大小 T，所有差分后的误差项可排成一个向量：
+$$
+\Delta \varepsilon_{i}=\left( \begin{array}{c}{\varepsilon_{i 2}-\varepsilon_{i 1}} \\ {\cdots} \\ {\varepsilon_{i, T}-\varepsilon_{i, T-1}}\end{array}\right) \tag{54}
+$$
+　　由工具变量排成的矩阵为：
+$$
+Z_{i} =\left( \begin{array}{ccccccc}{y_{i0}} & {0} & {0} & {\ldots} & {0} & {\ldots} & {0}\\ {0} & {y_{i0}} & {y_{i1}} & {\ldots} & {0} & {\ldots} & {0} \\ {\vdots} & {\vdots} & {\vdots} & {\ldots} & {\vdots} & {\ddots} & {\vdots} \\ {0} & {0} & {0} & {\ldots} & {y_{i0}} & {\ldots} & {y_{i, T-2}} \end{array}\right) \tag{55}
+$$
+　　矩阵$Z_{i}$的每一行都包含了给定时段所有有效工具。因此，所有矩条件的集合可写为：
+$$
+E\left\{Z_{i}^{\prime} \Delta \varepsilon_{i}\right\}=0 \tag{56}
+$$
+　　为了得到GMM估计，将等式(56)改写成
+$$
+E\left\{Z_{i}^{\prime}\left(\Delta y_{i}-\gamma \Delta y_{i,-1}\right)\right\}=0 \tag{57}
+$$
+
+　　显然，矩条件的数量会增加未知参数的数量。 $\gamma$这里我们通过最小化由等式(57)所对应的条件表达的二次型来估计参数$\gamma$：
+$$
+\min _{\gamma}\left[\frac{1}{N} \sum_{i=1}^{N} Z_{i}^{\prime}\left(\Delta y_{i}-\gamma \Delta y_{i,-1}\right)\right]^{\prime} W_{N}\left[\frac{1}{N} \sum_{i=1}^{N} Z_{i}^{\prime}\left(\Delta y_{i}-\gamma \Delta y_{i,-1}\right)\right] \tag{58}
+$$
+
+
+　　其中$W_{i}$是定义的对称正定的权重矩阵。然后，通过对等式(58)关于$\gamma$求微分并求解$\gamma$得到GMM估计量：
+$$
+\gamma_{G \hat{M} M}=\left(\left(\sum_{i=1}^{N} \Delta y_{i,-1}^{\prime} Z_{i}\right) W_{N}\left(\sum_{i=1}^{N} Z_{i}^{\prime} \Delta y_{i,-1}\right)\right)^{-1}\\ 
+\times\left(\sum_{i=1}^{N} \Delta y_{i,-1}^{\prime} Z_{i}\right) W_{N}\left(\sum_{i=1}^{N} Z_{i}^{\prime} \Delta y_{i}\right) \tag{59}
+$$
+
+　　MM估计并不强制要求$\varepsilon_{it}$关于个体与时间服从独立分布，但是需要注意的是，需要不存在自相关以保证矩条件有效。因此，在一个短面板（即T比较小），建议强制$\epsilon_{it}$不存在自相关，并结合同方差性假设。  　
+
+
+　　Alvarez 和 Arellano (2003) 表示，通常，GMM估计在$T \rightarrow \infty , N \rightarrow \infty$的情况下仍然保持一致性。但是，对于$T \rightarrow \infty$的情况下，GMM估计和FE估计会很接近，这给我们估计方法提供了一个更具有吸引力的选择。
+
+> 另一种分析：
+
+　　Arellano和Bond ( 1991) 提出了一阶差分GMM (FD-GMM)估计方法，主要做法是用变量的水平滞后值作为其一阶差分项的工具变量。具体来说：
+
+　　由我们上文所考虑的没有外生向量的模型(41)的水平方程$y_{i,t}=\delta y_{i,t-1}+\alpha_{i}+\varepsilon_{i,t}$，考虑它的差分方程
+$$
+\Delta y_{it}=\delta \Delta y_{i,t-1} + \Delta \varepsilon_{it} \tag{60}
+$$
+　　因为$\Delta y_{i,t-1}$相关联，所以将$y_{i,t-2}$作为$\Delta y_{i,t-1}$的工具变量。这种估计方法就是FD-GMM。<font color=red> 但是, Blundell和Bond (1998)曾指出,一阶差分GMM估计方法容易受到**弱工具变量**的影响而得到有偏的估计结果。</font>即由模型(41)的水平方程可得
+$$
+\Delta y_{i,t-1}=(\delta-1)y_{i,t-2}+\alpha_{i}+\varepsilon_{i,t-1}\tag{61}
+$$
+　　当$\delta$接近1的时候，工具变量和外生变量的关系就会变的很弱，这就会产生“弱工具变量问题”。 为了克服弱工具变量的影响, Arellano和Bover (1995) 以及Blundell和Bond (1998)提出了另外一种更加有效的方法,即系统GMM (SYS-GMM)估计方法。其具体做法是将水平方程和差分方程结合起来进行估计,在这种估计方法中,滞后水平作为一阶差分的工具变量,而一阶差分又作为水平变量的工具变量。具体来说：在上述FD-GMM估计中，可以看作是应用了矩条件$E(\Delta \varepsilon_{it}y_{i,t-2}=0)$，但是却有个矩条件被忽略了， 即：
+$$
+E\left(\Delta y_{i, t-1}\left(\alpha_{i}+\varepsilon_{i t}\right)\right)=E\left(\Delta y_{i, t-1}\left(y_{i t}-\delta y_{i, t-1}\right)\right)=0\tag{62}
+$$
+
+　　 而SYS-GMM则是考虑到了这一点，利用了更多的有效信息，使得估计不受$\delta$接近1时的影响。
+
+## GMM在动态面板估计中的案例
+
+> 动态面板GMM常用的Stata命令：
+>
+> - `xtabond`命令实现了 Arellano 和 Bond Roodman在1991年所提出的一阶差分矩估计法（FD-GMM），此时它的矩条件是将因变量的滞后和外生变量的一阶差分作为一阶差分方程的工具。
+> - `xtdpdsys`实现了Arellano、Bover/Blundell 和 Bond在1998年提出的系统 GMM 估计（SYS-GMM） ，它使用了`xtabond`的矩条件，同时又将因变量滞后第一差分作为水平方程的工具。
+> - `xtdpd`则是一种更加灵活的替代方法，它可以用比`xtabond`和`xtdpdsys`更复杂的结构来拟合在特殊误差和预定变量中具有低阶移动平均关联的模型。
+> - `estat bond`允许您在一阶差分残差中测试序列相关性，并测试过度识别限。
+> - `estat overid`允许您在估计后进行过度识别检验。
+
+### FD-GMM
+
+- 我们可以使用`xtabond`命令来实现FD-GMM估计，这里我们使用数据`abdata`
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+webuse abdata
+xtabond n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+
+```
+
+
+
+
+ `GMM`命令与`xtabond`命令的比较。
+ 
+ 
+ ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+webuse abdata,clear
+xtabond n L(0/1).w L(0/1).k, lags(1) noconstant vce(robust)
+
+```
+
+　　 也可以用 GMM 的形式估计动态面板，表示为：
+　　 
+ ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+webuse abdata,clear
+gmm (D.n - {rho}*LD.n - {xb:D.w LD.w D.k LD.k}),  ///
+    xtinstruments(n, lags(2/.)) ///
+    instruments(D.w LD.w D.k LD.k, noconstant) ///
+    deriv(/rho = -1*LD.n) deriv(/xb = -1) winitial(xt D) onestep
+```　　 
+
+### SYS-GMM  
+
+
+- 下面用`xtdpdsys`命令来实现SYS-GMM估计
+
+
+ ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+webuse abdata,clear
+xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+```　
+
+　　 可以看到工具变量的数量变多。
+
+>  `xtdpd`则是一种更加灵活的替代方法，它可以用比`xtabond`和`xtdpdsys`更复杂的结构来拟合在特殊误差和预定变量中具有低阶移动平均关联的模型。
+
+### 假设检验
+
+#### 序列相关检验
+
+　　 可以看出 Arellano–Bond估计工具变量的设定的关键点在于
+$$
+E\left(\Delta y_{i(t-j)} \Delta \varepsilon_{i t}\right)=0 \quad j \geq 2\tag{63}
+$$   
+
+　　 我们可以在 Stata 中使用`estat abond`命令来测试这些条件。
+　　 从本质上来说，一般未观测到的的差分项$\Delta y_{it}$应与其因变量的第二期滞后$y_{i,t-2}$和之后的滞后项都无关。如果不是这样，我们又回到了一开始的问题，内生性。所以我们主要关心的是有没有2阶或者更高阶的序列相关性。  
+
+　　 下面我们用`estat bond`命令来测试我们上述的例子：
+
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysdir set PLUS "D:\soft\stata\ado\plus"
+webuse abdata,clear
+qui xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+*序列相关检验
+estat abond, artests(4)
+```
+
+　　可以看到的是，我们可以拒绝一阶序列相关的原假设，但是不能拒绝2、3、4阶序列相关的原假设。所以原模型是合理的。
+
+#### 过度识别检验（estat overid）
+
+　　检验工具变量是否是与干扰项相关，也就是工具变量是否为外生变量。
+　　
+　　
+```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
+sysdir set PLUS "D:\soft\stata\ado\plus"
+webuse abdata,clear
+qui xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+*过度识别检验
+estat overid
+```
+
+　　原假设是：所有工具变量都是外生。其中包含 `hansen` 检验和` sargan` 检验，可以用 Stata 中的`xtabond2`命令实现。
+
+## GMM在动态面板中的其他例子
+
+- `xtabond`命令实现了 Arellano 和 Bond Roodman在1991年所提出的一阶差分矩估计法（FD-GMM），此时它的矩条件是将因变量的滞后和外生变量的一阶差分作为一阶差分方程的工具。
+- `xtdpdsys`实现了Arellano、Bover/Blundell 和 Bond在1998年提出的系统 GMM 估计（SYS-GMM） ，它使用了`xtabond`的矩条件，同时又将因变量滞后第一差分作为水平方程的工具。
+- `xtdpd`则是一种更加灵活的替代方法，它可以用比`xtabond`和`xtdpdsys`更复杂的结构来拟合在特殊误差和预定变量中具有低阶移动平均关联的模型。
+- 后估计工具允许您在一阶差分残差中测试序列相关性，并测试过度识别限制的有效性。
+
+###     例子
+
+​      基于Layard和Nickell(1986)的工作，Arellano和Bond(1991)将劳动力需求的动态模型拟合到位于英国的一个具有不平衡面板的公司上。首先，我们根据 工资(wages)、资本存量(capital stock)、行业产出(industry output)、年度假人(year dummies) 以及 一个时间趋势(a time trend )对就业率(employment) 进行建模，其中包括就业，工资和资本存量的滞后。我们将使用`xtabond`命令
+
+```stata
+ . webuse abdata
+ . xtabond n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+
+Arellano-Bond dynamic panel-data estimation     Number of obs     =        611
+Group variable: id　　　　　　   Number of groups  =        140
+Time variable: year
+　　　　　　　　　　   Obs per group:
+　　　　　　　　　　　　        min =　　 4
+　　　　　　　　　　　　        avg =   4.364286
+　　　　　　　　　　　　        max =　　 6
+
+Number of instruments =     40　　　　Wald chi2(13)     =    1318.68
+　　　　　　　　　　   Prob > chi2       =     0.0000
+One-step results
+　　　　　　　　 (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .6286618   .1161942     5.41   0.000     .4009254    .8563983
+　　    |
+　　  w |
+　　--. |  -.5104249   .1904292    -2.68   0.007    -.8836592   -.1371906
+　　L1. |   .2891446    .140946     2.05   0.040     .0128954    .5653937
+　　L2. |  -.0443653   .0768135    -0.58   0.564     -.194917    .1061865
+　　    |
+　　  k |
+　　--. |   .3556923   .0603274     5.90   0.000     .2374528    .4739318
+　　L1. |  -.0457102   .0699732    -0.65   0.514    -.1828552    .0914348
+　　L2. |  -.0619721   .0328589    -1.89   0.059    -.1263743    .0024301
+　　    |
+      yr1980 |  -.0282422   .0166363    -1.70   0.090    -.0608488    .0043643
+      yr1981 |  -.0694052    .028961    -2.40   0.017    -.1261677   -.0126426
+      yr1982 |  -.0523678   .0423433    -1.24   0.216    -.1353591    .0306235
+      yr1983 |  -.0256599   .0533747    -0.48   0.631    -.1302723    .0789525
+      yr1984 |  -.0093229   .0696241    -0.13   0.893    -.1457837    .1271379
+        year |   .0019575   .0119481     0.16   0.870    -.0214604    .0253754
+       _cons |  -2.543221   23.97919    -0.11   0.916    -49.54158    44.45514
+------------------------------------------------------------------------------
+Instruments for differenced equation
+        GMM-type: L(2/.).n
+        Standard: D.w LD.w L2D.w D.k LD.k L2D.k D.yr1980 D.yr1981 D.yr1982
+　　　　D.yr1983 D.yr1984 D.year
+Instruments for level equation
+        Standard: _cons
+```
+
+​        由于我们的回归模型中包含一个n的滞后，`xtabond`使用滞后2期和back作为工具。外生变量的差分也可以作为工具。
+
+　　这里，我们使用`xtdpdsys`来重新定义模型
+
+```stata
+. xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
+
+System dynamic panel-data estimation　　   Number of obs     =        751
+Group variable: id　　　　　　   Number of groups  =        140
+Time variable: year
+　　　　　　　　　　   Obs per group:
+　　　　　　　　　　　　        min =　　 5
+　　　　　　　　　　　　        avg =   5.364286
+　　　　　　　　　　　　        max =　　 7
+
+Number of instruments =     47　　　　Wald chi2(13)     =    2579.96
+　　　　　　　　　　   Prob > chi2       =     0.0000
+One-step results
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .8221535    .093387     8.80   0.000     .6391184    1.005189
+　　    |
+　　  w |
+　　--. |  -.5427935   .1881721    -2.88   0.004     -.911604   -.1739831
+　　L1. |   .3703602   .1656364     2.24   0.025     .0457189    .6950015
+　　L2. |  -.0726314   .0907148    -0.80   0.423    -.2504292    .1051664
+　　    |
+　　  k |
+　　--. |   .3638069   .0657524     5.53   0.000     .2349346    .4926792
+　　L1. |  -.1222996   .0701521    -1.74   0.081    -.2597951     .015196
+　　L2. |  -.0901355   .0344142    -2.62   0.009    -.1575862   -.0226849
+　　    |
+      yr1980 |  -.0308622    .016946    -1.82   0.069    -.0640757    .0023512
+      yr1981 |  -.0718417   .0293223    -2.45   0.014    -.1293123    -.014371
+      yr1982 |  -.0384806   .0373631    -1.03   0.303    -.1117111    .0347498
+      yr1983 |  -.0121768   .0498519    -0.24   0.807    -.1098847    .0855311
+      yr1984 |  -.0050903   .0655011    -0.08   0.938    -.1334701    .1232895
+        year |   .0058631   .0119867     0.49   0.625    -.0176304    .0293566
+       _cons |  -10.59198   23.92087    -0.44   0.658    -57.47602    36.29207
+------------------------------------------------------------------------------
+Instruments for differenced equation
+        GMM-type: L(2/.).n
+        Standard: D.w LD.w L2D.w D.k LD.k L2D.k D.yr1980 D.yr1981 D.yr1982
+　　　　D.yr1983 D.yr1984 D.year
+Instruments for level equation
+        GMM-type: LD.n
+        Standard: _cons
+```
+
+​        比较这两个命令输出的页脚说明了这两个估计器之间的关键区别。`xtdpdsys`将n的滞后差也作为工具纳入水平方程，而`xtabond`没有。`xtdpdsys`的工具变量变多了，但是模型的标准误降低了。
+
+​        这些GMM估计量的矩条件只有在特征误差不存在序列相关性的情况下才有效。由于白噪声的第一个差异必然是自相关的，我们只需要关注第二个和更高的自相关。我们可以使用`estat abond`测试自相关:
+
+```stata
+ . estat abond, artests(4)
+
+Dynamic panel-data estimation　　　　 Number of obs     =        751
+Group variable: id　　　　　　   Number of groups  =        140
+Time variable: year
+　　　　　　　　　　   Obs per group:
+　　　　　　　　　　　　        min =　　 5
+　　　　　　　　　　　　        avg =   5.364286
+　　　　　　　　　　　　        max =　　 7
+
+Number of instruments =     47　　　　Wald chi2(13)     =    2579.96
+　　　　　　　　　　   Prob > chi2       =     0.0000
+One-step results
+　　　　　　　　 (Std. Err. adjusted for clustering on id)
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .8221535    .093387     8.80   0.000     .6391184    1.005189
+　　    |
+　　  w |
+　　--. |  -.5427935   .1881721    -2.88   0.004     -.911604   -.1739831
+　　L1. |   .3703602   .1656364     2.24   0.025     .0457189    .6950015
+　　L2. |  -.0726314   .0907148    -0.80   0.423    -.2504292    .1051664
+　　    |
+　　  k |
+　　--. |   .3638069   .0657524     5.53   0.000     .2349346    .4926792
+　　L1. |  -.1222996   .0701521    -1.74   0.081    -.2597951     .015196
+　　L2. |  -.0901355   .0344142    -2.62   0.009    -.1575862   -.0226849
+　　    |
+      yr1980 |  -.0308622    .016946    -1.82   0.069    -.0640757    .0023512
+      yr1981 |  -.0718417   .0293223    -2.45   0.014    -.1293123    -.014371
+      yr1982 |  -.0384806   .0373631    -1.03   0.303    -.1117111    .0347498
+      yr1983 |  -.0121768   .0498519    -0.24   0.807    -.1098847    .0855311
+      yr1984 |  -.0050903   .0655011    -0.08   0.938    -.1334701    .1232895
+        year |   .0058631   .0119867     0.49   0.625    -.0176304    .0293566
+       _cons |  -10.59198   23.92087    -0.44   0.658    -57.47602    36.29207
+------------------------------------------------------------------------------
+Instruments for differenced equation
+        GMM-type: L(2/.).n
+        Standard: D.w LD.w L2D.w D.k LD.k L2D.k D.yr1980 D.yr1981 D.yr1982
+　　　　D.yr1983 D.yr1984 D.year
+Instruments for level equation
+        GMM-type: LD.n
+        Standard: _cons
+
+Arellano-Bond test for zero autocorrelation in first-differenced errors
+  +-----------------------+
+  |Order |  z     Prob > z|
+  |------+----------------|
+  |   1  |-4.6414  0.0000 |
+  |   2  |-1.0572  0.2904 |
+  |   3  |-.19492  0.8455 |
+  |   4  | .04472  0.9643 |
+  +-----------------------+
+   H0: no autocorrelation 
+```
+
+参考文献：
+ 1、 [Dynamic Panel Data : IV and GMM Estimation with Stata (Panel)](https://links.jianshu.com/go?to=%5Bhttp%3A%2F%2Frizaudinsahlan.blogspot.com%2F2017%2F11%2Fdynamic-panel-data-iv-and-gmm.html%5D(http%3A%2F%2Frizaudinsahlan.blogspot.com%2F2017%2F11%2Fdynamic-panel-data-iv-and-gmm.html))
+ 2、 [xtabond cheat sheet](https://links.jianshu.com/go?to=%5Bhttps%3A%2F%2Fblog.stata.com%2F2015%2F11%2F12%2Fxtabond-cheat-sheet%2F%5D(https%3A%2F%2Fblog.stata.com%2F2015%2F11%2F12%2Fxtabond-cheat-sheet%2F))
+
+
+
+### 重现 Arollano and Bond (1991) FD-GMM 结果
+
+```stata
+clear all
+set mem 32m
+set matsize 800
+use "http://www.stata-press.com/data/r7/abdata.dta"
+```
+
+- 设置变量，其一阶差分是年度虚拟变量和常数项。这个步骤一般不是必需的，但需要完全模仿DPD，因为它在FD-GMM中也是需要直接输入时间虚拟和常数项。
+
+```stata
+forvalues y = 1979/1984 {
+    gen yr`y'c = year>=`y'
+}
+gen cons = year
+```
+
+**运行结果**
+
+#### a1
+
+```stata
+xtabond2 n L(0/1).(l.n w) l(0/2).(k ys) yr198?c cons, gmm(L.n) iv(L(0/1).w l(0/2).(k ys) yr198?c cons) noleveleq noconstant robust
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, one-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       611
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 41　　　　    Obs per group: min =　　4
+Wald chi2(16) =   1727.45　　　　　　　　  avg =      4.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　6
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .6862261   .1445943     4.75   0.000     .4028266    .9696257
+　　L2. |  -.0853582   .0560155    -1.52   0.128    -.1951467    .0244302
+　　    |
+　　  w |
+　　--. |  -.6078208   .1782055    -3.41   0.001    -.9570972   -.2585445
+　　L1. |   .3926237   .1679931     2.34   0.019     .0633632    .7218842
+　　    |
+　　  k |
+　　--. |   .3568456   .0590203     6.05   0.000      .241168    .4725233
+　　L1. |  -.0580012   .0731797    -0.79   0.428    -.2014308    .0854284
+　　L2. |  -.0199475   .0327126    -0.61   0.542    -.0840631    .0441681
+　　    |
+　　 ys |
+　　--. |   .6085073   .1725313     3.53   0.000     .2703522    .9466624
+　　L1. |  -.7111651   .2317163    -3.07   0.002    -1.165321   -.2570095
+　　L2. |   .1057969   .1412021     0.75   0.454    -.1709542     .382548
+　　    |
+     yr1980c |   .0029062   .0158028     0.18   0.854    -.0280667    .0338791
+     yr1981c |   -.043344   .0169961    -2.55   0.011    -.0766557   -.0100323
+     yr1982c |   -.024839   .0202692    -1.23   0.220    -.0645658    .0148878
+     yr1983c |  -.0038161   .0219426    -0.17   0.862    -.0468227    .0391905
+     yr1984c |   .0040626   .0218975     0.19   0.853    -.0388558     .046981
+        cons |   .0095545   .0102896     0.93   0.353    -.0106127    .0297217
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.(w L.w k L.k L2.k ys L.ys L2.ys yr1980c yr1981c yr1982c yr1983c yr1984c
+    cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -3.60  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.52  Pr > z =  0.606
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(25)   =  67.59  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(25)   =  31.38  Prob > chi2 =  0.177
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(w L.w k L.k L2.k ys L.ys L2.ys yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(11)   =  12.01  Prob > chi2 =  0.363
+    Difference (null H = exogenous): chi2(14)   =  19.37  Prob > chi2 =  0.151
+```
+
+#### a2
+
+```stata
+xtabond2 n L(0/1).(l.n w) l(0/2).(k ys) yr198?c cons, gmm(L.n) iv(L(0/1).w l(0/2).(k ys) yr198?c cons) noleveleq noconstant two
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       611
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 41　　　　    Obs per group: min =　　4
+Wald chi2(16) =   2216.93　　　　　　　　  avg =      4.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　6
+------------------------------------------------------------------------------
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .6287089   .0904543     6.95   0.000     .4514216    .8059961
+　　L2. |  -.0651882   .0265009    -2.46   0.014     -.117129   -.0132474
+　　    |
+　　  w |
+　　--. |  -.5257597   .0537692    -9.78   0.000    -.6311453    -.420374
+　　L1. |   .3112899   .0940116     3.31   0.001     .1270305    .4955492
+　　    |
+　　  k |
+　　--. |   .2783619   .0449083     6.20   0.000     .1903432    .3663807
+　　L1. |   .0140994   .0528046     0.27   0.789    -.0893957    .1175946
+　　L2. |  -.0402484   .0258038    -1.56   0.119    -.0908229     .010326
+　　    |
+　　 ys |
+　　--. |   .5919243   .1162114     5.09   0.000     .3641542    .8196943
+　　L1. |  -.5659863   .1396738    -4.05   0.000    -.8397419   -.2922306
+　　L2. |   .1005433   .1126749     0.89   0.372    -.1202955     .321382
+　　    |
+     yr1980c |   .0006378   .0127959     0.05   0.960    -.0244417    .0257172
+     yr1981c |  -.0556422   .0143097    -3.89   0.000    -.0836888   -.0275956
+     yr1982c |  -.0209736   .0163224    -1.28   0.199    -.0529648    .0110177
+     yr1983c |   .0019072    .014625     0.13   0.896    -.0267574    .0305718
+     yr1984c |  -.0165899   .0153035    -1.08   0.278    -.0465842    .0134045
+        cons |   .0112155   .0077507     1.45   0.148    -.0039756    .0264066
+------------------------------------------------------------------------------
+Warning: Uncorrected two-step standard errors are unreliable.
+
+Instruments for first differences equation
+  Standard
+    D.(w L.w k L.k L2.k ys L.ys L2.ys yr1980c yr1981c yr1982c yr1983c yr1984c
+    cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -3.00  Pr > z =  0.003
+Arellano-Bond test for AR(2) in first differences: z =  -0.42  Pr > z =  0.678
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(25)   =  67.59  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(25)   =  31.38  Prob > chi2 =  0.177
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(w L.w k L.k L2.k ys L.ys L2.ys yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(11)   =  12.01  Prob > chi2 =  0.363
+    Difference (null H = exogenous): chi2(14)   =  19.37  Prob > chi2 =  0.151
+```
+
+#### b
+
+```stata
+xtabond2 n L(0/1).(l.n ys w) k yr198?c cons, gmm(L.n) iv(L(0/1).(ys w) k yr198?c cons) noleveleq noconstant two
+```
+
+输出结果为：
+
+```stata
+ Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       611
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 38　　　　    Obs per group: min =　　4
+Wald chi2(13) =   1603.26　　　　　　　　  avg =      4.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　6
+------------------------------------------------------------------------------
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .4741506   .0853032     5.56   0.000     .3069594    .6413417
+　　L2. |  -.0529677   .0272843    -1.94   0.052     -.106444    .0005087
+　　    |
+　　 ys |
+　　--. |    .609776   .1085238     5.62   0.000     .3970732    .8224788
+　　L1. |  -.4463736   .1248148    -3.58   0.000    -.6910061    -.201741
+　　    |
+　　  w |
+　　--. |  -.5132049   .0493453   -10.40   0.000      -.60992   -.4164898
+　　L1. |     .22464   .0800628     2.81   0.005     .0677198    .3815601
+　　    |
+　　  k |   .2927232   .0394626     7.42   0.000      .215378    .3700684
+     yr1980c |   .0036333   .0127335     0.29   0.775    -.0213239    .0285905
+     yr1981c |   -.050962   .0137101    -3.72   0.000    -.0778334   -.0240907
+     yr1982c |  -.0321491   .0139863    -2.30   0.022    -.0595618   -.0047364
+     yr1983c |  -.0123558   .0128418    -0.96   0.336    -.0375252    .0128135
+     yr1984c |  -.0207296   .0136789    -1.52   0.130    -.0475398    .0060806
+        cons |    .010509   .0072515     1.45   0.147    -.0037036    .0247216
+------------------------------------------------------------------------------
+Warning: Uncorrected two-step standard errors are unreliable.
+
+Instruments for first differences equation
+  Standard
+    D.(ys L.ys w L.w k yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -2.43  Pr > z =  0.015
+Arellano-Bond test for AR(2) in first differences: z =  -0.33  Pr > z =  0.739
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(25)   =  75.46  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(25)   =  30.11  Prob > chi2 =  0.220
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(ys L.ys w L.w k yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(14)   =  13.33  Prob > chi2 =  0.501
+    Difference (null H = exogenous): chi2(11)   =  16.78  Prob > chi2 =  0.115
+```
+
+#### c
+
+可用数据集缺少销售和库存信息，因此这里必须使用别的工具。 该回归完美地复制了 DPD 在 Ox包中 abest3.out 的结果
+
+```stata
+xtabond2 n L(0/1).(l.n ys w) k yr198?c cons, gmm(L.n) gmm(w k, lag(2 3)) iv(L(0/1).ys yr198?c cons) noleveleq noconstant two
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       611
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 59　　　　    Obs per group: min =　　4
+Wald chi2(13) =   2668.33　　　　　　　　  avg =      4.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　6
+------------------------------------------------------------------------------
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .8074308   .0491071    16.44   0.000     .7111827    .9036789
+　　L2. |  -.1134945   .0228508    -4.97   0.000    -.1582813   -.0687076
+　　    |
+　　 ys |
+　　--. |   .8599923   .1097787     7.83   0.000     .6448299    1.075155
+　　L1. |  -.8632569   .1101426    -7.84   0.000    -1.079132   -.6473814
+　　    |
+　　  w |
+　　--. |  -.5686242   .0598841    -9.50   0.000    -.6859949   -.4512536
+　　L1. |    .640707   .0672002     9.53   0.000      .508997     .772417
+　　    |
+　　  k |   .1833987   .0567488     3.23   0.001     .0721731    .2946243
+     yr1980c |   .0095269   .0112312     0.85   0.396    -.0124858    .0315397
+     yr1981c |  -.0557186   .0117042    -4.76   0.000    -.0786584   -.0327788
+     yr1982c |  -.0558586   .0122055    -4.58   0.000    -.0797809   -.0319362
+     yr1983c |  -.0304113   .0133729    -2.27   0.023    -.0566217   -.0042009
+     yr1984c |  -.0238496   .0137584    -1.73   0.083    -.0508155    .0031163
+        cons |   .0162529    .006453     2.52   0.012     .0036053    .0289005
+------------------------------------------------------------------------------
+Warning: Uncorrected two-step standard errors are unreliable.
+
+Instruments for first differences equation
+  Standard
+    D.(ys L.ys yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(2/3).(w k)
+    L(1/8).L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -4.07  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.68  Pr > z =  0.498
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(46)   =  98.75  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(46)   =  58.71  Prob > chi2 =  0.099
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  gmm(L.n, lag(1 .))
+    Hansen test excluding group:     chi2(19)   =  19.11  Prob > chi2 =  0.450
+    Difference (null H = exogenous): chi2(27)   =  39.60  Prob > chi2 =  0.056
+  gmm(w k, lag(2 3))
+    Hansen test excluding group:     chi2(22)   =  22.98  Prob > chi2 =  0.403
+    Difference (null H = exogenous): chi2(24)   =  35.73  Prob > chi2 =  0.058
+  iv(ys L.ys yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(38)   =  40.24  Prob > chi2 =  0.371
+    Difference (null H = exogenous): chi2(8)    =  18.47  Prob > chi2 =  0.018
+```
+
+### 重现 SYS-GMM 结果
+
+
+
+```stata
+clear all
+set matsize 800
+use "http://www.stata-press.com/data/r7/abdata.dta"
+```
+
+- 设置变量，其一阶差分是年度虚拟变量和常数项。
+  这个步骤一般不是必需的，但需要完全模仿DPD，因为它在FD-GMM中也是需要直接输入时间虚拟和常数项。
+
+```stata
+forvalues y = 1979/1984 {
+gen yr`y'c = year>=`y'
+}
+gen cons = year
+```
+
+**运行结果**
+
+#### **FD-GMM**
+
+- a
+
+```stata
+xtabond2 n L.n L(0/1).(w k) yr*c cons, gmm(L.(w k n)) iv(yr*c cons) noleveleq noconstant robust
+```
+
+输出结果
+
+```stata
+Dynamic panel-data estimation, one-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       751
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 91　　　　    Obs per group: min =　　5
+Wald chi2(12) =   1163.33　　　　　　　　  avg =      5.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　7
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .7074701   .0841788     8.40   0.000     .5424827    .8724576
+　　    |
+　　  w |
+　　--. |  -.7087965    .117102    -6.05   0.000    -.9383122   -.4792809
+　　L1. |   .5000149   .1113282     4.49   0.000     .2818157    .7182141
+　　    |
+　　  k |
+　　--. |   .4659776    .101044     4.61   0.000      .267935    .6640203
+　　L1. |  -.2151309   .0858525    -2.51   0.012    -.3833987   -.0468631
+　　    |
+     yr1979c |   .0021095   .0177521     0.12   0.905    -.0326839    .0369028
+     yr1980c |  -.0265559   .0194641    -1.36   0.172    -.0647048    .0115931
+     yr1981c |  -.0326771   .0232915    -1.40   0.161    -.0783275    .0129733
+     yr1982c |   .0223882   .0254598     0.88   0.379    -.0275121    .0722885
+     yr1983c |   .0188752   .0235881     0.80   0.424    -.0273567    .0651071
+     yr1984c |    .010743   .0269194     0.40   0.690    -.0420179     .063504
+        cons |   .0057636   .0166077     0.35   0.729    -.0267868     .038314
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.(yr1979c yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).(L.w L.k L.n)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -5.60  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.14  Pr > z =  0.891
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(79)   = 125.19  Prob > chi2 =  0.001
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(79)   =  88.80  Prob > chi2 =  0.211
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(yr1979c yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(72)   =  79.36  Prob > chi2 =  0.258
+    Difference (null H = exogenous): chi2(7)    =   9.44  Prob > chi2 =  0.223
+```
+
+- b
+
+```stata
+xtabond2 n L.n L(0/1).(w k) yr*c cons, gmm(L.(w k n)) iv(yr*c cons) noleveleq robust twostep
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       751
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 91　　　　    Obs per group: min =　　5
+Wald chi2(12) =    909.34　　　　　　　　  avg =      5.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　7
+------------------------------------------------------------------------------
+　　    |　　     Corrected
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .6787867   .0890781     7.62   0.000     .5041969    .8533765
+　　    |
+　　  w |
+　　--. |  -.7198296   .1221408    -5.89   0.000    -.9592211   -.4804381
+　　L1. |   .4626914   .1134755     4.08   0.000     .2402835    .6850992
+　　    |
+　　  k |
+　　--. |   .4539046   .1275537     3.56   0.000     .2039038    .7039053
+　　L1. |  -.1914923   .1044671    -1.83   0.067     -.396244    .0132595
+　　    |
+     yr1979c |  -.0023874   .0174565    -0.14   0.891    -.0366015    .0318267
+     yr1980c |  -.0258997   .0187008    -1.38   0.166    -.0625525    .0107532
+     yr1981c |  -.0317158   .0239383    -1.32   0.185     -.078634    .0152024
+     yr1982c |   .0226915   .0268209     0.85   0.398    -.0298764    .0752594
+     yr1983c |   .0246047   .0257232     0.96   0.339    -.0258117    .0750211
+     yr1984c |   .0105049   .0271836     0.39   0.699    -.0427738    .0637837
+        cons |   .0052583   .0156783     0.34   0.737    -.0254706    .0359872
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.(yr1979c yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).(L.w L.k L.n)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -4.46  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.17  Pr > z =  0.866
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(79)   = 125.19  Prob > chi2 =  0.001
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(79)   =  88.80  Prob > chi2 =  0.211
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(yr1979c yr1980c yr1981c yr1982c yr1983c yr1984c cons)
+    Hansen test excluding group:     chi2(72)   =  79.36  Prob > chi2 =  0.258
+    Difference (null H = exogenous): chi2(7)    =   9.44  Prob > chi2 =  0.223
+```
+
+#### **SYS-GMM**
+
+- `eq（level）`选项通常也不是必需的，但需要完美的模仿。
+- `dpds2`是一个未记录的选项，模拟在DPD中one-step GMM的错误，使误差方差的点估计值加倍（sig2）并影响Sargan和AR（）统计量。`dpds2`仅用于演示`xtabond2`完全匹配DPD的能力。
+
+- a
+
+```stata
+xtabond2 n L.n L(0/1).(w k) yr1978-yr1984, gmm(L.n, split) gmm(L.(w k)) iv(yr1978-yr1984, eq(level)) h(2) dpds2 robust
+```
+
+输出结果
+
+```stata
+Dynamic panel-data estimation, one-step system GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       891
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 113　　　　   Obs per group: min =　　6
+Wald chi2(12) =   4921.25　　　　　　　　  avg =      6.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　8
+------------------------------------------------------------------------------
+　　    |　　      Robust
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |   .8714137   .0440549    19.78   0.000     .7850676    .9577597
+　　    |
+　　  w |
+　　--. |  -.7810899   .1159218    -6.74   0.000    -1.008292   -.5538873
+　　L1. |   .5120738   .1675084     3.06   0.002     .1837634    .8403843
+　　    |
+　　  k |
+　　--. |   .4688295   .0706695     6.63   0.000     .3303199    .6073391
+　　L1. |  -.3559805   .0718965    -4.95   0.000     -.496895   -.2150659
+　　    |
+      yr1978 |   .0047266     .02076     0.23   0.820    -.0359621    .0454154
+      yr1979 |   .0193132   .0245036     0.79   0.431     -.028713    .0673394
+      yr1980 |   .0014647   .0247206     0.06   0.953    -.0469868    .0499163
+      yr1981 |  -.0211725    .029662    -0.71   0.475    -.0793089    .0369639
+      yr1982 |   .0148305   .0274198     0.54   0.589    -.0389113    .0685723
+      yr1983 |   .0310377   .0255244     1.22   0.224    -.0189891    .0810646
+      yr1984 |   .0201427   .0314874     0.64   0.522    -.0415714    .0818568
+       _cons |   .9994287   .3899577     2.56   0.010     .2351257    1.763732
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).(L.w L.k)
+    L(1/8).L.n
+Instruments for levels equation
+  Standard
+    yr1978 yr1979 yr1980 yr1981 yr1982 yr1983 yr1984
+    _cons
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    D.(L.w L.k)
+    D.L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -5.98  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.17  Pr > z =  0.867
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(100)  = 157.41  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(100)  = 111.59  Prob > chi2 =  0.201
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  GMM instruments for levels
+    Hansen test excluding group:     chi2(79)   =  88.15  Prob > chi2 =  0.225
+    Difference (null H = exogenous): chi2(21)   =  23.43  Prob > chi2 =  0.321
+  gmm(L.n, eq(diff) lag(1 8))
+    Hansen test excluding group:     chi2(72)   =  85.96  Prob > chi2 =  0.125
+    Difference (null H = exogenous): chi2(28)   =  25.63  Prob > chi2 =  0.593
+  gmm(L.n, eq(diff) lag(1 8)) eq(level) lag(0 0))
+    Hansen test excluding group:     chi2(93)   = 106.68  Prob > chi2 =  0.157
+    Difference (null H = exogenous): chi2(7)    =   4.91  Prob > chi2 =  0.671
+  gmm(L.w L.k, lag(1 .))
+    Hansen test excluding group:     chi2(30)   =  43.22  Prob > chi2 =  0.056
+    Difference (null H = exogenous): chi2(70)   =  68.37  Prob > chi2 =  0.533
+  iv(yr1978 yr1979 yr1980 yr1981 yr1982 yr1983 yr1984, eq(level))
+    Hansen test excluding group:     chi2(93)   = 109.91  Prob > chi2 =  0.111
+    Difference (null H = exogenous): chi2(7)    =   1.68  Prob > chi2 =  0.976
+```
+
+- b
+
+```stata
+xtabond2 n L.n L(0/1).(w k) yr1978-yr1984, gmm(L.n, split) gmm(L.(w k)) iv(yr1978-yr1984, eq(level)) h(2) robust twostep
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step system GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =       891
+Time variable : year　　　　　　 Number of groups   =       140
+Number of instruments = 113　　　　   Obs per group: min =　　6
+Wald chi2(12) =   5912.36　　　　　　　　  avg =      6.36
+Prob > chi2   =     0.000　　　　　　　　  max =　　8
+------------------------------------------------------------------------------
+　　    |　　     Corrected
+　　  n |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+　　  n |
+　　L1. |    .872881   .0452841    19.28   0.000     .7841259    .9616362
+　　    |
+　　  w |
+　　--. |  -.7797449   .1165601    -6.69   0.000    -1.008199   -.5512913
+　　L1. |   .5268032   .1620827     3.25   0.001     .2091269    .8444795
+　　    |
+　　  k |
+　　--. |   .4700773   .0798591     5.89   0.000     .3135562    .6265983
+　　L1. |  -.3576081   .0800305    -4.47   0.000     -.514465   -.2007512
+　　    |
+      yr1978 |   .0058018   .0197099     0.29   0.768    -.0328288    .0444325
+      yr1979 |   .0188977   .0227673     0.83   0.407    -.0257254    .0635207
+      yr1980 |   .0028196   .0240708     0.12   0.907    -.0443583    .0499976
+      yr1981 |  -.0200226   .0274419    -0.73   0.466    -.0738078    .0337625
+      yr1982 |   .0152802   .0233063     0.66   0.512    -.0303992    .0609597
+      yr1983 |    .031731   .0234974     1.35   0.177    -.0143231    .0777852
+      yr1984 |   .0224206   .0310743     0.72   0.471     -.038484    .0833251
+       _cons |   .9484881   .3775501     2.51   0.012     .2085035    1.688473
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).(L.w L.k)
+    L(1/8).L.n
+Instruments for levels equation
+  Standard
+    yr1978 yr1979 yr1980 yr1981 yr1982 yr1983 yr1984
+    _cons
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    D.(L.w L.k)
+    D.L.n
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -5.81  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.15  Pr > z =  0.883
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(100)  = 157.41  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(100)  = 111.59  Prob > chi2 =  0.201
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  GMM instruments for levels
+    Hansen test excluding group:     chi2(79)   =  88.15  Prob > chi2 =  0.225
+    Difference (null H = exogenous): chi2(21)   =  23.43  Prob > chi2 =  0.321
+  gmm(L.n, eq(diff) lag(1 8))
+    Hansen test excluding group:     chi2(72)   =  85.96  Prob > chi2 =  0.125
+    Difference (null H = exogenous): chi2(28)   =  25.63  Prob > chi2 =  0.593
+  gmm(L.n, eq(diff) lag(1 8)) eq(level) lag(0 0))
+    Hansen test excluding group:     chi2(93)   = 106.68  Prob > chi2 =  0.157
+    Difference (null H = exogenous): chi2(7)    =   4.91  Prob > chi2 =  0.671
+  gmm(L.w L.k, lag(1 .))
+    Hansen test excluding group:     chi2(30)   =  43.22  Prob > chi2 =  0.056
+    Difference (null H = exogenous): chi2(70)   =  68.37  Prob > chi2 =  0.533
+  iv(yr1978 yr1979 yr1980 yr1981 yr1982 yr1983 yr1984, eq(level))
+    Hansen test excluding group:     chi2(93)   = 109.91  Prob > chi2 =  0.111
+    Difference (null H = exogenous): chi2(7)    =   1.68  Prob > chi2 =  0.976
+```
+
+> 重现 [Greene 书中](https://links.jianshu.com/go?to=%5Bhttps%3A%2F%2Fspu.fem.uniag.sk%2Fcvicenia%2Fksov%2Fobtulovic%2FMana%C5%BE.%20%C5%A1tatistika%20a%20ekonometria%2FEconometricsGREENE.pdf%5D(https%3A%2F%2Fspu.fem.uniag.sk%2Fcvicenia%2Fksov%2Fobtulovic%2FMana%C5%BE.%20%C5%A1tatistika%20a%20ekonometria%2FEconometricsGREENE.pdf))结果
+> 重现[ Greene, Econometric Analysis, 5th ed.](https://links.jianshu.com/go?to=https%3A%2F%2Fspu.fem.uniag.sk%2Fcvicenia%2Fksov%2Fobtulovic%2FMana%C5%BE.%20%C5%A1tatistika%20a%20ekonometria%2FEconometricsGREENE.pdf)  p. 554例子
+> 这里需要加载[数据](https://links.jianshu.com/go?to=http%3A%2F%2Fqed.econ.queensu.ca%2Fjae%2F2000-v15.4%2Fdahlberg-johansson%2Fdj-data.zip)
+
+并使用`infile`语句提取文件
+
+```stata
+clear all
+set mem 32m
+set matsize 800
+
+infile id  year expend revenue grants using h:\macros\T7987.asc, clear
+tsset id year
+```
+
+输出：
+
+```stata
+ panel variable:  id (strongly balanced)
+        time variable:  year, 1979 to 1987
+　　       delta:  1 unit
+```
+
+**运行结果**
+
+1. 无设置年度虚拟变量
+
+```stata
+xi: xtabond2 expend l(1/3).(expend revenue grants) i.year, gmm(l.expend) iv(i.year) noleveleq twostep h(1)
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =      1325
+Time variable : year　　　　　　 Number of groups   =       265
+Number of instruments = 30　　　　    Obs per group: min =　　5
+Wald chi2(17) =    796.67　　　　　　　　  avg =      5.00
+Prob > chi2   =     0.000　　　　　　　　  max =　　5
+------------------------------------------------------------------------------
+      expend |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      expend |
+　　L1. |   1.154936   .3440941     3.36   0.001     .4805244    1.829348
+　　L2. |  -.0376625   .2267605    -0.17   0.868     -.482105      .40678
+　　L3. |  -.5644067   .2179554    -2.59   0.010    -.9915915    -.137222
+　　    |
+     revenue |
+　　L1. |  -1.238006   .3617064    -3.42   0.001    -1.946938   -.5290747
+　　L2. |   .0770075   .2717902     0.28   0.777    -.4556915    .6097065
+　　L3. |   .6497806   .2693003     2.41   0.016     .1219617    1.177599
+　　    |
+      grants |
+　　L1. |   .0163122    .824194     0.02   0.984    -1.599078    1.631703
+　　L2. |   1.553793   .7584145     2.05   0.040     .0673281    3.040258
+　　L3. |   1.789179   .6929651     2.58   0.010     .4309924    3.147366
+　　    |
+ _Iyear_1980 |　　 0  (omitted)
+ _Iyear_1981 |　　 0  (omitted)
+ _Iyear_1982 |　　 0  (omitted)
+ _Iyear_1983 |  -.0036579   .0002969   -12.32   0.000    -.0042399   -.0030759
+ _Iyear_1984 |  -.0041546   .0005716    -7.27   0.000    -.0052748   -.0030343
+ _Iyear_1985 |  -.0037737   .0006463    -5.84   0.000    -.0050404   -.0025071
+ _Iyear_1986 |   -.003459   .0007194    -4.81   0.000    -.0048689   -.0020491
+ _Iyear_1987 |  -.0025902   .0006666    -3.89   0.000    -.0038968   -.0012837
+------------------------------------------------------------------------------
+Warning: Uncorrected two-step standard errors are unreliable.
+
+Instruments for first differences equation
+  Standard
+    D.(_Iyear_1980 _Iyear_1981 _Iyear_1982 _Iyear_1983 _Iyear_1984 _Iyear_1985
+    _Iyear_1986 _Iyear_1987)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).L.expend
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -2.98  Pr > z =  0.003
+Arellano-Bond test for AR(2) in first differences: z =  -2.26  Pr > z =  0.024
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(13)   =  39.24  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(13)   =  22.83  Prob > chi2 =  0.044
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(_Iyear_1980 _Iyear_1981 _Iyear_1982 _Iyear_1983 _Iyear_1984 _Iyear_1985 _Iyear_1986 _Iyear_1987)
+    Hansen test excluding group:     chi2(8)    =   7.82  Prob > chi2 =  0.451
+    Difference (null H = exogenous): chi2(5)    =  15.01  Prob > chi2 =  0.010
+```
+
+1. 为了完美匹配，设置一阶差分为年度虚拟变量
+
+```stata
+forvalues y=1980/1987 {
+gen yr`y'c = year>=`y'
+}
+xtabond2 expend l(1/3).(expend revenue grants) yr*c, gmm(l.expend) iv(yr*c) noleveleq twostep h(1)
+```
+
+输出结果为：
+
+```stata
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: id　　　　　　   Number of obs      =      1325
+Time variable : year　　　　　　 Number of groups   =       265
+Number of instruments = 30　　　　    Obs per group: min =　　5
+Wald chi2(17) =    796.67　　　　　　　　  avg =      5.00
+Prob > chi2   =     0.000　　　　　　　　  max =　　5
+------------------------------------------------------------------------------
+      expend |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      expend |
+　　L1. |   1.154936   .3440941     3.36   0.001     .4805244    1.829348
+　　L2. |  -.0376625   .2267605    -0.17   0.868     -.482105      .40678
+　　L3. |  -.5644067   .2179554    -2.59   0.010    -.9915915    -.137222
+　　    |
+     revenue |
+　　L1. |  -1.238006   .3617064    -3.42   0.001    -1.946938   -.5290747
+　　L2. |   .0770075   .2717902     0.28   0.777    -.4556915    .6097065
+　　L3. |   .6497806   .2693003     2.41   0.016     .1219617    1.177599
+　　    |
+      grants |
+　　L1. |   .0163122    .824194     0.02   0.984    -1.599078    1.631703
+　　L2. |   1.553793   .7584145     2.05   0.040     .0673281    3.040258
+　　L3. |   1.789179   .6929651     2.58   0.010     .4309924    3.147366
+　　    |
+     yr1980c |　　 0  (omitted)
+     yr1981c |　　 0  (omitted)
+     yr1982c |　　 0  (omitted)
+     yr1983c |  -.0036579   .0002969   -12.32   0.000    -.0042399   -.0030759
+     yr1984c |  -.0004967   .0004128    -1.20   0.229    -.0013057    .0003123
+     yr1985c |   .0003809   .0003094     1.23   0.218    -.0002255    .0009872
+     yr1986c |   .0003147   .0003282     0.96   0.338    -.0003286     .000958
+     yr1987c |   .0008688    .000148     5.87   0.000     .0005788    .0011588
+------------------------------------------------------------------------------
+Warning: Uncorrected two-step standard errors are unreliable.
+
+Instruments for first differences equation
+  Standard
+    D.(yr1980c yr1981c yr1982c yr1983c yr1984c yr1985c yr1986c yr1987c)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(1/8).L.expend
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -2.98  Pr > z =  0.003
+Arellano-Bond test for AR(2) in first differences: z =  -2.26  Pr > z =  0.024
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(13)   =  39.24  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(13)   =  22.83  Prob > chi2 =  0.044
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(yr1980c yr1981c yr1982c yr1983c yr1984c yr1985c yr1986c yr1987c)
+    Hansen test excluding group:     chi2(8)    =   7.82  Prob > chi2 =  0.451
+    Difference (null H = exogenous): chi2(5)    =  15.01  Prob > chi2 =  0.010
+```
+
+> **参考资料**
+>
+> [1.Stata：GMM 简介及实现范例](https://www.jianshu.com/p/9da6fcfdfee1)
+>
+> [2.GMM 简介与 Stata 实现](https://www.jianshu.com/p/f981fed94eaa)
+>
+> [3.动态面板简介](https://www.jianshu.com/p/3767ee0ed284)
+>
+> [4.Dynamic Panel Data : IV and GMM Estimation with Stata (Panel)](http://rizaudinsahlan.blogspot.com/2017/11/dynamic-panel-data-iv-and-gmm.html)
+>
+> [5.Stata-xtabond-cheat-sheet](https://blog.stata.com/2015/11/12/xtabond-cheat-sheet/)
+>
+> [6.Roodman, D. , "How to Do Xtabond2: An Introduction to Difference and System GMM in Stata", The Stata Journal*, 2009, 1( 9), 86－136.](https://journals.sagepub.com/doi/10.1177/1536867X0900900106)
+>
+> [7.Angrist, J. D. and J. Pischke , *Mostly Harmless Econometrics*. Princeton, New Jersey: Princeton University Press, 2009.](http://home.cerge-ei.cz/kaliskova/files/aqm2/Angrist%20Pischke.pdf)
+
+
+
+
+
+</font>
+
