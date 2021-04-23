@@ -6,11 +6,11 @@ date: 2021-04-20
 categories:
   - 资本市场
   - 公司
-  - 张家界
+  - 福建金森
 tags:
   - 资本市场
   - 公司
-  - 张家界
+  - 福建金森
 slug: firm-report
 weight: 0002
 description: 动态韭菜研究。
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ```{r include=FALSE}
-Firm_code<-"张家界"
+Firm_code<-"福建金森"
 ```
 
 ```{r include=FALSE}

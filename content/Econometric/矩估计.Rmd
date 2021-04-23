@@ -1,22 +1,25 @@
 ---
 author:
   - 韭菜
-title: '广义矩估计（GMM）'
+title: '矩估计'
 categories:
   - R
   - Stata
   - 广义矩估计
+  - 矩估计
   - GMM
 tags:
   - R
   - Stata
   - 广义矩估计
+  - 矩估计
   - GMM
 date: 2021-04-21
-slug: GMM
+slug: MM
 weight: 001
 description: <font face="思源宋体 CN" >广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE 通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)</font>
 ---
+
 <font face="思源宋体 CN" >
 
 
@@ -1030,7 +1033,7 @@ $$
 
 #### FD-GMM 的实现
 
-##### 采用 `xtabond` 命令 进行 FD-GMM 估计
+##### 采用xtabond命令进行FD-GMM估计   
 
 　　`xtabond` 命令语法格式:
 
@@ -1063,7 +1066,7 @@ xtabond n L(0/1).w L(0/2).(k ys) yr1980-yr1984,  ///
 	  lags(2) twostep vce(robust)   // L(0/1).w 表示 w 的当期值与一阶滞后
 ```
 
-##### 采用 `xtdpd` 命令 进行 FD-GMM 估计
+##### 采用xtdpd命令进行FD-GMM估计       
 
 　　`xtdpd` 命令语法格式:
 
@@ -1090,7 +1093,7 @@ xtdpd n l(1/2).n L(0/1).w L(0/2).(k ys) yr1980-yr1984, ///
       div(yr1980-yr1984) twostep vce(robust)
 ```
 
-#####　采用 `xtabond2` 命令进行 FD-GMM 估计
+#####　采用xtabond2命令进行FD-GMM估计     
 
 　　`xtabond2` 命令语法格式：
 
@@ -1122,9 +1125,9 @@ xtabond2 n l(1/2).n l(0/1).w l(0/2).(k ys)  yr1980-yr1984,      ///
 ```
 
 
-#### SYS-GMM 的实现
+#### SYS-GMM的实现      
 
-##### 采用 `xtdpdsys` 命令进行 SYS-GMM 估计
+##### 采用xtdpdsys命令进行SYS-GMM估计   
 
 　　`xtdpdsys` 命令语法格式：
 
@@ -1151,9 +1154,7 @@ xtdpdsys n L(0/1).w L(0/2).(k ys) yr1980-yr1984, ///
 ```
 
 
-
-
-#####　采用 `xtdpd` 命令进行 SYS-GMM 估计
+##### 采用xtdpd命令进行SYS-GMM估计    
 
 　　`xtdpd` 估计命令：
 
@@ -1166,7 +1167,7 @@ xtdpd n L(1/2).n L(0/1).w L(0/2).(k ys) yr1980-yr1984, ///
 est store Sysxtdpd
 ```
 
-#####　采用 `xtabond2` 命令进行 SYS-GMM 估计
+##### 采用xtabond2命令进行SYS-GMM估计    
 
 　　`xtabond2` 估计命令：
 
@@ -1180,7 +1181,7 @@ xtabond2 n l(1/2).n l(0/1).w l(0/2).(k ys) yr1980-yr1984, ///
 
 
 
-##### 模型估计结果比较
+##### 模型估计结果比较           
 
 ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
 sysdir set PLUS "D:\soft\stata\ado\plus"
@@ -1238,7 +1239,7 @@ esttab `mm', mtitle(`mm') compress star(* 0.1 ** 0.05 *** 0.01) b(%10.3f) nogap
 　　对于 FD-GMM 估计，三种命令估计的结果相同，因此在做 FD-GMM 时，选择三者之中任意命令对结果没有影响，而对于 SYS-GMM 估计，`xtdpdsys` 和 `xtdpd` 的估计结果一致，而 `xtabond2` 估计结果与前面两个命令有差异。
 
 
-### 解释变量中含有内生变量
+### 解释变量中含有内生变量    
 
 　　考虑如下模型：
 
@@ -1296,7 +1297,7 @@ xtdpdsys n L(0/1).w L(0/2).ys k yr1980-yr1984, ///
 
 
 
-### 干扰项序列相关检验无法通过
+### 干扰项序列相关检验无法通过  
 
 　　Arellano and Bond (1991) 估计工具变量的设定关键点：
 
@@ -1335,7 +1336,7 @@ estat abond
 　　需要特别说明的是，序列相关检验和过度识别检验往往要同步进行。因为，如果选择的工具变量不妥 (表现为过度识别检验无法通过)，序列相关检验也就没有了根基。
 
 
-### 过度识别检验无法通过
+### 过度识别检验无法通过   
 
 　　在工具变量大于内生变量个数时，需要进行过度识别检验。基本原理是检验工具变量是否是与干扰项相关，即工具变量是否为外生变量。具体如下：
 
@@ -1402,7 +1403,7 @@ xtabond n L(0/1).w L(0/2).(k ys) yr1980-yr1984, twostep lags(2) maxldep(5)
 
 
 
-###  大 T 小 N 型面板数据
+###  大T小N型面板数据
 
 　　上面介绍的 FD-GMM 和 SYS-GMM 适用于 大 N 小 T 的短面板数据，当研究样本为长面板数据 (大 T 小 N) 时，比如省级面板数据，GMM 估计可能不是最有效的。根据 Bruno(2005) 的做法，基于 Bootstrap 偏差纠正的 LSDV 估计可以在一定程度上克服 N 较小的问题。
 
