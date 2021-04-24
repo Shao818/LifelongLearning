@@ -741,8 +741,7 @@ $$
 - t = 2 时，矩条件变为：$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$
   这意味着变量$y_{i,0}$是有效的工具，因为它与$(y_{i,1}-y_{i,0})$高度相关而与$(\epsilon_{i,2}-\epsilon_{i,1})$不相关。   
 
-- t = 3 时，同理可得，矩条件为：$E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}$同时也满足$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$
-　　其中，$ y_{i,1}$与$(y_{i,2}-y_{i,1})$相关，而与$(\epsilon_{i,3}-\epsilon_{i,2})$不相关。  
+- t = 3 时，同理可得，矩条件为：$E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}$同时也满足$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$其中，$y_{i,1}$与$(y_{i,2}-y_{i,1})$相关，而与$(\epsilon_{i,3}-\epsilon_{i,2})$不相关。  
 　　
 - t = 4 时，我们将得到三组矩条件：$E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0$；$E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}$；  $E[(\epsilon_{i,4}-\epsilon_{i, 3})y_{i,2}]=0$
 
@@ -792,7 +791,7 @@ $$
 $$
 \Delta y_{i,t-1}=(\delta-1)y_{i,t-2}+\alpha_{i}+\varepsilon_{i,t-1}\tag{62}
 $$
-　　当$\delta$接近1的时候，工具变量和外生变量的关系就会变的很弱，这就会产生“弱工具变量问题”。 为了克服弱工具变量的影响, Arellano和Bover (1995) 以及Blundell和Bond (1998)提出了另外一种更加有效的方法,即系统GMM (SYS-GMM)估计方法。其具体做法是将水平方程和差分方程结合起来进行估计,在这种估计方法中,滞后水平作为一阶差分的工具变量,而一阶差分又作为水平变量的工具变量。具体来说：在上述FD-GMM估计中，可以看作是应用了矩条件$E(\Delta \varepsilon_{it}y_{i,t-2}=0)$，但是却有个矩条件被忽略了， 即：
+　　当$\delta$接近1的时候，工具变量和外生变量的关系就会变的很弱，这就会产生“弱工具变量问题”。 为了克服弱工具变量的影响, Arellano和Bover (1995) 以及Blundell和Bond (1998)提出了另外一种更加有效的方法,即系统GMM (SYS-GMM)估计方法。其具体做法是将水平方程和差分方程结合起来进行估计,在这种估计方法中,<font color=blue >滞后水平作为一阶差分的工具变量,而一阶差分又作为水平变量的工具变量。</font>具体来说：在上述FD-GMM估计中，可以看作是应用了矩条件$E(\Delta \varepsilon_{it}y_{i,t-2}=0)$，但是却有个矩条件被忽略了， 即：
 $$
 E\left(\Delta y_{i, t-1}\left(\alpha_{i}+\varepsilon_{i t}\right)\right)=E\left(\Delta y_{i, t-1}\left(y_{i t}-\delta y_{i, t-1}\right)\right)=0\tag{63}
 $$
@@ -970,7 +969,7 @@ estat abond, artests(4)
 
 ### 问题背景
 
-　　关于动态面板数据模型 (dynamic panel data，DPD)，我们常常会遇到如下问题[^Stata实操陷阱：动态面板数据模型]：
+　　关于动态面板数据模型 (dynamic panel data，DPD)，我们常常会遇到如下问题[^Stata实操陷阱：动态面板数据模型]：      
 
 [^Stata实操陷阱：动态面板数据模型]:[Stata实操陷阱：动态面板数据模型](https://www.lianxh.cn/news/cc6c5ea80d70c.html)
 
@@ -987,9 +986,9 @@ estat abond, artests(4)
 
 ### FD-GMM 还是 SYS-GMM
 
-　　需要强调的是，无论一阶差分GMM (FD-GMM)还是系统 GMM (SYS-GMM)，模型设定是不受影响的，并且二者仅在计量估计方法上不一样，即矩条件不同。SYS-GMM 使用的矩条件多，利用的信息也多，估计也更有效率，但其受到的限制也多，如假定被解释变量的一阶差分项与个体效应变量不相关。更多细节参考IV-GMM[^IV-GMM]。
-　　
-[^IV-GMM]:[IV-GMM](https://www.lianxh.cn/blogs/38.html)
+　　需要强调的是，无论一阶差分GMM (FD-GMM)还是系统 GMM (SYS-GMM)，模型设定是不受影响的，并且二者仅在计量估计方法上不一样，即矩条件不同。SYS-GMM 使用的矩条件多，利用的信息也多，估计也更有效率，但其受到的限制也多，如假定被解释变量的一阶差分项与个体效应变量不相关。更多细节参考IV-GMM[^IVGMM]。      
+
+[^IVGMM]:[IV-GMM](https://www.lianxh.cn/blogs/38.html)
 
 　　**那么，在估计模型时该选择哪种估计方法呢？**
 
@@ -1093,7 +1092,7 @@ xtdpd n l(1/2).n L(0/1).w L(0/2).(k ys) yr1980-yr1984, ///
       div(yr1980-yr1984) twostep vce(robust)
 ```
 
-#####　采用xtabond2命令进行FD-GMM估计     
+##### 采用xtabond2命令进行FD-GMM估计     
 
 　　`xtabond2` 命令语法格式：
 
@@ -1309,9 +1308,21 @@ $$
 
 　　原假设：扰动项不存在序列相关；   
 
-- “扰动项的一阶差分” 存在自相关：
+- “扰动项的一阶差分” 存在自相关：   
 
-- 扰动项的差分不存在二阶或更高的自相关：
+$$
+\begin{aligned}
+\operatorname{Cov}\left(\Delta \varepsilon_{i t}, \Delta \varepsilon_{i, t-1}\right) &=\operatorname{Cov}\left(\varepsilon_{i t}-\varepsilon_{i, t-1}, \varepsilon_{i, t-1}-\varepsilon_{i, t-2}\right) \\
+&=\operatorname{Cov}\left(\varepsilon_{i, t-1},-\varepsilon_{i, t-1}\right) \\
+&=-\operatorname{Var}\left(\varepsilon_{i, t-1}\right) \neq 0
+\end{aligned}   \tag{70}
+$$
+
+- 扰动项的差分不存在二阶或更高的自相关：  
+
+$$
+\operatorname{Cov}\left(\Delta \varepsilon_{i t}, \Delta \varepsilon_{i, t-k}\right)=0, k \geqslant 2 \tag{71}
+$$
 
 　　故可通过检验扰动项的差分是否存在二阶 (或更高阶) 的自相关来检验原假设。
 
@@ -1327,7 +1338,7 @@ estat abond
 
 　　可以看出，在 5% 的显著性水平下，扰动项的差分存在一阶自相关，但不存在二阶自相关，故不拒绝原假设。
 
-　　如果无法通过序列相关检验，主要原因可能是干扰项中包含了一些序列相关特征较为明显的变量。此时，我们可以通过增加解释变量，以使干扰项变得更「干净」。具体设定如下：
+　　<font color=blue >如果无法通过序列相关检验，主要原因可能是干扰项中包含了一些序列相关特征较为明显的变量。此时，我们可以通过增加解释变量，以使干扰项变得更「干净」。</font>具体设定如下：
 
 - 加入时间虚拟变量；
 - 加入部分解释变量的滞后项 (要有一定的理论依据)；
@@ -1416,7 +1427,7 @@ $$
 y_{i t}=0.9 y_{i t-1}+0.8 x_{i, t}+u_{i}+u_{t}+e_{i t-1} \\
 \cot \alpha\left(x_{i t}, u_{i}\right) \neq 0 \\
 x_{i t}=0.2 x_{i t-1}+v_{i t}
-\end{array}  \tag{70}
+\end{array}  \tag{72}
 $$
 
 　　对应 Stata 命令：
@@ -1469,8 +1480,8 @@ local mm "FdGMM SysGMM LSDVab LSDVbb"
 esttab `mm', mtitle(`mm') compress star(* 0.1 ** 0.05 *** 0.01)
 ```
 
-　　可以看出，当$y_{i t-1}$的系数为 0.4， `XTLSDVC` 的优势非常有限；而当$y_{i t-1}$的系数为 0.9 时，`XTLSDVC` 的优势比较明显。
-　　
+　　可以看出，当$y_{i t-1}$的系数为 0.4， `XTLSDVC` 的优势非常有限；而当$y_{i t-1}$的系数为 0.9 时，`XTLSDVC` 的优势比较明显。     
+
 ## xtdpdgmm：动态面板数据模型一网打尽   
 
 ### 简介
@@ -1479,7 +1490,9 @@ esttab `mm', mtitle(`mm') compress star(* 0.1 ** 0.05 *** 0.01)
 
 　　相应地，Stata 也提供了 `xtabond`、`xtdpdsys`、以及 `xtabond2` 等早期估计 GMM 的命令。Kripfganz (2019) 在此基础上，编写了 `xtdpdgmm` 命令，该命令解决了 `xtabond2` 等命令的一些缺陷，并使估计更加灵活。特别的，该命令整合了 Ahn 和 Schmidt (1995) 非线性矩条件、更好解决了高度自相关问题、以及提供了 Hansen 等 (1996) 的迭代 GMM 估计。
 
-　　本文的主要目的是介绍动态面板数据模型的两种估计方法，以及 `xtdpdgmm` 命令的应用。
+　　本文的主要目的是介绍动态面板数据模型的两种估计方法，以及 `xtdpdgmm` 命令的应用[^xtdpdgmm]。   
+
+[^xtdpdgmm]:[xtdpdgmm](https://www.lianxh.cn/news/b6713ec0cfa7a.html)
 
 
 ### 估计方法
@@ -1489,22 +1502,22 @@ esttab `mm', mtitle(`mm') compress star(* 0.1 ** 0.05 *** 0.01)
 　　考虑以下动态面板模型：   
 　　
 $$
-y_{i t}=\alpha+\rho y_{i, t-1}+\boldsymbol{x}_{i i}^{\prime} \boldsymbol{\beta}+z_{i}^{\prime} \boldsymbol{\delta}+u_{i}+\varepsilon_{i t} \quad(t=2, \cdots, T)  \tag{71}
+y_{i t}=\alpha+\rho y_{i, t-1}+\boldsymbol{x}_{i i}^{\prime} \boldsymbol{\beta}+z_{i}^{\prime} \boldsymbol{\delta}+u_{i}+\varepsilon_{i t} \quad(t=2, \cdots, T)  \tag{73}
 $$
 
 　　通过一阶差分消去个体效应$u_{i}$，可得：
 
 $$
-\Delta y_{i t}=\rho \Delta y_{i, t-1}+\Delta x_{i t}^{\prime} \beta+\Delta \varepsilon_{i t} \quad(t=2, \cdots, T)  \tag{72}
+\Delta y_{i t}=\rho \Delta y_{i, t-1}+\Delta x_{i t}^{\prime} \beta+\Delta \varepsilon_{i t} \quad(t=2, \cdots, T)  \tag{74}
 $$
 
-　　然而，由于$y_{i, t-1}$与$\varepsilon_{i t}$相关， 使得$\Delta y_{i, t-1} \equiv y_{i, t-1}-y_{i, t-2}$与$\Delta \varepsilon_{i, t} \equiv \varepsilon_{i, t-1}-\varepsilon_{i, t-2}$相关。也因此， 为内生变量，我们需要为其找到适当的工具变量才能得到一致估计。
+　　然而，由于$y_{i, t-1}$与$\varepsilon_{i t-1}$相关， 使得$\Delta y_{i, t-1} \equiv y_{i, t-1}-y_{i, t-2}$与$\Delta \varepsilon_{i, t} \equiv \varepsilon_{i, t}-\varepsilon_{i, t-1}$相关。也因此， 为内生变量，我们需要为其找到适当的工具变量才能得到一致估计。
 
 　　为此，Anderson 和 Hsiao (1981) 认为由于$y_{i, t-2}$与$\Delta y_{i, t-1} \equiv y_{i, t-1}-y_{i, t-2}$相关，若$\varepsilon_{i}$不存在自相关，则$y_{i, t-2}$与$\Delta \varepsilon_{i, t} \equiv \varepsilon_{i, t}-\varepsilon_{i, t-1}$不相关，故$y_{i, t-2}$是$\Delta y_{i, t-1}$ 的有效工具变量。根据这一思想，更高阶的滞后变量${y_{i, t-3},y_{i, t-4},...}$ 也是有效工具变量，但是Anderson 和 Hsiao (1981) 估计并未加以利用，所以估计并非最有效。
 
 　　Arellano 和 Bond (1991) 使用所有可能的滞后变量作为工具变量 (工具变量个数可能多于内生变量) 进行估计，这一方法又被称为「差分 GMM」。值得注意的是，在使用差分 GMM 时，扰动项$\varepsilon_{i}$不存在自相关，即 $Cov(\varepsilon_{it},\varepsilon_{is})=0$。
 
-**差分 GMM 注意事项：**
+　　**差分 GMM 注意事项：**
 
 - 如果$x_{it}$非严格外生，即虽然$x_{it}$与当期$\varepsilon_{it}$不相关，但与 $\varepsilon_{it-1}$相关，则$\Delta x_{i, t} \equiv x_{i, t}-x_{i, t-1}$与 $\Delta \varepsilon_{i, t} \equiv \varepsilon_{i, t}-\varepsilon_{i, t-1}$相关，使得$\Delta x_{i, t}$为内生变量。此时，可以使用${x_{i, t-1},x_{i, t-2},...}$作为$\Delta x_{i, t}$的工具变量。  
 
@@ -1520,7 +1533,7 @@ $$
 
 #### 系统 GMM
 
-　　Blundell 和 Bond (1998) 将差分 GMM 与水平 GMM 联合进行 GMM 估计，即「系统 GMM」。与差分 GMM 相比，系统 GMM的优点是，可以提高估计的效率，并且可以估计不随时间变化的变量 的系数。其缺点是，必须假定以及${\Delta{y_{i, t-1},\Delta y_{i, t-2},...}}$与个体效应$u_{i}$无关。
+　　Blundell 和 Bond (1998) 将差分GMM与水平GMM联合进行GMM估计，即「系统GMM」。与差分GMM相比，系统 GMM的优点是，可以提高估计的效率，并且可以估计不随时间变化的变量的系数。其缺点是，必须假定以及${\Delta{y_{i, t-1},\Delta y_{i, t-2},...}}$与个体效应$u_{i}$无关。
 
 ### xtdpdgmm 命令介绍
 
@@ -1546,7 +1559,7 @@ ssc install xtdpdgmm, replace
 - `collapse`：折叠式工具变量为标准式工具变量；
 - `model(model_spec)`：设置工具变量的默认形式及标准误；
 - `norescale`：不重新缩放转换后的矩条件；
-- `wmatrix(wmat_spec)`：指定用于获得一阶 GMM 估计或两步 GMM 　　估计的初始估计的加权矩阵；
+- `wmatrix(wmat_spec)`：指定用于获得一阶 GMM 估计或两步 GMM估计的初始估计的加权矩阵；
 - `onestep|twostep`：确定一步估计或两步估计；
 - `igmm`：使用迭代 GMM 估计;
 - `teffects`：模型增加时间效应；
