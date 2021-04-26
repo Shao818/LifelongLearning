@@ -1,8 +1,8 @@
 ---
 author:
   - 韭菜园
-title: '张家界研究报告'
-date: 2021-04-20
+title: '华闻集团研究报告'
+date: 2021-04-26
 categories:
   - 资本市场
   - 公司
