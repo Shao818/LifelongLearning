@@ -21,12 +21,6 @@ outputs:
 # some menu items were added via the `menu` option in YAML in posts
 menu:
   header:
-    - name: 类别
-      url: "/categories/"
-      weight: 2
-    - name: 标签
-      url: "/tags/"
-      weight: 3
     - name: 搜索
       url: "#"
       identifier: menu-search

@@ -81,17 +81,18 @@ Firm_abbreviation <-dbGetQuery(con,QueryCondition)
 #包的登录与新闻数据可以的维护
 pacman::p_load(httr, readr, rjson,tidyverse,reshape2,openxlsx,ggplot2,
                magrittr,showtextdb,sysfonts,showtext,xts,reticulate,
-               RODBC,RMySQL)
+               RODBC,RMySQL,RMariaDB,zeallot)
 #Mysql包登陆数据库------
-con <- dbConnect(MySQL(), host="", dbname="finance", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
+con <- dbConnect(MariaDB(), host="", dbname="finance", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
 
-#RODBC包登陆数据库
-channel <- odbcConnect("finance", uid="root", pwd="Zh_xq1234@")
+# #RODBC包登陆数据库
+# channel <- odbcConnect("finance", uid="root", pwd="Zh_xq1234@")
 library('Tushare')
 api <- Tushare::pro_api(token = 'c4cbc3b98311c39bf32997953d8db4b1ffb43d66236273554a63692d')
 #新浪新闻数据库的维护
 #设置字段的字符编码
-dbSendQuery(con,'SET NAMES gbk')
+#dbSendQuery(con,'SET NAMES gbk')
+dbSendQuery(con, "SET NAMES utf8")
 #读取特定表中的数据
 #dbReadTable(con,"test") 
 start_date_time<- as.POSIXlt(dbGetQuery(con,"select 时间 from  Tushare_News_sina  order by 时间 desc limit 5") [1,])
@@ -135,16 +136,17 @@ for (time_i in 1:1000){
 }
 
 colnames(Tushare_News_sina)<-c("时间","内容","标题")
-sqlSave(channel,  # 创建的数据连接
-        Tushare_News_sina, #R数据框名称
-        tablename = "Tushare_News_sina", # 数据库表名
-        rownames = FALSE,
-        append=TRUE,
-        varTypes=c(内容="TEXT",
-                     标题="TEXT")
-)#, # 不存储数据框的行名
+# sqlSave(channel,  # 创建的数据连接
+#         Tushare_News_sina, #R数据框名称
+#         tablename = "Tushare_News_sina", # 数据库表名
+#         rownames = FALSE,
+#         append=TRUE,
+#         varTypes=c(内容="TEXT",
+#                      标题="TEXT")
 
+# )#, # 不存储数据框的行名
 
+dbWriteTable(con,"Tushare_News_sina",Tushare_News_sina,append = TRUE)
 
 #东方财富数据维护
 start_date_time<- as.POSIXlt(dbGetQuery(con,"select 时间 from  Tushare_News_eastmoney  order by 时间 desc limit 5") [1,])
@@ -188,15 +190,15 @@ for (time_i in 1:1000){
 }
 
 colnames(Tushare_News_eastmoney)<-c("时间","内容","标题")
-sqlSave(channel,  # 创建的数据连接
-        Tushare_News_eastmoney, #R数据框名称
-        tablename = "Tushare_News_eastmoney", # 数据库表名
-        rownames = FALSE,
-        append=TRUE,
-        varTypes=c(内容="TEXT",
-                     标题="TEXT")
-)#, # 不存储数据框的行名
-
+# sqlSave(channel,  # 创建的数据连接
+#         Tushare_News_eastmoney, #R数据框名称
+#         tablename = "Tushare_News_eastmoney", # 数据库表名
+#         rownames = FALSE,
+#         append=TRUE,
+#         varTypes=c(内容="TEXT",
+#                      标题="TEXT")
+# )#, # 不存储数据框的行名
+dbWriteTable(con,"Tushare_News_eastmoney",Tushare_News_eastmoney,append = TRUE)
 #同花顺数据维护
 start_date_time<- as.POSIXlt(dbGetQuery(con,"select 时间 from  Tushare_News_iFind  order by 时间 desc limit 5") [1,])
 Tushare_News_iFind<-data.frame()
@@ -239,14 +241,15 @@ for (time_i in 1:1000){
 }
 
 colnames(Tushare_News_iFind)<-c("时间","内容","标题")
-sqlSave(channel,  # 创建的数据连接
-        Tushare_News_iFind, #R数据框名称
-        tablename = "Tushare_News_iFind", # 数据库表名
-        rownames = FALSE,
-        append=TRUE,
-        varTypes=c(内容="TEXT",
-                     标题="TEXT")
-)#, # 不存储数据框的行名
+# sqlSave(channel,  # 创建的数据连接
+#         Tushare_News_iFind, #R数据框名称
+#         tablename = "Tushare_News_iFind", # 数据库表名
+#         rownames = FALSE,
+#         append=TRUE,
+#         varTypes=c(内容="TEXT",
+#                      标题="TEXT")
+# )#, # 不存储数据框的行名
+dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 ```
 
 # 选股框架  
