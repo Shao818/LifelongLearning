@@ -19,8 +19,8 @@
         {{ i18n "CapitalsListTitle" }}
     {{ else if (eq .Key "Econometric") }}
         {{ i18n "EconometricsListTitle" }}
-    {{ else if (eq .Key "RProgram") }}
-    {{ i18n "RProgramsListTitle" }}
+    {{ else if (eq .Key "ProgramR") }}
+    {{ i18n "ProgramRsListTitle" }}
     {{ else }}
       {{ .Key | pluralize | title }}
     {{ end }}
