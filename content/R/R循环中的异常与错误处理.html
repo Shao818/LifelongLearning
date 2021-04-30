@@ -1,0 +1,196 @@
+---
+author:
+  - 韭菜园
+title: 'R循环中的异常与错误处理'
+date: 2021-05-01
+categories:
+  - R循环
+  - 异常
+  - 错误
+tags:
+  - R循环
+  - 异常
+  - 错误
+slug: waring-error
+weight: 0003
+description: 使用R语言进行数据处理时，常常需要写批处理程序实现程序自动处理，但是可能会出现一些意想不到的错误，从而导致自动化过程中断，这时需要妥然处理，以避免不必要的时间成本。  
+
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p><font face="思源宋体 CN" ></p>
+<p>　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：</p>
+<ul>
+<li><code>try()</code> 忽略错误，不打印任何信息，继续执行循环体。<br />
+</li>
+<li><code>tryCatch()</code> 捕捉异常或错误，然后采用对应的函数处理异常和错误。<br />
+</li>
+<li><code>withCallingHandlers()</code>是tryCatch()的变体，只是运行的上下文条件不同，它使用的情况很少，但是非常有用。</li>
+</ul>
+<div id="try" class="section level1">
+<h1><code>try()</code></h1>
+<p>　　
+　　忽略错误，不打印任何信息，继续执行循环体。</p>
+<div id="try的使用方法" class="section level2">
+<h2><code>try()</code>的使用方法</h2>
+<pre class="r"><code>library(formatR)
+usage(try)</code></pre>
+<pre><code>## try(expr, silent = FALSE,
+##     outFile = getOption(&quot;try.outFile&quot;, default = stderr()))</code></pre>
+<p>　　如果表达式运行产生错误提示，try()函数会返回一个类(class)对象’try-error’。如果参数 silent=TRUE，错误信息将被隐藏，silent=FALSE，错误信息将显示到屏幕上。</p>
+</div>
+<div id="例子" class="section level2">
+<h2>例子</h2>
+<p>　　try() 允许出现错误后继续执行代码。例如，一般来说，如果你运行的函数引发错误，它会立即终止，并且不返回值：</p>
+<p>　　Error : Failed to render content/R/R循环中的异常与错误处理.Rmd</p>
+<p>　　但是，如果将产生错误的语句放在try()中，那么错误信息将被打印，但程序会继续执行：</p>
+<pre class="r"><code> f2 &lt;- function(x) {
+    try(log(x))
+    10
+  }
+  f2(&quot;a&quot;)</code></pre>
+<pre><code>## Error in log(x) : 数学函数中用了非数值参数</code></pre>
+<pre><code>## [1] 10</code></pre>
+<pre class="r"><code>  #&gt; Error in log(x) : non-numeric argument to mathematical function</code></pre>
+<p>　　我们可以使用try(…, silent=TRUE)函数，隐藏错误异常信息。如果大段代码中有错误，想忽略错误，可以采用try()，但大段代码需放在{}中：</p>
+<pre class="r"><code>#默认 silent = FALSE，显示错误信息
+  try({
+    a &lt;- 1
+    b &lt;- &quot;x&quot;
+    a + b
+  })</code></pre>
+<pre><code>## Error in a + b : 二进列运算符中有非数值参数</code></pre>
+<p>　　你可以捕获try()的输出，如果程序运行成功，返回计算结果；如果程序运行不成功，则可以通过class()函数返回，错误类型 ‘try-error’。</p>
+<pre class="r"><code>success &lt;- try(1 + 2)
+failure &lt;- try(&quot;a&quot; + &quot;b&quot;)</code></pre>
+<pre><code>## Error in &quot;a&quot; + &quot;b&quot; : 二进列运算符中有非数值参数</code></pre>
+<pre class="r"><code>class(success)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(failure)</code></pre>
+<pre><code>## [1] &quot;try-error&quot;</code></pre>
+<p>　　在list列表中使用try()函数非常有用，可以有效避免个别元素不能计算引起的错误。</p>
+<pre class="r"><code>elements &lt;- list(1:10, c(-1, 10), c(T, F), letters)
+#results &lt;- lapply(elements, log)
+results &lt;- lapply(elements, function(x) try(log(x)))</code></pre>
+<pre><code>## Warning in log(x): 产生了NaNs</code></pre>
+<pre><code>## Error in log(x) : 数学函数中用了非数值参数</code></pre>
+<p>　　在R中没有一个可以识别错误类型（class）-“try-error”的函数，我们可以自定义一个函数，然后结合sapply函数，可以非常方便的提取出错误类型、错误的位置以及错误值和正确值。</p>
+<pre class="r"><code>is.error &lt;- function(x) inherits(x, &quot;try-error&quot;)
+succeeded &lt;- !sapply(results, is.error)
+str(results[succeeded])</code></pre>
+<pre><code>## List of 3
+##  $ : num [1:10] 0 0.693 1.099 1.386 1.609 ...
+##  $ : num [1:2] NaN 2.3
+##  $ : num [1:2] 0 -Inf</code></pre>
+<pre class="r"><code>str(elements[!succeeded])</code></pre>
+<pre><code>## List of 1
+##  $ : chr [1:26] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; ...</code></pre>
+</div>
+</div>
+<div id="trycatch" class="section level1">
+<h1><code>tryCatch()</code></h1>
+<p>　　下面就是tryCatch()函数的标准语法：</p>
+<p>　　两个实际的小例子，code：</p>
+<p>　　使用tryCatch()函数，根据获取到的条件信号，返回相应的内置函数处理结果，错误、警告、消息等。</p>
+<pre class="r"><code>  show_condition &lt;- function(code) {
+    tryCatch(code,
+      error = function(c) &quot;error&quot;,
+      warning = function(c) &quot;warning&quot;,
+      message = function(c) &quot;message&quot;
+    )
+  }
+  show_condition(stop(&quot;!&quot;))</code></pre>
+<pre><code>## [1] &quot;error&quot;</code></pre>
+<pre class="r"><code>  show_condition(warning(&quot;?!&quot;))</code></pre>
+<pre><code>## [1] &quot;warning&quot;</code></pre>
+<pre class="r"><code>  show_condition(message(&quot;?&quot;))</code></pre>
+<pre><code>## [1] &quot;message&quot;</code></pre>
+<pre class="r"><code>  # If no condition is captured, tryCatch returns the 
+  # value of the input
+  show_condition(10)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>　　我们可以使用tryCatch()函数来实现的try()函数的功能。需要使用conditionMessage()来提取与原来错误相关联的消息。</p>
+<p>　　在使用tryCatch()捕获异常，中断程序代码时，需要注意可能造成死循环的情况。（除非你 kill R 程序过程！！！）</p>
+<p>　　tryCatch()还有一个功能模块：finally = { cleanup-code }，它指定一个代码块（cleanup-code）（不是函数），无论初始表达是成功还是失败，都运行这段代码块。这对于清理程序（例如，删除文件，关闭连接）非常有用。这个功能等同于使用on.exit()，但它可以被封装在较小的代码块中使用。</p>
+</div>
+<div id="withcallinghandlers" class="section level1">
+<h1><code>withCallingHandlers()</code></h1>
+<p>　　与tryCatch()功能相似的另一种方法是withCallingHandlers()。它们的功能之间主要有两个区别：</p>
+<p>　　tryCatch()处理程序的返回值由tryCatch()返回，而withCallingHandlers()的返回值被处理程序忽略。</p>
+<p>　　通过调用sys.calls()查看相应的中间过程，它的运行相当于traceback()的用法，如下所示，它列出了导致当前函数的所有调用。</p>
+<p>　　以下为一个示例code：</p>
+<p>　　这些细微的差别很少用到，当你试图捕捉究竟哪里出了问题，并把它传递给另一个函数时除外。在大多数情况下，你不应该需要使用withCallingHandlers()。</p>
+<pre class="r"><code>    #!/usr/bin/env Rscript
+    # tryCatch.r -- experiments with tryCatch
+    
+    # Get any arguments
+    arguments &lt;- commandArgs(trailingOnly=TRUE)
+    a &lt;- arguments[1]
+    
+    # Define a division function that can issue warnings and errors
+    myDivide &lt;- function(d, a) {
+      if (a == &#39;warning&#39;) {
+        return_value &lt;- &#39;myDivide warning result&#39;
+        warning(&quot;myDivide warning message&quot;)
+      } else if (a == &#39;error&#39;) {
+        return_value &lt;- &#39;myDivide error result&#39;
+        stop(&quot;myDivide error message&quot;)
+      } else {
+        return_value = d / as.numeric(a)
+      }
+      return(return_value)
+    }
+    
+    # Evalute the desired series of expressions inside of tryCatch
+    result &lt;- tryCatch({
+      
+      b &lt;- 2
+      c &lt;- b^2
+      d &lt;- c+2
+      if (a == &#39;suppress-warnings&#39;) {
+        e &lt;- suppressWarnings(myDivide(d,a))
+      } else {
+        e &lt;- myDivide(d,a) # 6/a
+      }
+      f &lt;- e + 100
+      
+    }, warning = function(war) {
+      
+      # warning handler picks up where error was generated
+      print(paste(&quot;MY_WARNING:  &quot;,war))
+      b &lt;- &quot;changing &#39;b&#39; inside the warning handler has no effect&quot;
+      e &lt;- myDivide(d,0.1) # =60
+      f &lt;- e + 100
+      return(f)
+      
+    }, error = function(err) {
+      
+      # warning handler picks up where error was generated
+      print(paste(&quot;MY_ERROR:  &quot;,err))
+      b &lt;- &quot;changing &#39;b&#39; inside the error handler has no effect&quot;
+      e &lt;- myDivide(d,0.01) # =600
+      f &lt;- e + 100
+      return(f)
+      
+    }, finally = {
+      
+      print(paste(&quot;a =&quot;,a))
+      print(paste(&quot;b =&quot;,b))
+      print(paste(&quot;c =&quot;,c))
+      print(paste(&quot;d =&quot;,d))
+      # NOTE:  Finally is evaluated in the context of of the inital
+      # NOTE:  tryCatch block and &#39;e&#39; will not exist if a warning
+      # NOTE:  or error occurred.
+      #print(paste(&quot;e =&quot;,e))
+      
+    }) # END tryCatch</code></pre>
+<pre><code>## [1] &quot;MY_WARNING:   simpleWarning in myDivide(d, a): 强制改变过程中产生了NA\n&quot;
+## [1] &quot;a = C:\\Users\\DELL\\AppData\\Local\\Temp\\RtmpqWwlXk\\file4d006bea410f.rds&quot;
+## [1] &quot;b = 2&quot;
+## [1] &quot;c = 4&quot;
+## [1] &quot;d = 6&quot;</code></pre>
+<pre class="r"><code>    print(paste(&quot;result =&quot;,result))</code></pre>
+<pre><code>## [1] &quot;result = 160&quot;</code></pre>
+</div>

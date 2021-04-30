@@ -54,3 +54,9 @@
 
 - id: EconometricsListTitle
   translation: "计量经济学"
+
+- id: RListTitle
+  translation: "R语言"
+
+- id: RsListTitle
+  translation: "R语言"

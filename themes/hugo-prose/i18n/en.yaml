@@ -54,3 +54,9 @@
 
 - id: EconometricsListTitle
   translation: "Econometric"
+
+- id: RListTitle
+  translation: "R"
+
+- id: RsListTitle
+  translation: "R"

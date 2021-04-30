@@ -1,0 +1,334 @@
+---
+author:
+  - 韭菜园
+title: 'R循环中的异常与错误处理'
+date: 2021-05-01
+categories:
+  - R循环
+  - 异常
+  - 错误
+tags:
+  - R循环
+  - 异常
+  - 错误
+slug: waring-error
+weight: 0003
+description: 使用R语言进行数据处理时，常常需要写批处理程序实现程序自动处理，但是可能会出现一些意想不到的错误，从而导致自动化过程中断，这时需要妥然处理，以避免不必要的时间成本。  
+
+---
+
+<font face="思源宋体 CN" >
+
+
+　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：     
+
+- `try()` 忽略错误，不打印任何信息，继续执行循环体。    
+- `tryCatch()` 捕捉异常或错误，然后采用对应的函数处理异常和错误。    
+-  `withCallingHandlers()`是tryCatch()的变体，只是运行的上下文条件不同，它使用的情况很少，但是非常有用。  
+
+
+# `try()`    
+　　
+　　忽略错误，不打印任何信息，继续执行循环体。  
+
+## `try()`的使用方法
+
+```{r}
+library(formatR)
+usage(try)
+```
+　　如果表达式运行产生错误提示，try()函数会返回一个类(class)对象'try-error'。如果参数 silent=TRUE，错误信息将被隐藏，silent=FALSE，错误信息将显示到屏幕上。  
+
+
+## 例子   
+
+　　try() 允许出现错误后继续执行代码。例如，一般来说，如果你运行的函数引发错误，它会立即终止，并且不返回值：
+
+```{r eval=FALSE, include=FALSE}
+f1 <- function(x) {
+    log(x)
+    10
+  }
+  f1("x")
+```
+
+　　Error : Failed to render content/R/R循环中的异常与错误处理.Rmd
+
+
+　　但是，如果将产生错误的语句放在try()中，那么错误信息将被打印，但程序会继续执行：
+
+```{r}
+ f2 <- function(x) {
+    try(log(x))
+    10
+  }
+  f2("a")
+  #> Error in log(x) : non-numeric argument to mathematical function
+
+```
+
+　　我们可以使用try(…, silent=TRUE)函数，隐藏错误异常信息。如果大段代码中有错误，想忽略错误，可以采用try()，但大段代码需放在{}中：   
+
+```{r}
+#默认 silent = FALSE，显示错误信息
+  try({
+    a <- 1
+    b <- "x"
+    a + b
+  })
+```
+
+　　你可以捕获try()的输出，如果程序运行成功，返回计算结果；如果程序运行不成功，则可以通过class()函数返回，错误类型 'try-error'。
+
+```{r}
+success <- try(1 + 2)
+failure <- try("a" + "b")
+class(success)
+class(failure)
+
+```
+
+　　在list列表中使用try()函数非常有用，可以有效避免个别元素不能计算引起的错误。  
+
+```{r}
+elements <- list(1:10, c(-1, 10), c(T, F), letters)
+#results <- lapply(elements, log)
+results <- lapply(elements, function(x) try(log(x)))
+```
+
+　　在R中没有一个可以识别错误类型（class）-"try-error"的函数，我们可以自定义一个函数，然后结合sapply函数，可以非常方便的提取出错误类型、错误的位置以及错误值和正确值。   
+
+```{r}
+is.error <- function(x) inherits(x, "try-error")
+succeeded <- !sapply(results, is.error)
+str(results[succeeded])
+str(elements[!succeeded])
+```
+
+# `tryCatch()`    
+
+　　下面就是tryCatch()函数的标准语法：  
+
+```{r eval=FALSE, include=FALSE}
+  result = tryCatch({
+      #正常的逻辑
+      expr
+  }, warning = function(w) {
+      #出现warning的处理逻辑
+      warning-handler-code
+  }, error = function(e) {
+      #出现error的处理逻辑
+      error-handler-code
+  }, finally = {
+      #不管出现异常还是正常都会执行的代码模块，
+      #一般用来处理清理操作，例如关闭连接资源等。
+      cleanup-code
+  }
+```
+
+　　两个实际的小例子，code：  
+
+```{r eval=FALSE, include=FALSE}
+  #code1:
+  get.msg <- function(path)
+  {
+    con <- file(path, open = "rt", encoding = "latin1")
+    text <- readLines(con)
+    msg <- tryCatch({
+      text[seq(which(text == "")[1] + 1, length(text), 1)]
+    }, error = function(e) {
+      ""
+    })
+    close(con)
+    return(paste(msg, collapse = "\n"))
+  }
+
+```
+
+```{r eval=FALSE, include=FALSE}
+  #code2:
+  library(RMySQL)
+  result = tryCatch({
+      #获取数据连接
+      connect <- dbConnect(MySQL(), dbname="db_olap_web", username="root", password="")
+      #处理其他逻辑
+      #……
+  }, warning = function(w) {
+      #这里我只是简单处理一下
+      #也就是打印到控制台
+      print(w)
+  }, error = function(e) {
+      #这里我只是简单处理一下
+      #也就是打印到控制台
+      print(e)
+  }, finally = {
+      #关闭数据库连接
+      dbDisconnect(connect)
+  }
+```
+
+　　使用tryCatch()函数，根据获取到的条件信号，返回相应的内置函数处理结果，错误、警告、消息等。  
+
+
+```{r}
+  show_condition <- function(code) {
+    tryCatch(code,
+      error = function(c) "error",
+      warning = function(c) "warning",
+      message = function(c) "message"
+    )
+  }
+  show_condition(stop("!"))
+  show_condition(warning("?!"))
+  show_condition(message("?"))
+  # If no condition is captured, tryCatch returns the 
+  # value of the input
+  show_condition(10)
+```
+
+　　我们可以使用tryCatch()函数来实现的try()函数的功能。需要使用conditionMessage()来提取与原来错误相关联的消息。  
+
+```{r eval=FALSE, include=FALSE}
+  try2 <- function(code, silent = FALSE) {
+    tryCatch(code, error = function(c) {
+      msg <- conditionMessage(c)
+      if (!silent) message(c)
+      invisible(structure(msg, class = "try-error"))
+    })
+  }
+ 
+  try2(1)
+  try2(stop("Hi"))
+  try2(stop("Hi"), silent = TRUE)
+```
+
+　　在使用tryCatch()捕获异常，中断程序代码时，需要注意可能造成死循环的情况。（除非你 kill R 程序过程！！！）  
+
+```{r eval=FALSE, include=FALSE}
+  # Don't let the user interrupt the code
+  i <- 1
+  while(i < 3) {
+    tryCatch({
+      Sys.sleep(0.5)
+      message("Try to escape")
+    }, interrupt = function(x) {
+      message("Try again!")
+      i <<- i + 1
+    })
+  }
+```
+
+
+　　tryCatch()还有一个功能模块：finally = { cleanup-code }，它指定一个代码块（cleanup-code）（不是函数），无论初始表达是成功还是失败，都运行这段代码块。这对于清理程序（例如，删除文件，关闭连接）非常有用。这个功能等同于使用on.exit()，但它可以被封装在较小的代码块中使用。  
+
+
+# `withCallingHandlers()`
+
+　　与tryCatch()功能相似的另一种方法是withCallingHandlers()。它们的功能之间主要有两个区别：  
+
+　　tryCatch()处理程序的返回值由tryCatch()返回，而withCallingHandlers()的返回值被处理程序忽略。  
+
+
+```{r eval=FALSE, include=FALSE}
+  f <- function() stop("!")
+  tryCatch(f(), error = function(e) 1)
+  withCallingHandlers(f(), error = function(e) 1)
+```
+
+
+　　通过调用sys.calls()查看相应的中间过程，它的运行相当于traceback()的用法，如下所示，它列出了导致当前函数的所有调用。  
+
+```{r eval=FALSE, include=FALSE}
+  f <- function() g()
+  g <- function() h()
+  h <- function() stop("!")
+ 
+  tryCatch(f(), error = function(e) print(sys.calls()))
+ 
+  withCallingHandlers(f(), error = function(e) print(sys.calls()))
+```
+
+　　以下为一个示例code：  
+
+```{r eval=FALSE, include=FALSE}
+  message2error <- function(code) {
+    withCallingHandlers(code, message = function(e) stop(e))
+  }
+  f <- function() g()
+  g <- function() message("Hi!")
+  g()
+  message2error(g())
+  traceback()
+```
+
+　　这些细微的差别很少用到，当你试图捕捉究竟哪里出了问题，并把它传递给另一个函数时除外。在大多数情况下，你不应该需要使用withCallingHandlers()。  
+
+```{r}
+    #!/usr/bin/env Rscript
+    # tryCatch.r -- experiments with tryCatch
+    
+    # Get any arguments
+    arguments <- commandArgs(trailingOnly=TRUE)
+    a <- arguments[1]
+    
+    # Define a division function that can issue warnings and errors
+    myDivide <- function(d, a) {
+      if (a == 'warning') {
+        return_value <- 'myDivide warning result'
+        warning("myDivide warning message")
+      } else if (a == 'error') {
+        return_value <- 'myDivide error result'
+        stop("myDivide error message")
+      } else {
+        return_value = d / as.numeric(a)
+      }
+      return(return_value)
+    }
+    
+    # Evalute the desired series of expressions inside of tryCatch
+    result <- tryCatch({
+      
+      b <- 2
+      c <- b^2
+      d <- c+2
+      if (a == 'suppress-warnings') {
+        e <- suppressWarnings(myDivide(d,a))
+      } else {
+        e <- myDivide(d,a) # 6/a
+      }
+      f <- e + 100
+      
+    }, warning = function(war) {
+      
+      # warning handler picks up where error was generated
+      print(paste("MY_WARNING:  ",war))
+      b <- "changing 'b' inside the warning handler has no effect"
+      e <- myDivide(d,0.1) # =60
+      f <- e + 100
+      return(f)
+      
+    }, error = function(err) {
+      
+      # warning handler picks up where error was generated
+      print(paste("MY_ERROR:  ",err))
+      b <- "changing 'b' inside the error handler has no effect"
+      e <- myDivide(d,0.01) # =600
+      f <- e + 100
+      return(f)
+      
+    }, finally = {
+      
+      print(paste("a =",a))
+      print(paste("b =",b))
+      print(paste("c =",c))
+      print(paste("d =",d))
+      # NOTE:  Finally is evaluated in the context of of the inital
+      # NOTE:  tryCatch block and 'e' will not exist if a warning
+      # NOTE:  or error occurred.
+      #print(paste("e =",e))
+      
+    }) # END tryCatch
+    
+    print(paste("result =",result))
+```
+
