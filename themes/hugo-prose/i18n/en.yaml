@@ -55,8 +55,8 @@
 - id: EconometricsListTitle
   translation: "Econometric"
 
-- id: RListTitle
-  translation: "R"
+- id: RProgramListTitle
+  translation: "RProgram"
 
-- id: RsListTitle
-  translation: "R"
+- id: RProgramsListTitle
+  translation: "RProgram"
