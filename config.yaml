@@ -17,15 +17,33 @@ permalinks:
 
 outputs:
   home: [html, rss, json]
-
 # some menu items were added via the `menu` option in YAML in posts
 menu:
   header:
+    - name: 市场
+      url: "/Capital"
+      weight: 2
+    - name: 计量
+      weight: 3
+      url: "/Econometric/"
+    - name: R语言
+      url: "/ProgramR"
+      weight: 4
+    - name: 类别
+      url: "/categories/"
+      weight: 5
+    - name: 标签
+      url: "/tags/"
+      weight: 6
     - name: 搜索
       url: "#"
+      weight: 7
       identifier: menu-search
     - name: 订阅
       url: "https://lifelonglearn.netlify.app/"
+
+
+
   footer:
 #    - name: 联系
 #      url: "/404.html"
