@@ -21,12 +21,12 @@ description: 使用R语言进行数据处理时，常常需要写批处理程序
 
 
 <p><font face="思源宋体 CN" ></p>
-　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：
-　　
-<div class="embed-right">
-<p>　　
-<iframe src="//player.bilibili.com/player.html?aid=205288913&bvid=BV1oh41127dC&cid=332374113&page=1" width="640" height="400" scrolling="no" border="0" frameborder="no" framespacing="0" allow="autoplay; fullscreen" > </iframe></p>
+<div class="fullwidth">
+<iframe src="//player.bilibili.com/player.html?aid=205288913&amp;bvid=BV1oh41127dC&amp;cid=332374113&amp;page=1" width="1280" height="900">
+</iframe>
 </div>
+<p>　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：<br />
+　　</p>
 <ul>
 <li><code>try()</code> 忽略错误，不打印任何信息，继续执行循环体。<br />
 </li>
@@ -192,7 +192,7 @@ str(results[succeeded])</code></pre>
       
     }) # END tryCatch</code></pre>
 <pre><code>## [1] &quot;MY_WARNING:   simpleWarning in myDivide(d, a): 强制改变过程中产生了NA\n&quot;
-## [1] &quot;a = C:\\Users\\DELL\\AppData\\Local\\Temp\\Rtmp0IxtoL\\file2ff42e1e470a.rds&quot;
+## [1] &quot;a = C:\\Users\\DELL\\AppData\\Local\\Temp\\RtmpmKnng5\\file61d01bc24c8a.rds&quot;
 ## [1] &quot;b = 2&quot;
 ## [1] &quot;c = 4&quot;
 ## [1] &quot;d = 6&quot;</code></pre>

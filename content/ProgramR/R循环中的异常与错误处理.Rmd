@@ -20,11 +20,14 @@ description: 使用R语言进行数据处理时，常常需要写批处理程序
 <font face="思源宋体 CN" >
 
 
-　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：
-　　
-<div class="embed-right">　　
-<iframe src="//player.bilibili.com/player.html?aid=205288913&bvid=BV1oh41127dC&cid=332374113&page=1" width="640" height="400" scrolling="no" border="0" frameborder="no" framespacing="0" allow="autoplay; fullscreen" > </iframe>
+<div class="fullwidth">
+<iframe src="//player.bilibili.com/player.html?aid=205288913&bvid=BV1oh41127dC&cid=332374113&page=1" width="1280" height="900"> </iframe>
 </div>
+
+　　当在使用R语言循环操作时，通常会因为各边循环出错二跳出循环，导致我们不得不逐步查找错误，重新跑循环。因此，如何捕捉循环过程中的异常（waring)和错误（error），并妥善的处理他们，不仅仅有助于我们查找循环体中的局部错误，也可以避免因为个别循环出错而反复执行循环体的问题，大大提供我们的工作效率。针对解决此类问题，通常可以使用以下三个命令进行处理：  
+　　
+
+
 
 
 - `try()` 忽略错误，不打印任何信息，继续执行循环体。    
@@ -336,4 +339,10 @@ str(elements[!succeeded])
     
     print(paste("result =",result))
 ```
+
+
+
+
+
+
 
