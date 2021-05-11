@@ -18,12 +18,13 @@ description: 使用R语言链接Mysql数据库进行数据查询
 
 # 包的载入与数据表的基本信息
 
-```{r}
+```{r include=FALSE}
 pacman::p_load(RMySQL,RMariaDB,zeallot)
+con <- dbConnect(MariaDB(), host="", dbname="learning", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
 ```
 
 ```{r}
-con <- dbConnect(MariaDB(), host="", dbname="learning", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
+
 #查看链接信息
 summary(con)
 #查看数据库信息

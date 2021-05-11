@@ -21,9 +21,7 @@ description: 使用R语言链接Mysql数据库进行数据查询
 
 <div id="包的载入与数据表的基本信息" class="section level1">
 <h1>包的载入与数据表的基本信息</h1>
-<pre class="r"><code>pacman::p_load(RMySQL,RMariaDB,zeallot)</code></pre>
-<pre class="r"><code>con &lt;- dbConnect(MariaDB(), host=&quot;&quot;, dbname=&quot;learning&quot;, user=&quot;root&quot;, password=&quot;Zh_xq1234@&quot;)#,host=&quot;127.0.0.1&quot;, port=3306
-#查看链接信息
+<pre class="r"><code>#查看链接信息
 summary(con)</code></pre>
 <pre><code>## MariaDBConnection 
 ## host = localhost 
@@ -33,7 +31,7 @@ summary(con)</code></pre>
 ## db.version = 8.0.24 
 ## port = NA 
 ## protocol.version = 10 
-## thread.id = 340</code></pre>
+## thread.id = 341</code></pre>
 <pre class="r"><code>#查看数据库信息
 dbGetInfo(con)</code></pre>
 <pre><code>## $host
@@ -58,7 +56,7 @@ dbGetInfo(con)</code></pre>
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 340</code></pre>
+## [1] 341</code></pre>
 <pre class="r"><code>#查看数据库中的表
 dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
