@@ -19,8 +19,11 @@ description: 使用R语言链接Mysql数据库进行数据查询
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
+<p><font face="思源宋体 CN" ></p>
 <div id="包的载入与数据表的基本信息" class="section level1">
 <h1>包的载入与数据表的基本信息</h1>
+<div id="查询链接状态" class="section level2">
+<h2>查询链接状态</h2>
 <pre class="r"><code>#查看链接信息
 summary(con)</code></pre>
 <pre><code>## MariaDBConnection 
@@ -31,7 +34,7 @@ summary(con)</code></pre>
 ## db.version = 8.0.24 
 ## port = NA 
 ## protocol.version = 10 
-## thread.id = 342</code></pre>
+## thread.id = 391</code></pre>
 <pre class="r"><code>#查看数据库信息
 dbGetInfo(con)</code></pre>
 <pre><code>## $host
@@ -56,10 +59,31 @@ dbGetInfo(con)</code></pre>
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 342</code></pre>
+## [1] 391</code></pre>
 <pre class="r"><code>#查看数据库中的表
 dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
+</div>
+<div id="查询表中的所有字段信息" class="section level2">
+<h2>查询表中的所有字段信息</h2>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;describe person&quot;)</code></pre>
+<pre><code>##       Field                   Type Null Key Default          Extra
+## 1        id                    int   NO PRI    &lt;NA&gt; auto_increment
+## 2      name            varchar(50)   NO        &lt;NA&gt;               
+## 3       age                tinyint  YES           0               
+## 4       sex enum(&#39;男&#39;,&#39;女&#39;,&#39;人妖&#39;)   NO        人妖               
+## 5    salary          decimal(10,2)   NO      250.00               
+## 6 hire_date                   date   NO        &lt;NA&gt;               
+## 7   dept_id                    int  YES        &lt;NA&gt;</code></pre>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;describe dept&quot;)</code></pre>
+<pre><code>##   Field        Type Null Key Default          Extra
+## 1   did         int   NO PRI    &lt;NA&gt; auto_increment
+## 2 dname varchar(50)   NO        &lt;NA&gt;</code></pre>
+</div>
+<div id="查询表中的所有观测与字段" class="section level2">
+<h2>查询表中的所有观测与字段</h2>
 <pre class="r"><code>#描述表格信息
 dbGetQuery(con,&quot;select * from person&quot;)</code></pre>
 <pre><code>##    id       name age  sex  salary  hire_date dept_id
@@ -83,24 +107,14 @@ dbGetQuery(con,&quot;select * from dept&quot;)</code></pre>
 ## 3   3 市场部
 ## 4   4 人事部
 ## 5   5 鼓励部</code></pre>
-<pre class="r"><code>#描述表格信息
-dbGetQuery(con,&quot;describe person&quot;)</code></pre>
-<pre><code>##       Field                   Type Null Key Default          Extra
-## 1        id                    int   NO PRI    &lt;NA&gt; auto_increment
-## 2      name            varchar(50)   NO        &lt;NA&gt;               
-## 3       age                tinyint  YES           0               
-## 4       sex enum(&#39;男&#39;,&#39;女&#39;,&#39;人妖&#39;)   NO        人妖               
-## 5    salary          decimal(10,2)   NO      250.00               
-## 6 hire_date                   date   NO        &lt;NA&gt;               
-## 7   dept_id                    int  YES        &lt;NA&gt;</code></pre>
-<pre class="r"><code>#描述表格信息
-dbGetQuery(con,&quot;describe dept&quot;)</code></pre>
-<pre><code>##   Field        Type Null Key Default          Extra
-## 1   did         int   NO PRI    &lt;NA&gt; auto_increment
-## 2 dname varchar(50)   NO        &lt;NA&gt;</code></pre>
+</div>
 </div>
 <div id="跨表查询" class="section level1">
 <h1>跨表查询</h1>
+<pre><code>#多表查询语法
+select  字段1,字段2... from 表1,表2... [where 条件]</code></pre>
+<p>　　注意: 如果不加条件直接进行查询,则会出现以下效果,这种结果我们称之为 笛卡尔乘积。笛卡尔乘积公式 : A表中数据条数 * B表中数据条数 = 笛卡尔乘积。
+　　</p>
 <div id="笛卡尔乘积" class="section level2">
 <h2>笛卡尔乘积</h2>
 <pre class="r"><code>#描述表格信息
@@ -179,6 +193,123 @@ dbGetQuery(con,&quot;select * from person,dept where person.id = dept.did&quot;)
 ## 3  3       egon  30   男   6500 2015-06-21       1   3 市场部
 ## 4  4 jingnvshen  18   女   6680 2014-06-21       1   4 人事部
 ## 5  5       歪歪  20   女   3000 2015-02-21       2   5 鼓励部</code></pre>
+<p>　　<strong>注意: 多表查询时,一定要找到两个表中相互关联的字段,并且作为条件使用</strong></p>
 </div>
+<div id="多表链接查询" class="section level3">
+<h3>多表链接查询 　</h3>
+<pre><code>#多表连接查询语法(重点)
+SELECT 字段列表
+    FROM 表1  INNER|LEFT|RIGHT JOIN  表2
+ON 表1.字段 = 表2.字段;</code></pre>
+<div id="内连接查询-只显示符合条件的数据" class="section level4">
+<h4>内连接查询 (只显示符合条件的数据)</h4>
+<pre class="r"><code>#查询人员和部门所有信息
+dbGetQuery(con,&quot;select * from person inner join dept  on person.id =dept.did&quot;)</code></pre>
+<pre><code>##   id       name age  sex salary  hire_date dept_id did  dname
+## 1  1       alex  28 人妖  53000 2010-06-21       1   1 教学部
+## 2  2    wupeiqi  23   男   8000 2011-02-21       1   2 销售部
+## 3  3       egon  30   男   6500 2015-06-21       1   3 市场部
+## 4  4 jingnvshen  18   女   6680 2014-06-21       1   4 人事部
+## 5  5       歪歪  20   女   3000 2015-02-21       2   5 鼓励部</code></pre>
+<p>　　<strong>效果: 大家可能会发现, 内连接查询与多表联合查询的效果是一样的.</strong></p>
+</div>
+<div id="左外连接查询-左边表中的数据优先全部显示" class="section level4">
+<h4>左外连接查询 (左边表中的数据优先全部显示)</h4>
+<pre class="r"><code>#查询人员和部门所有信息
+dbGetQuery(con,&quot;select * from person left join  dept  on  person.id =dept.did&quot;)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id did  dname
+## 1   1       alex  28 人妖   53000 2010-06-21       1   1 教学部
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1   2 销售部
+## 3   3       egon  30   男    6500 2015-06-21       1   3 市场部
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1   4 人事部
+## 5   5       歪歪  20   女    3000 2015-02-21       2   5 鼓励部
+## 6   6       星星  20   女    2000 2018-01-30       2  NA   &lt;NA&gt;
+## 7   7       格格  20   女    2000 2018-02-27       2  NA   &lt;NA&gt;
+## 8   8       周周  20   女    2000 2015-06-21       2  NA   &lt;NA&gt;
+## 9   9       月月  21   女    4000 2014-07-21       3  NA   &lt;NA&gt;
+## 10 10       安琪  22   女    4000 2015-07-15       3  NA   &lt;NA&gt;
+## 11 11     周明月  17   女    5000 2014-06-21       4  NA   &lt;NA&gt;
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA  NA   &lt;NA&gt;</code></pre>
+</div>
+<div id="右外连接查询-右边表中的数据优先全部显示" class="section level4">
+<h4>右外连接查询 (右边表中的数据优先全部显示)</h4>
+<pre class="r"><code>#查询人员和部门所有信息
+dbGetQuery(con,&quot;select * from person right join  dept  on  person.id =dept.did&quot;)</code></pre>
+<pre><code>##   id       name age  sex salary  hire_date dept_id did  dname
+## 1  1       alex  28 人妖  53000 2010-06-21       1   1 教学部
+## 2  2    wupeiqi  23   男   8000 2011-02-21       1   2 销售部
+## 3  3       egon  30   男   6500 2015-06-21       1   3 市场部
+## 4  4 jingnvshen  18   女   6680 2014-06-21       1   4 人事部
+## 5  5       歪歪  20   女   3000 2015-02-21       2   5 鼓励部</code></pre>
+<p>　　<strong>效果:正好与[左外连接相反]</strong></p>
+</div>
+<div id="全连接查询显示左右表中全部数据" class="section level4">
+<h4>全连接查询(显示左右表中全部数据)</h4>
+<p>全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
+　　注意: mysql并不支持全连接 full JOIN 关键字
+　　注意: 但是mysql 提供了 UNION 关键字.使用 UNION 可以间接实现 full JOIN 功能</p>
+<pre class="r"><code>dbGetQuery(con,&quot;SELECT * FROM person LEFT JOIN dept ON person.id = dept.did
+                UNION 
+            SELECT * FROM person RIGHT JOIN dept ON person.id = dept.did&quot;)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id did  dname
+## 1   1       alex  28 人妖   53000 2010-06-21       1   1 教学部
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1   2 销售部
+## 3   3       egon  30   男    6500 2015-06-21       1   3 市场部
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1   4 人事部
+## 5   5       歪歪  20   女    3000 2015-02-21       2   5 鼓励部
+## 6   6       星星  20   女    2000 2018-01-30       2  NA   &lt;NA&gt;
+## 7   7       格格  20   女    2000 2018-02-27       2  NA   &lt;NA&gt;
+## 8   8       周周  20   女    2000 2015-06-21       2  NA   &lt;NA&gt;
+## 9   9       月月  21   女    4000 2014-07-21       3  NA   &lt;NA&gt;
+## 10 10       安琪  22   女    4000 2015-07-15       3  NA   &lt;NA&gt;
+## 11 11     周明月  17   女    5000 2014-06-21       4  NA   &lt;NA&gt;
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA  NA   &lt;NA&gt;</code></pre>
+<p>　　<strong>注意: UNION 和 UNION ALL 的区别:UNION 会去掉重复的数据,而 UNION ALL 则直接显示结果</strong></p>
+</div>
+</div>
+</div>
+</div>
+<div id="复制条件多表查询" class="section level1">
+<h1>复制条件多表查询　　</h1>
+<div id="多表联合查询方式" class="section level2">
+<h2>多表联合查询方式:</h2>
+<p>　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)</p>
+<pre class="r"><code>dbGetQuery(con,&quot;select * from person p1,dept d2 where p1.id = d2.did and 
+    d2.dname=&#39;鼓励部&#39; 
+    and  p1.age&gt;=20 
+    and p1.salary&lt;80000 
+    ORDER BY salary DESC&quot;)</code></pre>
+<pre><code>##   id name age sex salary  hire_date dept_id did  dname
+## 1  5 歪歪  20  女   3000 2015-02-21       2   5 鼓励部</code></pre>
+</div>
+<div id="内连接查询方式" class="section level2">
+<h2>内连接查询方式</h2>
+<p>　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)</p>
+<pre class="r"><code>dbGetQuery(con,&quot;SELECT * FROM person p1 INNER JOIN dept d2 ON p1.id= d2.did 
+    and d2.dname=&#39;鼓励部&#39; 
+    and  p1.age&gt;=20 
+    and  p1.salary&lt;80000 
+ORDER BY p1.salary DESC&quot;)</code></pre>
+<pre><code>##   id name age sex salary  hire_date dept_id did  dname
+## 1  5 歪歪  20  女   3000 2015-02-21       2   5 鼓励部</code></pre>
+<p>　　查询每个部门中最高工资和最低工资是多少,显示部门名称</p>
+<pre class="r"><code>dbGetQuery(con,&quot;select MAX(salary),MIN(salary),dept.dname from 
+        person LEFT JOIN dept
+            ON person.id = dept.did
+ GROUP BY person.id&quot;)</code></pre>
+<pre><code>##    MAX(salary) MIN(salary)  dname
+## 1        53000       53000 教学部
+## 2         8000        8000 销售部
+## 3         6500        6500 市场部
+## 4         6680        6680 人事部
+## 5         3000        3000 鼓励部
+## 6         2000        2000   &lt;NA&gt;
+## 7         2000        2000   &lt;NA&gt;
+## 8         2000        2000   &lt;NA&gt;
+## 9         4000        4000   &lt;NA&gt;
+## 10        4000        4000   &lt;NA&gt;
+## 11        5000        5000   &lt;NA&gt;
+## 12     1000000     1000000   &lt;NA&gt;</code></pre>
+<p></font></p>
 </div>
 </div>

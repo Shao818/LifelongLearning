@@ -16,7 +16,11 @@ weight: 0004
 description: 使用R语言链接Mysql数据库进行数据查询
 --- 
 
+<font face="思源宋体 CN" >
+
 # 包的载入与数据表的基本信息
+
+## 查询链接状态
 
 ```{r include=FALSE}
 pacman::p_load(RMySQL,RMariaDB,zeallot)
@@ -24,7 +28,6 @@ con <- dbConnect(MariaDB(), host="", dbname="learning", user="root", password="Z
 ```
 
 ```{r}
-
 #查看链接信息
 summary(con)
 #查看数据库信息
@@ -33,15 +36,7 @@ dbGetInfo(con)
 dbListTables(con)
 ```
 
-```{r}
-#描述表格信息
-dbGetQuery(con,"select * from person")
-```
-
-```{r}
-#描述表格信息
-dbGetQuery(con,"select * from dept")
-```
+## 查询表中的所有字段信息
 
 
 ```{r}
@@ -54,7 +49,31 @@ dbGetQuery(con,"describe person")
 dbGetQuery(con,"describe dept")
 ```
 
+## 查询表中的所有观测与字段  
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from person")
+```
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from dept")
+```
+
+
+
+
+
 # 跨表查询
+
+```
+#多表查询语法
+select  字段1,字段2... from 表1,表2... [where 条件]
+```
+
+　　注意: 如果不加条件直接进行查询,则会出现以下效果,这种结果我们称之为 笛卡尔乘积。笛卡尔乘积公式 : A表中数据条数   *  B表中数据条数  = 笛卡尔乘积。
+　　
 
 ## 笛卡尔乘积
 
@@ -72,3 +91,97 @@ dbGetQuery(con,"select * from person,dept")
 #描述表格信息
 dbGetQuery(con,"select * from person,dept where person.id = dept.did")
 ```
+
+　　**注意: 多表查询时,一定要找到两个表中相互关联的字段,并且作为条件使用**
+
+
+### 多表链接查询  　
+
+```
+#多表连接查询语法(重点)
+SELECT 字段列表
+    FROM 表1  INNER|LEFT|RIGHT JOIN  表2
+ON 表1.字段 = 表2.字段;
+```  
+
+
+
+####  内连接查询 (只显示符合条件的数据)
+
+```{r}
+#查询人员和部门所有信息
+dbGetQuery(con,"select * from person inner join dept  on person.id =dept.did")
+```
+
+　　**效果: 大家可能会发现, 内连接查询与多表联合查询的效果是一样的.**
+
+
+#### 左外连接查询 (左边表中的数据优先全部显示)
+
+```{r}
+#查询人员和部门所有信息
+dbGetQuery(con,"select * from person left join  dept  on  person.id =dept.did")
+```
+
+#### 右外连接查询 (右边表中的数据优先全部显示)  
+
+```{r}
+#查询人员和部门所有信息
+dbGetQuery(con,"select * from person right join  dept  on  person.id =dept.did")
+```
+
+　　**效果:正好与[左外连接相反]**
+
+#### 全连接查询(显示左右表中全部数据)  
+
+全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
+　　注意: mysql并不支持全连接 full JOIN 关键字
+　　注意: 但是mysql 提供了 UNION 关键字.使用 UNION 可以间接实现 full JOIN 功能
+
+```{r}
+dbGetQuery(con,"SELECT * FROM person LEFT JOIN dept ON person.id = dept.did
+                UNION 
+            SELECT * FROM person RIGHT JOIN dept ON person.id = dept.did")
+```
+
+　　**注意: UNION 和 UNION ALL 的区别:UNION 会去掉重复的数据,而 UNION ALL 则直接显示结果**  
+
+
+# 复制条件多表查询　　
+
+## 多表联合查询方式:
+
+　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)
+
+```{r}
+dbGetQuery(con,"select * from person p1,dept d2 where p1.id = d2.did and 
+    d2.dname='鼓励部' 
+    and  p1.age>=20 
+    and p1.salary<80000 
+    ORDER BY salary DESC")
+```
+
+
+## 内连接查询方式
+
+　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)
+
+```{r}
+dbGetQuery(con,"SELECT * FROM person p1 INNER JOIN dept d2 ON p1.id= d2.did 
+    and d2.dname='鼓励部' 
+    and  p1.age>=20 
+    and  p1.salary<80000 
+ORDER BY p1.salary DESC")
+```
+
+　　查询每个部门中最高工资和最低工资是多少,显示部门名称  
+
+```{r}
+dbGetQuery(con,"select MAX(salary),MIN(salary),dept.dname from 
+        person LEFT JOIN dept
+            ON person.id = dept.did
+ GROUP BY person.id")
+```
+
+
+</font>
