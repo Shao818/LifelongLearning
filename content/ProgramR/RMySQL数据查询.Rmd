@@ -42,6 +42,17 @@ dbGetQuery(con,"select * from person")
 dbGetQuery(con,"select * from dept")
 ```
 
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"describe person")
+```
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"describe dept")
+```
+
 # 跨表查询
 
 ## 笛卡尔乘积

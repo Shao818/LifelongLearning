@@ -33,7 +33,7 @@ summary(con)</code></pre>
 ## db.version = 8.0.24 
 ## port = NA 
 ## protocol.version = 10 
-## thread.id = 337</code></pre>
+## thread.id = 340</code></pre>
 <pre class="r"><code>#查看数据库信息
 dbGetInfo(con)</code></pre>
 <pre><code>## $host
@@ -58,7 +58,7 @@ dbGetInfo(con)</code></pre>
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 337</code></pre>
+## [1] 340</code></pre>
 <pre class="r"><code>#查看数据库中的表
 dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
@@ -85,6 +85,21 @@ dbGetQuery(con,&quot;select * from dept&quot;)</code></pre>
 ## 3   3 市场部
 ## 4   4 人事部
 ## 5   5 鼓励部</code></pre>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;describe person&quot;)</code></pre>
+<pre><code>##       Field                   Type Null Key Default          Extra
+## 1        id                    int   NO PRI    &lt;NA&gt; auto_increment
+## 2      name            varchar(50)   NO        &lt;NA&gt;               
+## 3       age                tinyint  YES           0               
+## 4       sex enum(&#39;男&#39;,&#39;女&#39;,&#39;人妖&#39;)   NO        人妖               
+## 5    salary          decimal(10,2)   NO      250.00               
+## 6 hire_date                   date   NO        &lt;NA&gt;               
+## 7   dept_id                    int  YES        &lt;NA&gt;</code></pre>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;describe dept&quot;)</code></pre>
+<pre><code>##   Field        Type Null Key Default          Extra
+## 1   did         int   NO PRI    &lt;NA&gt; auto_increment
+## 2 dname varchar(50)   NO        &lt;NA&gt;</code></pre>
 </div>
 <div id="跨表查询" class="section level1">
 <h1>跨表查询</h1>
