@@ -49,21 +49,55 @@ dbGetQuery(con,"describe person")
 dbGetQuery(con,"describe dept")
 ```
 
-## 查询表中的所有观测与字段  
+## 查询表中的所有观测与字段 
+
+### person表  
+
+#### 方式一：dbReadTable
+
+　　查询表中的所有字段与观测；
+
+```{r}
+dbReadTable(con,"person")
+```
+
+#### 方式二：使用SQL语句查询表数据
+
+
 
 ```{r}
 #描述表格信息
 dbGetQuery(con,"select * from person")
 ```
 
+
+#### 方式三：使用dbSendQuery查询数据
+
 ```{r}
-#描述表格信息
-dbGetQuery(con,"select * from dept")
+dbSendQuery(con, "SELECT * FROM person")  
+```
+
+```{r}
+res <- dbSendQuery(con, "SELECT * FROM person")  
+data <- dbFetch(res,n=-1) #取前2条数据，n=-1时是获取所有数据  
+print(data)
+dbClearResult(res)
 ```
 
 
 
 
+### dept表   
+
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from dept")
+```
+
+```{r}
+dbReadTable(con,"dept")
+```
 
 # 跨表查询
 
@@ -134,7 +168,7 @@ dbGetQuery(con,"select * from person right join  dept  on  person.id =dept.did")
 
 #### 全连接查询(显示左右表中全部数据)  
 
-全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
+　　全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
 　　注意: mysql并不支持全连接 full JOIN 关键字
 　　注意: 但是mysql 提供了 UNION 关键字.使用 UNION 可以间接实现 full JOIN 功能
 
@@ -151,7 +185,7 @@ dbGetQuery(con,"SELECT * FROM person LEFT JOIN dept ON person.id = dept.did
 
 ## 多表联合查询方式:
 
-　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)
+　　查询出鼓励部年龄大于等于20岁,并且工资小于80000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)。
 
 ```{r}
 dbGetQuery(con,"select * from person p1,dept d2 where p1.id = d2.did and 
@@ -164,7 +198,7 @@ dbGetQuery(con,"select * from person p1,dept d2 where p1.id = d2.did and
 
 ## 内连接查询方式
 
-　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)
+　　查询出鼓励部年龄大于等于20岁,并且工资小于80000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)。
 
 ```{r}
 dbGetQuery(con,"SELECT * FROM person p1 INNER JOIN dept d2 ON p1.id= d2.did 
@@ -174,7 +208,7 @@ dbGetQuery(con,"SELECT * FROM person p1 INNER JOIN dept d2 ON p1.id= d2.did
 ORDER BY p1.salary DESC")
 ```
 
-　　查询每个部门中最高工资和最低工资是多少,显示部门名称  
+　　查询每个部门中最高工资和最低工资是多少,显示部门名称。
 
 ```{r}
 dbGetQuery(con,"select MAX(salary),MIN(salary),dept.dname from 

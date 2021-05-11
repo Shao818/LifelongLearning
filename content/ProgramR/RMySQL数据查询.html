@@ -34,7 +34,7 @@ summary(con)</code></pre>
 ## db.version = 8.0.24 
 ## port = NA 
 ## protocol.version = 10 
-## thread.id = 391</code></pre>
+## thread.id = 406</code></pre>
 <pre class="r"><code>#查看数据库信息
 dbGetInfo(con)</code></pre>
 <pre><code>## $host
@@ -59,7 +59,7 @@ dbGetInfo(con)</code></pre>
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 391</code></pre>
+## [1] 406</code></pre>
 <pre class="r"><code>#查看数据库中的表
 dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
@@ -84,6 +84,28 @@ dbGetQuery(con,&quot;describe dept&quot;)</code></pre>
 </div>
 <div id="查询表中的所有观测与字段" class="section level2">
 <h2>查询表中的所有观测与字段</h2>
+<div id="person表" class="section level3">
+<h3>person表</h3>
+<div id="方式一dbreadtable" class="section level4">
+<h4>方式一：dbReadTable</h4>
+<p>　　查询表中的所有字段与观测；</p>
+<pre class="r"><code>dbReadTable(con,&quot;person&quot;)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id
+## 1   1       alex  28 人妖   53000 2010-06-21       1
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1
+## 3   3       egon  30   男    6500 2015-06-21       1
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1
+## 5   5       歪歪  20   女    3000 2015-02-21       2
+## 6   6       星星  20   女    2000 2018-01-30       2
+## 7   7       格格  20   女    2000 2018-02-27       2
+## 8   8       周周  20   女    2000 2015-06-21       2
+## 9   9       月月  21   女    4000 2014-07-21       3
+## 10 10       安琪  22   女    4000 2015-07-15       3
+## 11 11     周明月  17   女    5000 2014-06-21       4
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA</code></pre>
+</div>
+<div id="方式二使用sql语句查询表数据" class="section level4">
+<h4>方式二：使用SQL语句查询表数据</h4>
 <pre class="r"><code>#描述表格信息
 dbGetQuery(con,&quot;select * from person&quot;)</code></pre>
 <pre><code>##    id       name age  sex  salary  hire_date dept_id
@@ -99,6 +121,35 @@ dbGetQuery(con,&quot;select * from person&quot;)</code></pre>
 ## 10 10       安琪  22   女    4000 2015-07-15       3
 ## 11 11     周明月  17   女    5000 2014-06-21       4
 ## 12 12     苍老师  33   女 1000000 2018-02-21      NA</code></pre>
+</div>
+<div id="方式三使用dbsendquery查询数据" class="section level4">
+<h4>方式三：使用dbSendQuery查询数据</h4>
+<pre class="r"><code>dbSendQuery(con, &quot;SELECT * FROM person&quot;)  </code></pre>
+<pre><code>## &lt;MariaDBResult&gt;
+##   SQL  SELECT * FROM person
+##   ROWS Fetched: 0 [incomplete]
+##        Changed: 0</code></pre>
+<pre class="r"><code>res &lt;- dbSendQuery(con, &quot;SELECT * FROM person&quot;)  
+data &lt;- dbFetch(res,n=-1) #取前2条数据，n=-1时是获取所有数据  
+print(data)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id
+## 1   1       alex  28 人妖   53000 2010-06-21       1
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1
+## 3   3       egon  30   男    6500 2015-06-21       1
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1
+## 5   5       歪歪  20   女    3000 2015-02-21       2
+## 6   6       星星  20   女    2000 2018-01-30       2
+## 7   7       格格  20   女    2000 2018-02-27       2
+## 8   8       周周  20   女    2000 2015-06-21       2
+## 9   9       月月  21   女    4000 2014-07-21       3
+## 10 10       安琪  22   女    4000 2015-07-15       3
+## 11 11     周明月  17   女    5000 2014-06-21       4
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA</code></pre>
+<pre class="r"><code>dbClearResult(res)</code></pre>
+</div>
+</div>
+<div id="dept表" class="section level3">
+<h3>dept表</h3>
 <pre class="r"><code>#描述表格信息
 dbGetQuery(con,&quot;select * from dept&quot;)</code></pre>
 <pre><code>##   did  dname
@@ -107,6 +158,14 @@ dbGetQuery(con,&quot;select * from dept&quot;)</code></pre>
 ## 3   3 市场部
 ## 4   4 人事部
 ## 5   5 鼓励部</code></pre>
+<pre class="r"><code>dbReadTable(con,&quot;dept&quot;)</code></pre>
+<pre><code>##   did  dname
+## 1   1 教学部
+## 2   2 销售部
+## 3   3 市场部
+## 4   4 人事部
+## 5   5 鼓励部</code></pre>
+</div>
 </div>
 </div>
 <div id="跨表查询" class="section level1">
@@ -245,7 +304,7 @@ dbGetQuery(con,&quot;select * from person right join  dept  on  person.id =dept.
 </div>
 <div id="全连接查询显示左右表中全部数据" class="section level4">
 <h4>全连接查询(显示左右表中全部数据)</h4>
-<p>全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
+<p>　　全连接查询：是在内连接的基础上增加 左右两边没有显示的数据
 　　注意: mysql并不支持全连接 full JOIN 关键字
 　　注意: 但是mysql 提供了 UNION 关键字.使用 UNION 可以间接实现 full JOIN 功能</p>
 <pre class="r"><code>dbGetQuery(con,&quot;SELECT * FROM person LEFT JOIN dept ON person.id = dept.did
@@ -273,7 +332,7 @@ dbGetQuery(con,&quot;select * from person right join  dept  on  person.id =dept.
 <h1>复制条件多表查询　　</h1>
 <div id="多表联合查询方式" class="section level2">
 <h2>多表联合查询方式:</h2>
-<p>　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)</p>
+<p>　　查询出鼓励部年龄大于等于20岁,并且工资小于80000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)。</p>
 <pre class="r"><code>dbGetQuery(con,&quot;select * from person p1,dept d2 where p1.id = d2.did and 
     d2.dname=&#39;鼓励部&#39; 
     and  p1.age&gt;=20 
@@ -284,7 +343,7 @@ dbGetQuery(con,&quot;select * from person right join  dept  on  person.id =dept.
 </div>
 <div id="内连接查询方式" class="section level2">
 <h2>内连接查询方式</h2>
-<p>　　查询出 教学部 年龄大于20岁,并且工资小于40000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)</p>
+<p>　　查询出鼓励部年龄大于等于20岁,并且工资小于80000的员工,按工资倒序排列.(要求:分别使用多表联合查询和内连接查询)。</p>
 <pre class="r"><code>dbGetQuery(con,&quot;SELECT * FROM person p1 INNER JOIN dept d2 ON p1.id= d2.did 
     and d2.dname=&#39;鼓励部&#39; 
     and  p1.age&gt;=20 
@@ -292,7 +351,7 @@ dbGetQuery(con,&quot;select * from person right join  dept  on  person.id =dept.
 ORDER BY p1.salary DESC&quot;)</code></pre>
 <pre><code>##   id name age sex salary  hire_date dept_id did  dname
 ## 1  5 歪歪  20  女   3000 2015-02-21       2   5 鼓励部</code></pre>
-<p>　　查询每个部门中最高工资和最低工资是多少,显示部门名称</p>
+<p>　　查询每个部门中最高工资和最低工资是多少,显示部门名称。</p>
 <pre class="r"><code>dbGetQuery(con,&quot;select MAX(salary),MIN(salary),dept.dname from 
         person LEFT JOIN dept
             ON person.id = dept.did
