@@ -1,0 +1,171 @@
+---
+author:
+  - 韭菜园
+title: 'RMySQL数据查询'
+date: 2021-05-11
+categories:
+  - R
+  - MySQL
+  - 数据查询
+tags:
+  - R
+  - MySQL
+  - 数据查询
+slug: MySQL
+weight: 0004
+description: 使用R语言链接Mysql数据库进行数据查询
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="包的载入与数据表的基本信息" class="section level1">
+<h1>包的载入与数据表的基本信息</h1>
+<pre class="r"><code>pacman::p_load(RMySQL,RMariaDB,zeallot)</code></pre>
+<pre class="r"><code>con &lt;- dbConnect(MariaDB(), host=&quot;&quot;, dbname=&quot;learning&quot;, user=&quot;root&quot;, password=&quot;Zh_xq1234@&quot;)#,host=&quot;127.0.0.1&quot;, port=3306
+#查看链接信息
+summary(con)</code></pre>
+<pre><code>## MariaDBConnection 
+## host = localhost 
+## username = root 
+## dbname = learning 
+## con.type = localhost via TCP/IP 
+## db.version = 8.0.24 
+## port = NA 
+## protocol.version = 10 
+## thread.id = 337</code></pre>
+<pre class="r"><code>#查看数据库信息
+dbGetInfo(con)</code></pre>
+<pre><code>## $host
+## [1] &quot;localhost&quot;
+## 
+## $username
+## [1] &quot;root&quot;
+## 
+## $dbname
+## [1] &quot;learning&quot;
+## 
+## $con.type
+## [1] &quot;localhost via TCP/IP&quot;
+## 
+## $db.version
+## [1] &quot;8.0.24&quot;
+## 
+## $port
+## [1] NA
+## 
+## $protocol.version
+## [1] 10
+## 
+## $thread.id
+## [1] 337</code></pre>
+<pre class="r"><code>#查看数据库中的表
+dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;select * from person&quot;)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id
+## 1   1       alex  28 人妖   53000 2010-06-21       1
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1
+## 3   3       egon  30   男    6500 2015-06-21       1
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1
+## 5   5       歪歪  20   女    3000 2015-02-21       2
+## 6   6       星星  20   女    2000 2018-01-30       2
+## 7   7       格格  20   女    2000 2018-02-27       2
+## 8   8       周周  20   女    2000 2015-06-21       2
+## 9   9       月月  21   女    4000 2014-07-21       3
+## 10 10       安琪  22   女    4000 2015-07-15       3
+## 11 11     周明月  17   女    5000 2014-06-21       4
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA</code></pre>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;select * from dept&quot;)</code></pre>
+<pre><code>##   did  dname
+## 1   1 教学部
+## 2   2 销售部
+## 3   3 市场部
+## 4   4 人事部
+## 5   5 鼓励部</code></pre>
+</div>
+<div id="跨表查询" class="section level1">
+<h1>跨表查询</h1>
+<div id="笛卡尔乘积" class="section level2">
+<h2>笛卡尔乘积</h2>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;select * from person,dept&quot;)</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id did  dname
+## 1   1       alex  28 人妖   53000 2010-06-21       1   5 鼓励部
+## 2   1       alex  28 人妖   53000 2010-06-21       1   4 人事部
+## 3   1       alex  28 人妖   53000 2010-06-21       1   3 市场部
+## 4   1       alex  28 人妖   53000 2010-06-21       1   2 销售部
+## 5   1       alex  28 人妖   53000 2010-06-21       1   1 教学部
+## 6   2    wupeiqi  23   男    8000 2011-02-21       1   5 鼓励部
+## 7   2    wupeiqi  23   男    8000 2011-02-21       1   4 人事部
+## 8   2    wupeiqi  23   男    8000 2011-02-21       1   3 市场部
+## 9   2    wupeiqi  23   男    8000 2011-02-21       1   2 销售部
+## 10  2    wupeiqi  23   男    8000 2011-02-21       1   1 教学部
+## 11  3       egon  30   男    6500 2015-06-21       1   5 鼓励部
+## 12  3       egon  30   男    6500 2015-06-21       1   4 人事部
+## 13  3       egon  30   男    6500 2015-06-21       1   3 市场部
+## 14  3       egon  30   男    6500 2015-06-21       1   2 销售部
+## 15  3       egon  30   男    6500 2015-06-21       1   1 教学部
+## 16  4 jingnvshen  18   女    6680 2014-06-21       1   5 鼓励部
+## 17  4 jingnvshen  18   女    6680 2014-06-21       1   4 人事部
+## 18  4 jingnvshen  18   女    6680 2014-06-21       1   3 市场部
+## 19  4 jingnvshen  18   女    6680 2014-06-21       1   2 销售部
+## 20  4 jingnvshen  18   女    6680 2014-06-21       1   1 教学部
+## 21  5       歪歪  20   女    3000 2015-02-21       2   5 鼓励部
+## 22  5       歪歪  20   女    3000 2015-02-21       2   4 人事部
+## 23  5       歪歪  20   女    3000 2015-02-21       2   3 市场部
+## 24  5       歪歪  20   女    3000 2015-02-21       2   2 销售部
+## 25  5       歪歪  20   女    3000 2015-02-21       2   1 教学部
+## 26  6       星星  20   女    2000 2018-01-30       2   5 鼓励部
+## 27  6       星星  20   女    2000 2018-01-30       2   4 人事部
+## 28  6       星星  20   女    2000 2018-01-30       2   3 市场部
+## 29  6       星星  20   女    2000 2018-01-30       2   2 销售部
+## 30  6       星星  20   女    2000 2018-01-30       2   1 教学部
+## 31  7       格格  20   女    2000 2018-02-27       2   5 鼓励部
+## 32  7       格格  20   女    2000 2018-02-27       2   4 人事部
+## 33  7       格格  20   女    2000 2018-02-27       2   3 市场部
+## 34  7       格格  20   女    2000 2018-02-27       2   2 销售部
+## 35  7       格格  20   女    2000 2018-02-27       2   1 教学部
+## 36  8       周周  20   女    2000 2015-06-21       2   5 鼓励部
+## 37  8       周周  20   女    2000 2015-06-21       2   4 人事部
+## 38  8       周周  20   女    2000 2015-06-21       2   3 市场部
+## 39  8       周周  20   女    2000 2015-06-21       2   2 销售部
+## 40  8       周周  20   女    2000 2015-06-21       2   1 教学部
+## 41  9       月月  21   女    4000 2014-07-21       3   5 鼓励部
+## 42  9       月月  21   女    4000 2014-07-21       3   4 人事部
+## 43  9       月月  21   女    4000 2014-07-21       3   3 市场部
+## 44  9       月月  21   女    4000 2014-07-21       3   2 销售部
+## 45  9       月月  21   女    4000 2014-07-21       3   1 教学部
+## 46 10       安琪  22   女    4000 2015-07-15       3   5 鼓励部
+## 47 10       安琪  22   女    4000 2015-07-15       3   4 人事部
+## 48 10       安琪  22   女    4000 2015-07-15       3   3 市场部
+## 49 10       安琪  22   女    4000 2015-07-15       3   2 销售部
+## 50 10       安琪  22   女    4000 2015-07-15       3   1 教学部
+## 51 11     周明月  17   女    5000 2014-06-21       4   5 鼓励部
+## 52 11     周明月  17   女    5000 2014-06-21       4   4 人事部
+## 53 11     周明月  17   女    5000 2014-06-21       4   3 市场部
+## 54 11     周明月  17   女    5000 2014-06-21       4   2 销售部
+## 55 11     周明月  17   女    5000 2014-06-21       4   1 教学部
+## 56 12     苍老师  33   女 1000000 2018-02-21      NA   5 鼓励部
+## 57 12     苍老师  33   女 1000000 2018-02-21      NA   4 人事部
+## 58 12     苍老师  33   女 1000000 2018-02-21      NA   3 市场部
+## 59 12     苍老师  33   女 1000000 2018-02-21      NA   2 销售部
+## 60 12     苍老师  33   女 1000000 2018-02-21      NA   1 教学部</code></pre>
+</div>
+<div id="链接查询" class="section level2">
+<h2>链接查询</h2>
+<div id="简单的跨表查询" class="section level3">
+<h3>简单的跨表查询</h3>
+<pre class="r"><code>#描述表格信息
+dbGetQuery(con,&quot;select * from person,dept where person.id = dept.did&quot;)</code></pre>
+<pre><code>##   id       name age  sex salary  hire_date dept_id did  dname
+## 1  1       alex  28 人妖  53000 2010-06-21       1   1 教学部
+## 2  2    wupeiqi  23   男   8000 2011-02-21       1   2 销售部
+## 3  3       egon  30   男   6500 2015-06-21       1   3 市场部
+## 4  4 jingnvshen  18   女   6680 2014-06-21       1   4 人事部
+## 5  5       歪歪  20   女   3000 2015-02-21       2   5 鼓励部</code></pre>
+</div>
+</div>
+</div>

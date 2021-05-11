@@ -1,0 +1,62 @@
+---
+author:
+  - 韭菜园
+title: 'RMySQL数据查询'
+date: 2021-05-11
+categories:
+  - R
+  - MySQL
+  - 数据查询
+tags:
+  - R
+  - MySQL
+  - 数据查询
+slug: MySQL
+weight: 0004
+description: 使用R语言链接Mysql数据库进行数据查询
+--- 
+
+# 包的载入与数据表的基本信息
+
+```{r}
+pacman::p_load(RMySQL,RMariaDB,zeallot)
+```
+
+```{r}
+con <- dbConnect(MariaDB(), host="", dbname="learning", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
+#查看链接信息
+summary(con)
+#查看数据库信息
+dbGetInfo(con)
+#查看数据库中的表
+dbListTables(con)
+```
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from person")
+```
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from dept")
+```
+
+# 跨表查询
+
+## 笛卡尔乘积
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from person,dept")
+```
+
+
+## 链接查询
+
+### 简单的跨表查询
+
+```{r}
+#描述表格信息
+dbGetQuery(con,"select * from person,dept where person.id = dept.did")
+```
