@@ -77,7 +77,7 @@ Y_{i, t-1}=\beta X_{i t-1}+u_{i}+\varepsilon_{i t-1} \tag{4}
 <span class="math display">\[
 \Delta Y_{i, t-1}=Y_{i, t-1}-Y_{i, t-2}=(\alpha-1) Y_{i, t-2}+\beta X_{i, t-1}+\varepsilon_{i, t-1}\tag{6}
 \]</span>
-　　 <span class="math inline">\(cov(\Delta Y_{i,t-1},\Delta \epsilon_{i,t})\)</span>显然不会等于0，因为两者都有<span class="math inline">\(\varepsilon_{i, t-1}\)</span>这一项。通常所用的固定效应模型实际上就是对（1）式差分，得到类似于（5）式的差分回归方程，然后做OLS。对于现在的情况，由于<span class="math inline">\(\Delta Y_{i, t-1}\)</span>和<span class="math inline">\(\Delta \varepsilon_{i, t}\)</span>之间的相关性，再用OLS只会得到有偏误的回归系数。所以传统的统计方法无法实现对此类方程的估计，需要用GMM方法。</p>
+　　 <span class="math inline">\(cov(\Delta Y_{i,t-1},\Delta \varepsilon_{i,t})\)</span>显然不会等于0，因为两者都有<span class="math inline">\(\varepsilon_{i, t-1}\)</span>这一项。通常所用的固定效应模型实际上就是对（1）式差分，得到类似于（5）式的差分回归方程，然后做OLS。对于现在的情况，由于<span class="math inline">\(\Delta Y_{i, t-1}\)</span>和<span class="math inline">\(\Delta \varepsilon_{i, t}\)</span>之间的相关性，再用OLS只会得到有偏误的回归系数。所以传统的统计方法无法实现对此类方程的估计，需要用GMM方法。</p>
 <blockquote>
 <p>　　<font face="思源宋体 CN" >需要注意的是（2）的模型（包含滞后项的OLS）和（3）的模型（不包含滞后项的FE，固定效应）尽管都有偏误,但好处是一个偏大,一个偏小(具体哪个大,哪个小要看变量之间的关系),所以这两个估计系数应该界定了真实参数的范围（Angrist and Pischke，2009:246页；Roodman，2009）。也就是说，你最后用GMM方法估计出来的参数应该落到这个区间。</font></p>
 </blockquote>
@@ -86,14 +86,13 @@ Y_{i, t-1}=\beta X_{i t-1}+u_{i}+\varepsilon_{i t-1} \tag{4}
 </div>
 <div id="基本思想" class="section level1">
 <h1>基本思想</h1>
-<p>　　广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE 通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。<font color=blue>GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件</font>。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>。</p>
+<p>　　广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE <font color=blue>通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件</font>。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>。</p>
 </div>
 <div id="矩-moment" class="section level1">
 <h1>矩 (Moment)</h1>
 <p>　　何为矩？简单说，矩就是<font color = blue>随机变量之函数的期望</font>。比如，对于随机变量 ，其一阶原点矩为其期望<span class="math inline">\(E(x)\)</span> ，二阶中心矩为其方差<span class="math inline">\(\operatorname{Var} \equiv \mathrm{E}[x-\mathrm{E}(x)]^{2}\)</span>，以此类推。</p>
 <p>　　更一般地，考虑随机变量<span class="math inline">\(x\)</span>的函数<span class="math inline">\(f(x)\)</span>。显然，<span class="math inline">\(f(x)\)</span>仍为随机变量，其期望<span class="math inline">\(E[f(x)]\)</span>
-也称为“矩”（moment）。</p>
-<p>　　进一步推广，随机向量<span class="math inline">\(x\)</span>的函数<span class="math inline">\(f(x)\)</span>之期望<span class="math inline">\(E[f(x)]\)</span>，也称为 “矩”。总之，矩可以视为随<font color = blue>机变（向）量的某种特征</font></p>
+也称为“矩”（moment）。总之，矩ont color = blue&gt;可以视为随&lt;f机变（向）量的某种特征</font></p>
 </div>
 <div id="矩估计量mm估计量" class="section level1">
 <h1>矩估计量（MM估计量）</h1>
@@ -107,7 +106,7 @@ E(\mathrm{y}-\mu)=0 \rightarrow \frac{1}{N} \sum_{i=1}^{N}\left(y_{i}-\hat{\mu}\
 <span class="math display">\[
  E[\mathrm{y}]-\mu=0  \tag{8}
 \]</span></p>
-<p>　　<span class="math inline">\(\left\{y_{1}, y_{2}, \dots, y_{n}\right\}\)</span>为从这个母体中随机抽取的一组样本观察值，则对应的“样本矩条件( SMC )”为
+<p>　　<span class="math inline">\(\left\{y_{1}, y_{2}, \dots, y_{n}\right\}\)</span>为从这个母体中随机抽取的一组样本观察值，则对应的“样本矩条件( SMC )”为：
 <span class="math display">\[
 \frac{1}{N} \sum_{i=1}^{N} y_{i}-\hat{\mu}=0 \tag{9}
 \]</span>
@@ -130,7 +129,7 @@ E\left[(Y-k)^{2}-2 k\right]=0 \qquad \tag{10b}
 \frac{1}{N} \sum_{i=1}^{N}\left[\left(y_{i}-\hat{k}\right)^{2}-2 \hat{k}\right]=0 \tag{11b}
 \]</span></p>
 <blockquote>
-<p>　　矩估计法是用样本的 <span class="math inline">\(k\)</span>阶矩作为总体的 <span class="math inline">\(k\)</span>阶矩的估计量，建立含待估计参数的方程，从而可解出待估计参数。一般地，不论总体服从什么分布，总体期望 <span class="math inline">\(\mu\)</span> 与方差 <span class="math inline">\(\sigma^{2}\)</span> 存在，则根据据估计法，它们的矩估计量分别为：</p>
+<p>　　矩估计法是用样本的 <span class="math inline">\(k\)</span>阶矩作为总体的 <span class="math inline">\(k\)</span>阶矩的估计量，建立含待估计参数的方程，从而可解出待估计参数。一般地，不论总体服从什么分布，总体期望 <span class="math inline">\(\mu\)</span> 与方差 <span class="math inline">\(\sigma^{2}\)</span> 存在，则根据矩估计法，它们的矩估计量分别为：</p>
 </blockquote>
 <p><span class="math display">\[
 \hat{\mu}=\frac{1}{n} \sum_{i=1}^{n} X_{i}=\overline{X} \tag{12a}
@@ -286,16 +285,16 @@ Cov(z_{i},\varepsilon_{i})=0 \tag{16}
 <span class="math display">\[
 Cov(z_{i},x_{i})\not =0  \tag{17}
 \]</span></p>
-<p>　　<strong>工具变量法中，假设待估参数的个数为<span class="math inline">\(k\)</span>，矩条件的个数为<span class="math inline">\(l\)</span>：</strong></p>
+<p>　　工具变量法中，假设待估参数的个数为<span class="math inline">\(k\)</span>，矩条件的个数为<span class="math inline">\(l\)</span>：</p>
 <ul>
-<li><p>1.无法识别（unidentified）：当 <span class="math inline">\(k &gt; l\)</span> 时，即工具变量个数少于内生变量个数，则无法进行2SLS 估计，称为“不可识别”（unidentified），因为无法得到对模型参数的一致估计；</p></li>
-<li><p>2.恰好识别( just or exactly identified )：当 <span class="math inline">\(k = l\)</span> 时；</p></li>
-<li><p>3.过度识别( overidentified )：当 <span class="math inline">\(k &lt; l\)</span>时，即待估参数个数小于工具变量的个数。</p></li>
+<li><p>（1）无法识别（unidentified）：当 <span class="math inline">\(k &gt; l\)</span> 时，即工具变量个数少于内生变量个数，则无法进行2SLS 估计，称为“不可识别”（unidentified），因为无法得到对模型参数的一致估计；</p></li>
+<li><p>（2）恰好识别( just or exactly identified )：当 <span class="math inline">\(k = l\)</span> 时；</p></li>
+<li><p>（3）过度识别( overidentified )：当 <span class="math inline">\(k &lt; l\)</span>时，即待估参数个数小于工具变量的个数。</p></li>
 </ul>
 </div>
 <div id="工具变量法两阶段最小二乘估计2sls" class="section level3">
 <h3>工具变量法：两阶段最小二乘估计（2SLS）</h3>
-<p>　　<strong>两阶段最小二乘法其本质上是属于工具变量，回归分两个阶段进行，因此而得名。具体机理是：<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></strong></p>
+<p>　　<font color=blue >两阶段最小二乘法其本质上是属于工具变量，回归分两个阶段进行，因此而得名。具体机理是：<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></font></p>
 <ul>
 <li><p>第一步，将结构方程先转换为简化式模型（约简型方程），简化式模型里的每一个方程都不存在随机解释变量问题，可以直接采用普通最小二乘法进行估计。</p></li>
 <li><p>第二步，由第一步得出的 <span class="math inline">\(\hat{Y}\)</span>的估计量替换 <span class="math inline">\(Y\)</span>。该方程中不存在随机解释变量问题，也可以直接用普通最小二乘法进行估计。</p></li>
@@ -309,13 +308,13 @@ Y_{i}=\beta_{0}+\beta_{1} X_{1 i}+\ldots+\beta_{k} X_{k i}+\beta_{k+1} W_{1 i}+\
 <ul>
 <li><span class="math inline">\(Y_{i}\)</span>为因变量；</li>
 <li><span class="math inline">\(u_{i}\)</span>为误差项，表示测量误差和/或遗漏因素；</li>
-<li><span class="math inline">\(X_{1 i} , X_{2 i} , \ldots , X_{k i}\)</span>表示k个内生回归变量，可能与 <span class="math inline">\(u_{i}\)</span>相关；</li>
-<li><span class="math inline">\(W_{1 i} , W_{2 i}, \ldots , W_{r i}\)</span> 表示 r 个包含的外生变量，与 <span class="math inline">\(u_{i}\)</span> 不相关；</li>
+<li><span class="math inline">\(X_{1 i} , X_{2 i} , \ldots , X_{k i}\)</span>表示<span class="math inline">\(k\)</span>个内生回归变量，可能与<span class="math inline">\(u_{i}\)</span>相关；</li>
+<li><span class="math inline">\(W_{1 i} , W_{2 i}, \ldots , W_{r i}\)</span> 表示<span class="math inline">\(r\)</span> 个包含的外生变量，与 <span class="math inline">\(u_{i}\)</span> 不相关；</li>
 <li><span class="math inline">\(\beta_{0} , \beta_{1} , \ldots , \beta_{k+r}\)</span> 为未知回归系数；</li>
 <li><span class="math inline">\(Z_{1 i} , Z_{2 i} , \ldots , Z_{m i}\)</span>为 <span class="math inline">\(m\)</span> 个工具变量。</li>
 </ul></li>
 </ul>
-<p>　　以单内生回归变量的 2SLS 为例，当只有一个内生回归变量 <span class="math inline">\(X\)</span>和一些其他的包含的外生变量时，感兴趣的方程为：
+<p>　　以单内生回归变量的 2SLS 为例，当只有一个内生回归变量 <span class="math inline">\(X\)</span>和一些其他的外生变量时，感兴趣的方程为：
 <span class="math display">\[
 Y_{i}=\beta_{0}+\beta_{1} X_{i}+\beta_{2} W_{1 i}+\ldots+\beta_{k+r} W_{r i}+u_{i} \tag{19}
 \]</span>
@@ -355,7 +354,7 @@ z_{i k}
 \end{array}\right)=0    \tag{23}
 \]</span>
 　　 此<font color=blue >总体矩条件也被称为“正交条件”（orthogonality conditions）</font>在数理统计中，如果两个随机变量的乘积之期望为0，则称这两个随机变量正交。</p>
-<p>　　 显然，<font color=blue >如果两个随机变量中包含一个随机扰动项，则 “两个随机变量不相关” 就等价于 “两个随机变量正交”</font>，比如：<br />
+<p>　　 显然，<font color=blue >如果两个随机变量中包含一个随机扰动项，则“两个随机变量不相关” 就等价于“两个随机变量正交”</font>，比如：<br />
 <span class="math display">\[
 0=\operatorname{Cov}\left(z_{i }, \varepsilon_{i}\right)=\mathrm{E}\left(z_{i } \varepsilon_{i}\right)-\mathrm{E}\left(z_{i }\right) \underbrace{\mathrm{E}\left(\varepsilon_{i}\right)}_{=0}=\mathrm{E}\left(z_{i } \varepsilon_{i}\right)=0
 \]</span>
@@ -382,15 +381,15 @@ z_{i k}
 </blockquote>
 <div id="lars-hansen的脑筋急转弯" class="section level4">
 <h4>Lars Hansen的脑筋急转弯</h4>
-<p>　　看似已走入死胡同的矩估计，却被 Lars Hansen起死回生了。假设工具变量<span class="math inline">\(\mathbf{z_{i}}\)</span>的维度<span class="math inline">\(L\)</span>，且严格大于参数向量<span class="math inline">\(\beta\)</span><span class="math inline">\(\beta\)</span>的维度 。如上所述，此时样本矩的线性方程组无解。这意味着，找不到<span class="math inline">\(\hat{\beta}\)</span>，能够使得上述样本矩等于0向量。　　</p>
+<p>　　看似已走入死胡同的矩估计，却被 Lars Hansen起死回生了。假设工具变量<span class="math inline">\(\mathbf{z_{i}}\)</span>的维度<span class="math inline">\(L\)</span>，且严格大于参数向量<span class="math inline">\(\beta\)</span>的维度 。如上所述，此时样本矩的线性方程组无解。这意味着，找不到<span class="math inline">\(\hat{\beta}\)</span>，能够使得上述样本矩等于0向量。　　</p>
 <p>　　但Lars Hansen来了个脑筋急转弯：虽然无法找到<span class="math inline">\(\hat{\beta}\)</span>，使得样本矩等于0，但总可以让样本矩尽量接近于0。由于样本矩<span class="math inline">\(\mathbf{g}_{n}(\hat{\beta})\)</span>为<span class="math inline">\(L\)</span>维列向量，故可用二次型来衡量它到0向量的距离，比如最小化如下目标函数：　　</p>
 <p><span class="math display">\[
-\min _{\hat{\beta}}\left(\mathbf{g}_{i}(\beta)\right)\left(\mathbf{g}_{n}(\beta)\right) \tag{26}
+\min _{\hat{\beta}}\left(\mathbf{g}_{n}(\beta)\right)\left(\mathbf{g}_{n}(\beta)\right) \tag{26}
 \]</span>
-　　这个脑筋急转弯价值不菲，三十多年后为Lars　Hansen带来了诺贝尔奖。更一般地，可用一个“权重矩阵”（weightingmatrix）（可依赖于样本）来构成二次型，定义最小化的目标函数为：<br />
+　　这个脑筋急转弯价值不菲，三十多年后为Lars Hansen带来了诺贝尔奖。更一般地，可用一个“权重矩阵”（eightingmatrix）（可依赖于样本）来构成二次型，定义最小化的目标函数为：<br />
 　　
 <span class="math display">\[
-\min _{\tilde{\beta}} J(\beta, \mathbf{W}) \equiv n\left(\mathbf{g}_{n}(\beta)\right) \mathbf{W}\left(\mathbf{g}_{n}(\beta)\right) \tag{27}
+\min _{\tilde{\beta}} J(\hat{\beta}, \hat{\mathbf{W}}) \equiv n\left(\mathbf{g}_{n}(\hat{\beta})\right)^{\prime} \hat{\mathbf{W}}\left(\mathbf{g}_{n}(\hat{\beta})\right) \tag{27}
 \]</span>
 　　其中，因子<span class="math inline">\(n\)</span>不影响最小化。这是一个无约束的最优化问题，目标函数<span class="math inline">\(J(\hat{\beta}, \widehat{\mathbf{W}})\)</span>是<span class="math inline">\(\hat{\beta}\)</span>的二次（型）函数，故可得到其解析解（推导方法类似于 OLS），即 “GMM估计量”。</p>
 <p>　　在恰好识别的情况下，目标函数的最小值正好为0，故GMM估计量等价于MM估计量（故也等价于 2SLS），因此 GMM 确实是 MM 的推广。</p>
