@@ -26,26 +26,18 @@ description: <font face="思源宋体 CN" >广义矩估计 (Generalized Method o
 <p><font face="思源宋体 CN" ></p>
 <p>　　<strong>几个重要的计量经济学方法的提出时间顺序：</strong></p>
 <ul>
-<li>IV，Philip Green Wright<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>，1928；Henri Theil，Olav Reiersøl，1945；</li>
-</ul>
-<ul>
-<li>GLS，Alexander Aitken<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>，1935.</li>
-</ul>
-<ul>
-<li><p>2SLS，Henri Theil<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>，1953.</p></li>
-<li><p>3SLS，Henri Theil<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>，1962，<font color=blue >模型是被用的，而不是被信的。</font></p></li>
-</ul>
-<ul>
-<li>MM，Karl Pearson1<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>，1894.</li>
-</ul>
-<ul>
-<li>GMM，Lars Peter Hansen<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>，1982.</li>
+<li><p>IV，Philip Green Wright[^Philip]，1928；Henri Theil，Olav Reiersøl，1945；</p></li>
+<li><p>GLS，Alexander Aitken[^Alexander]，1935.</p></li>
+<li><p>2SLS，Henri Theil[^Henri]，1953.</p></li>
+<li><p>3SLS，Henri Theil[^Henri]，1962，<font color=blue >模型是被用的，而不是被信的。</font></p></li>
+<li><p>MM，Karl Pearson1[^Pearson1]，1894.</p></li>
+<li><p>GMM，Lars Peter Hansen[^Hansen]，1982.</p></li>
 </ul>
 <div id="为何要使用-gmm" class="section level1">
 <h1>为何要使用 GMM ？</h1>
 <div id="过度识别且存在异方差" class="section level2">
 <h2>过度识别且存在异方差</h2>
-<p>　　传统的工具变量法2SLS，因为它操作方便，且同时适用于恰好识别与过度识别的情形。然而，<font color=blue >2SLS仅在扰动项同方差的情况下，才是最有效率的</font>。理由很简单，如果每位个体的扰动项方差不相同（比如，大企业的方差一般不同于小企业的方差），则方差小的个体观测值所包含的信息量更大，而2SLS却对所有数据等量齐观地进行处理，故在异方差的情况下不是最有效率的<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>。</p>
+<p>　　传统的工具变量法2SLS，因为它操作方便，且同时适用于恰好识别与过度识别的情形。然而，<font color=blue >2SLS仅在扰动项同方差的情况下，才是最有效率的</font>。理由很简单，如果每位个体的扰动项方差不相同（比如，大企业的方差一般不同于小企业的方差），则方差小的个体观测值所包含的信息量更大，而2SLS却对所有数据等量齐观地进行处理，故在异方差的情况下不是最有效率的<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>。</p>
 <p>　　在过度识别且存在异方差的情况下，更有效率的做法是“广义矩估计”（Generalized Method of Moments，简记 GMM）。该方法由芝加哥大学的 Lars Peter Hansen 教授所提出 (Hansen, 1982)，已成为最流行的计量方法之一，Hansen也因此获得 2013年的诺贝尔经济学奖。顾名思义，广义矩估计为矩估计的推广，故先介绍矩估计。</p>
 <p>　　假设待估参数的个数为<span class="math inline">\(K\)</span>，矩条件的个数为<span class="math inline">\(L\)</span> 。当<span class="math inline">\(L=K\)</span>时，称为“恰好识别”，当<span class="math inline">\(L&gt;K\)</span>时，称为 “过度识别”。</p>
 <p>　　GMM是矩估计（MM）的推广。在恰好识别情况下，目标函数的最小值等于 0 ，GMM 估计量与 MM 估计量等价；然而在过度识别情况下，MM 不再适用，GMM 可以有效地组合矩条件，使 GMM 比 MM 更有效。GMM 建立在期望值和样本平均值的基础上。矩条件是用真实矩指定模型参数的期望值。</p>
@@ -86,13 +78,13 @@ Y_{i, t-1}=\beta X_{i t-1}+u_{i}+\varepsilon_{i t-1} \tag{4}
 </div>
 <div id="基本思想" class="section level1">
 <h1>基本思想</h1>
-<p>　　广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE <font color=blue>通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件</font>。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>。</p>
+<p>　　广义矩估计 (Generalized Method of Moment, 简称 GMM) 是一种构造估计量的方法，类似于极大似然法 (MLE) 。MLE <font color=blue>通过假设随机变量服从特定的分布，进而将待估参数嵌入似然函数，通过极大化联合概率密度函数得到参数的估计值。GMM 则是以随机变量遵循特定矩的假设，而不是对整个分布的假设，这些假设被称为矩条件</font>。这使得 GMM 比 MLE 更稳健，但会导致估计量的有效性有所降低 (估计出的标准误比较大)<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>。</p>
 </div>
 <div id="矩-moment" class="section level1">
 <h1>矩 (Moment)</h1>
 <p>　　何为矩？简单说，矩就是<font color = blue>随机变量之函数的期望</font>。比如，对于随机变量 ，其一阶原点矩为其期望<span class="math inline">\(E(x)\)</span> ，二阶中心矩为其方差<span class="math inline">\(\operatorname{Var} \equiv \mathrm{E}[x-\mathrm{E}(x)]^{2}\)</span>，以此类推。</p>
 <p>　　更一般地，考虑随机变量<span class="math inline">\(x\)</span>的函数<span class="math inline">\(f(x)\)</span>。显然，<span class="math inline">\(f(x)\)</span>仍为随机变量，其期望<span class="math inline">\(E[f(x)]\)</span>
-也称为“矩”（moment）。总之，矩ont color = blue&gt;可以视为随&lt;f机变（向）量的某种特征</font></p>
+也称为“矩”（moment）。总之，矩on<font color=blue>可以视为随机变（向）量的某种特征</font></p>
 </div>
 <div id="矩估计量mm估计量" class="section level1">
 <h1>矩估计量（MM估计量）</h1>
@@ -275,7 +267,7 @@ gmm (mpg - {xb:gear_ratio turn} - {b0}), instruments(gear_ratio turn)
 <h2>工具变量法的MM与GMM估计</h2>
 <div id="工具变量法的原理" class="section level3">
 <h3>工具变量法的原理</h3>
-<p>　　工具变量的思想其实很简单。虽然内生变量<span class="math inline">\(x\)</span>是“坏”的变量（与扰动项相关），但仍可能有“好”的部分（与扰动项不相关的部分），正如坏人通常也有好的一面。如果能将内生变量<em><span class="math inline">\(x\)</span></em>分解为内生部分与外生部分之和，则可能使用其外生部分得到一致估计<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>。</p>
+<p>　　工具变量的思想其实很简单。虽然内生变量<span class="math inline">\(x\)</span>是“坏”的变量（与扰动项相关），但仍可能有“好”的部分（与扰动项不相关的部分），正如坏人通常也有好的一面。如果能将内生变量<em><span class="math inline">\(x\)</span></em>分解为内生部分与外生部分之和，则可能使用其外生部分得到一致估计<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>。</p>
 <p>　　而要实现这种分离，通常需要借助另一变量，比如<strong><span class="math inline">\(z\)</span></strong>，称为 “工具变量”（Instrumental Variable，简记 IV），因为它起着工具性的作用。</p>
 <p>　　显然，并非任何变量都可以作为工具变量。首先，变量<span class="math inline">\(z\)</span>要能够帮助内生变量<span class="math inline">\(x\)</span>分离出一个外生部分，则变量<span class="math inline">\(z\)</span>自身必须是“干净”的，即满足“外生性”（<span class="math inline">\(z\)</span>与扰动项<span class="math inline">\(\varepsilon\)</span>不相关）：<br />
 <span class="math display">\[
@@ -294,7 +286,7 @@ Cov(z_{i},x_{i})\not =0  \tag{17}
 </div>
 <div id="工具变量法两阶段最小二乘估计2sls" class="section level3">
 <h3>工具变量法：两阶段最小二乘估计（2SLS）</h3>
-<p>　　<font color=blue >两阶段最小二乘法其本质上是属于工具变量，回归分两个阶段进行，因此而得名。具体机理是：<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></font></p>
+<p>　　<font color=blue >两阶段最小二乘法其本质上是属于工具变量，回归分两个阶段进行，因此而得名。具体机理是：<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></font></p>
 <ul>
 <li><p>第一步，将结构方程先转换为简化式模型（约简型方程），简化式模型里的每一个方程都不存在随机解释变量问题，可以直接采用普通最小二乘法进行估计。</p></li>
 <li><p>第二步，由第一步得出的 <span class="math inline">\(\hat{Y}\)</span>的估计量替换 <span class="math inline">\(Y\)</span>。该方程中不存在随机解释变量问题，也可以直接用普通最小二乘法进行估计。</p></li>
@@ -332,7 +324,7 @@ X_{i}=\pi_{0}+\pi_{1} Z_{1 i}+\ldots+\pi_{m} Z_{m i}+\pi_{m+1} W_{1 i}+\ldots+\p
 </div>
 <div id="工具变量法的矩估计mm" class="section level3">
 <h3>工具变量法的矩估计（MM）</h3>
-<p>　　在恰好识别的情况下，可将矩估计运用于工具变量法<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>。考虑以下多元回归模型，共有个<span class="math inline">\(K\)</span>个未知参数，</p>
+<p>　　在恰好识别的情况下，可将矩估计运用于工具变量法<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>。考虑以下多元回归模型，共有个<span class="math inline">\(K\)</span>个未知参数，</p>
 <p>　　
 <span class="math display">\[
 \mathrm{y}_{i}=\beta_{1} x_{i 1}+\cdots+\beta_{\mathrm{K}} x_{i \mathrm{k}}+\varepsilon_{i} \quad(i=1, \ldots, n) \tag{21}
@@ -396,7 +388,7 @@ z_{i k}
 </div>
 <div id="矩条件的强弱" class="section level4">
 <h4>矩条件的强弱</h4>
-<p>　　显然，GMM 估计量取决于权重矩阵。对于<span class="math inline">\(\widehat{\mathbf{W}}\)</span>的灵活选择是GMM 的最大优点之一，因为不同矩条件的强弱程度一般不同。矩条件只是说明<span class="math inline">\(\mathrm{E}(z_{i } \varepsilon_{i})=0\)</span>，但每个矩条件的方差<span class="math inline">\(\mathrm{Var}(z_{i } \varepsilon_{i})\)</span>可以不同，参见右图<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>。</p>
+<p>　　显然，GMM 估计量取决于权重矩阵。对于<span class="math inline">\(\widehat{\mathbf{W}}\)</span>的灵活选择是GMM 的最大优点之一，因为不同矩条件的强弱程度一般不同。矩条件只是说明<span class="math inline">\(\mathrm{E}(z_{i } \varepsilon_{i})=0\)</span>，但每个矩条件的方差<span class="math inline">\(\mathrm{Var}(z_{i } \varepsilon_{i})\)</span>可以不同，参见右图<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>。</p>
 <p><span class="math display">\[
 \mathbf{Y}=\mathbf{X} \boldsymbol{\beta}+\boldsymbol{\varepsilon}
 \]</span>
@@ -748,7 +740,7 @@ gmm (mpg - {b1}*turn - {b2}*gear_ratio - {b0}),  ///
 <div id="动态面板数据模型fd-gmm与sys-gmm" class="section level1">
 <h1>动态面板数据模型（FD-GMM与SYS-GMM）</h1>
 <p>　　动态面板数据模型，是指通过在静态面板数据模型中引入滞后被解释变量以反映动态滞后效应的模型。这种模型的特殊性在于被解释变量的动态滞后项与随机误差组成部分中的个体效应相关，从而造成估计的内生性。</p>
-<p>　　也就是说在动态面板模型允许使用过去的可观测值，考虑了过去结果对当前结果的影响。而实际上许多经济学问题本质上都是动态的，其中一些经济模型表明，当前的行为依赖于过去的行为，例如就业模型和公司投资问题<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>。</p>
+<p>　　也就是说在动态面板模型允许使用过去的可观测值，考虑了过去结果对当前结果的影响。而实际上许多经济学问题本质上都是动态的，其中一些经济模型表明，当前的行为依赖于过去的行为，例如就业模型和公司投资问题<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>。</p>
 <div id="模型基本形式" class="section level2">
 <h2>模型基本形式</h2>
 <div id="ar1-模型" class="section level3">
@@ -823,12 +815,10 @@ plim_{n\rightarrow \infty}\frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}(\epsilon_{i,t
 y_{i,t}-y_{i,t-1}=\delta(y_{i,t-1}-y_{i,t-2})+(\epsilon_{i,t}-\epsilon_{i,t-1}) \quad t=2,...,T\quad \tag{48}
 \]</span></p>
 <p>　　此处若使用最小二乘法(OSL)得到等式(48)的估计量是不一致的，尽管是在<span class="math inline">\(T\rightarrow \infty\)</span>的情况下，这是因为<span class="math inline">\(y_{i,t-1}\)</span>和<span class="math inline">\(\epsilon_{i,t-1}\)</span>相关。</p>
-<ul>
-<li>转换规范等式(48)给出一个IV估计的方法，例如，<span class="math inline">\(y_{i,t-2}\)</span>与<span class="math inline">\((y_{i,t-1}-y_{i,t-2})\)</span>相关，但与<span class="math inline">\(\epsilon_{i,t-1}\)</span>不相关，所以选取<span class="math inline">\(y_{i,t-2}\)</span>作为工具变量，给出了<span class="math inline">\(\delta\)</span>的一个IV估计：
+<p>　　转换规范等式(48)给出一个IV估计的方法，例如，<span class="math inline">\(y_{i,t-2}\)</span>与<span class="math inline">\((y_{i,t-1}-y_{i,t-2})\)</span>相关，但与<span class="math inline">\(\epsilon_{i,t-1}\)</span>不相关，所以选取<span class="math inline">\(y_{i,t-2}\)</span>作为工具变量，给出了<span class="math inline">\(\delta\)</span>的一个IV估计：
 <span class="math display">\[
-\hat{y_{IV}}=\frac{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t}-y_{i,t-1})}{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t-1}-y_{i,t-2})} \tag{49}
-\]</span></li>
-</ul>
+  \hat{y_{IV}}=\frac{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t}-y_{i,t-1})}{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t-1}-y_{i,t-2})} \tag{49}
+  \]</span></p>
 <p>　　对应的关于等式(49)的一致性条件为
 <span class="math display">\[
 plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2}=0 \quad \tag{50}
@@ -843,7 +833,7 @@ plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon
   plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})=0 \tag{52}
   \]</span></p>
 <p>　　且只要<span class="math inline">\(\epsilon_{i,t}\)</span>不是自相关的，等式(49)和(51)的一致性都得到了保障。</p>
-<p>　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(49还是等式(51)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，<font color=red >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font></p>
+<p>　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(49还是等式(51)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，<font color=blue >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font></p>
 </div>
 <div id="gmm" class="section level3">
 <h3>GMM</h3>
@@ -1273,7 +1263,7 @@ estat abond, artests(4)</code></pre>
 <h2>Stata实操陷阱：动态面板数据模型</h2>
 <div id="问题背景" class="section level3">
 <h3>问题背景</h3>
-<p>　　关于动态面板数据模型 (dynamic panel data，DPD)，我们常常会遇到如下问题<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>：</p>
+<p>　　关于动态面板数据模型 (dynamic panel data，DPD)，我们常常会遇到如下问题<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>：</p>
 <ul>
 <li>如何在一阶差分 GMM 和系统 GMM 间选择；<br />
 </li>
@@ -1291,7 +1281,7 @@ estat abond, artests(4)</code></pre>
 </div>
 <div id="fd-gmm-还是-sys-gmm" class="section level3">
 <h3>FD-GMM 还是 SYS-GMM</h3>
-<p>　　需要强调的是，无论一阶差分GMM (FD-GMM)还是系统 GMM (SYS-GMM)，模型设定是不受影响的，并且二者仅在计量估计方法上不一样，即矩条件不同。SYS-GMM 使用的矩条件多，利用的信息也多，估计也更有效率，但其受到的限制也多，如假定被解释变量的一阶差分项与个体效应变量不相关。更多细节参考IV-GMM<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>。</p>
+<p>　　需要强调的是，无论一阶差分GMM (FD-GMM)还是系统 GMM (SYS-GMM)，模型设定是不受影响的，并且二者仅在计量估计方法上不一样，即矩条件不同。SYS-GMM 使用的矩条件多，利用的信息也多，估计也更有效率，但其受到的限制也多，如假定被解释变量的一阶差分项与个体效应变量不相关。更多细节参考IV-GMM<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>。</p>
 <p>　　<strong>那么，在估计模型时该选择哪种估计方法呢？</strong></p>
 <p>　　Bond (2002) 认为当被解释变量的一阶滞后项系数 不是很大时，如 ，FD-GMM 估计结果较好，而当 时，SYS-GMM 较好。</p>
 <p>　　此外，若对性别、户口、行业等不随时间变化变量感兴趣，则必须使用 SYS-GMM 估计。</p>
@@ -3569,7 +3559,7 @@ esttab `mm&#39;, mtitle(`mm&#39;) compress star(* 0.1 ** 0.05 *** 0.01)</code></
 <h3>简介</h3>
 <p>　　对于动态面板数据模型 (Dynamic Panel Data, DPD)，直接用最小二乘法估计是有偏的，为解决这一问题，Arellano 和 Bond (1991)、 Arellano 和 Bover (1995)、以及 Blundell 和 Bond (1998) 等提出了「一阶差分 GMM (FD-GMM)」和「系统 GMM (SYS-GMM)」估计法。</p>
 <p>　　相应地，Stata 也提供了 <code>xtabond</code>、<code>xtdpdsys</code>、以及 <code>xtabond2</code> 等早期估计 GMM 的命令。Kripfganz (2019) 在此基础上，编写了 <code>xtdpdgmm</code> 命令，该命令解决了 <code>xtabond2</code> 等命令的一些缺陷，并使估计更加灵活。特别的，该命令整合了 Ahn 和 Schmidt (1995) 非线性矩条件、更好解决了高度自相关问题、以及提供了 Hansen 等 (1996) 的迭代 GMM 估计。</p>
-<p>　　本文的主要目的是介绍动态面板数据模型的两种估计方法，以及 <code>xtdpdgmm</code> 命令的应用<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>。</p>
+<p>　　本文的主要目的是介绍动态面板数据模型的两种估计方法，以及 <code>xtdpdgmm</code> 命令的应用<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>。</p>
 </div>
 <div id="估计方法-1" class="section level3">
 <h3>估计方法</h3>
@@ -4550,29 +4540,19 @@ xtreg n w k, fe</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><img src="https://i.loli.net/2021/04/22/RlQO7Wt9BcTXYEJ.jpg" /><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p><img src="https://i.loli.net/2021/04/22/1pmr8Vfy4JQWwM7.jpg" /><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p><img src="https://i.loli.net/2021/04/22/i7b6NDvqWkzOhVx.jpg" /><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p><img src="https://i.loli.net/2021/04/22/i7b6NDvqWkzOhVx.jpg" /><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p><img src="https://gitee.com/shao818/Figure/raw/master/20210422191915.png" /><a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p><a href="https://mp.weixin.qq.com/s/aSbHlvAlcWiT6CnCpW1L6Q">工具变量法（四）：GMM</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p><a href="https://www.lianxh.cn/news/56e2f8913175e.html">Stata：GMM-简介及实现范例</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><a href="https://mp.weixin.qq.com/s/CxzYLg3kNzp_WGCZhWtUYg">工具变量法（一）：2SLS</a><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p><a href="https://www.lianxh.cn/news/56e2f8913175e.html">Stata：GMM-简介及实现范例</a><a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p><a href="https://mp.weixin.qq.com/s/aSbHlvAlcWiT6CnCpW1L6Q">工具变量法（四）：GMM</a><a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><div class="figure">
-<img src="https://gitee.com/shao818/Figure/raw/master/20210421184457.png" alt="" />
-<p class="caption">Hansen</p>
-</div>
-<a href="#fnref6" class="footnote-back">↩︎</a></li>
-<li id="fn7"><p><a href="https://mp.weixin.qq.com/s/aSbHlvAlcWiT6CnCpW1L6Q">工具变量法（四）：GMM</a><a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p><a href="https://www.lianxh.cn/news/56e2f8913175e.html">Stata：GMM-简介及实现范例</a><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p><a href="https://mp.weixin.qq.com/s/CxzYLg3kNzp_WGCZhWtUYg">工具变量法（一）：2SLS</a><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p><a href="https://www.lianxh.cn/news/56e2f8913175e.html">Stata：GMM-简介及实现范例</a><a href="#fnref10" class="footnote-back">↩︎</a></p></li>
-<li id="fn11"><p><a href="https://mp.weixin.qq.com/s/aSbHlvAlcWiT6CnCpW1L6Q">工具变量法（四）：GMM</a><a href="#fnref11" class="footnote-back">↩︎</a></p></li>
-<li id="fn12"><div class="figure">
 <img src="https://gitee.com/shao818/Figure/raw/master/null/image-20201118160559634.png" alt="" />
 <p class="caption">矩条件的强弱</p>
 </div>
-<a href="#fnref12" class="footnote-back">↩︎</a></li>
-<li id="fn13"><p><a href="https://www.jianshu.com/p/3767ee0ed284">动态面板简介</a><a href="#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p><a href="https://www.lianxh.cn/news/cc6c5ea80d70c.html">Stata实操陷阱：动态面板数据模型</a><a href="#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p><a href="https://www.lianxh.cn/blogs/38.html">IV-GMM</a><a href="#fnref15" class="footnote-back">↩︎</a></p></li>
-<li id="fn16"><p><a href="https://www.lianxh.cn/news/b6713ec0cfa7a.html">xtdpdgmm</a><a href="#fnref16" class="footnote-back">↩︎</a></p></li>
+<a href="#fnref6" class="footnote-back">↩︎</a></li>
+<li id="fn7"><p><a href="https://www.jianshu.com/p/3767ee0ed284">动态面板简介</a><a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p><a href="https://www.lianxh.cn/news/cc6c5ea80d70c.html">Stata实操陷阱：动态面板数据模型</a><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p><a href="https://www.lianxh.cn/blogs/38.html">IV-GMM</a><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p><a href="https://www.lianxh.cn/news/b6713ec0cfa7a.html">xtdpdgmm</a><a href="#fnref10" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

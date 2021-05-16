@@ -27,25 +27,24 @@ description: <font face="思源宋体 CN" >广义矩估计 (Generalized Method o
 
 - IV，Philip Green Wright[^Philip]，1928；Henri Theil，Olav Reiersøl，1945；    
 
-[^Philip]:![](https://i.loli.net/2021/04/22/RlQO7Wt9BcTXYEJ.jpg)
 
 - GLS，Alexander Aitken[^Alexander]，1935.  
 
-[^Alexander]:![](https://i.loli.net/2021/04/22/1pmr8Vfy4JQWwM7.jpg)
+
 
 - 2SLS，Henri Theil[^Henri]，1953.   
 
 - 3SLS，Henri Theil[^Henri]，1962，<font color=blue >模型是被用的，而不是被信的。</font> 
 
-[^Henri]:![](https://i.loli.net/2021/04/22/i7b6NDvqWkzOhVx.jpg)
+
 
 - MM，Karl Pearson1[^Pearson1]，1894. 
 
-[^Pearson1]:![](https://gitee.com/shao818/Figure/raw/master/20210422191915.png)
+
 
 - GMM，Lars Peter Hansen[^Hansen]，1982. 
 
-[^Hansen]:![Hansen](https://gitee.com/shao818/Figure/raw/master/20210421184457.png)
+
 
 # 为何要使用 GMM ？
 
@@ -110,7 +109,7 @@ $$
 　　何为矩？简单说，矩就是<font color = blue>随机变量之函数的期望</font>。比如，对于随机变量  ，其一阶原点矩为其期望$E(x)$ ，二阶中心矩为其方差$\operatorname{Var} \equiv \mathrm{E}[x-\mathrm{E}(x)]^{2}$，以此类推。
 
 　　更一般地，考虑随机变量$x$的函数$f(x)$。显然，$f(x)$仍为随机变量，其期望$E[f(x)]$
- 也称为“矩”（moment）。总之，矩ont color = blue>可以视为随<f机变（向）量的某种特征</font>
+ 也称为“矩”（moment）。总之，矩on<font color=blue>可以视为随机变（向）量的某种特征</font>
 
 # 矩估计量（MM估计量）
 
@@ -696,7 +695,7 @@ $$
 
 　　此处若使用最小二乘法(OSL)得到等式(48)的估计量是不一致的，尽管是在$T\rightarrow \infty$的情况下，这是因为$y_{i,t-1}$和$\epsilon_{i,t-1}$相关。
 
-- 转换规范等式(48)给出一个IV估计的方法，例如，$y_{i,t-2}$与$(y_{i,t-1}-y_{i,t-2})$相关，但与$\epsilon_{i,t-1}$不相关，所以选取$y_{i,t-2}$作为工具变量，给出了$\delta$的一个IV估计：
+　　转换规范等式(48)给出一个IV估计的方法，例如，$y_{i,t-2}$与$(y_{i,t-1}-y_{i,t-2})$相关，但与$\epsilon_{i,t-1}$不相关，所以选取$y_{i,t-2}$作为工具变量，给出了$\delta$的一个IV估计：
   $$
   \hat{y_{IV}}=\frac{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t}-y_{i,t-1})}{\sum_{i=1}^{N}\sum_{t=2}^{T}y_{i,t-2}(y_{i,t-1}-y_{i,t-2})} \tag{49}
   $$
@@ -719,7 +718,7 @@ $$
 
 　　且只要$\epsilon_{i,t}$不是自相关的，等式(49)和(51)的一致性都得到了保障。
 
-　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(49还是等式(51)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，<font color=red >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font>
+　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(49还是等式(51)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，<font color=blue >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font>
 
 ### GMM
 
