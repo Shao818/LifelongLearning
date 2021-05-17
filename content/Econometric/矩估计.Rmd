@@ -25,24 +25,24 @@ description: <font face="思源宋体 CN" >广义矩估计 (Generalized Method o
 
 　　**几个重要的计量经济学方法的提出时间顺序：**     
 
-- IV，Philip Green Wright[^Philip]，1928；Henri Theil，Olav Reiersøl，1945；    
+- IV，Philip Green Wright，1928；Henri Theil，Olav Reiersøl，1945；    
 
 
-- GLS，Alexander Aitken[^Alexander]，1935.  
-
-
-
-- 2SLS，Henri Theil[^Henri]，1953.   
-
-- 3SLS，Henri Theil[^Henri]，1962，<font color=blue >模型是被用的，而不是被信的。</font> 
+- GLS，Alexander Aitken，1935.  
 
 
 
-- MM，Karl Pearson1[^Pearson1]，1894. 
+- 2SLS，Henri Theil，1953.   
+
+- 3SLS，Henri Theil，1962，<font color=blue >模型是被用的，而不是被信的。</font> 
 
 
 
-- GMM，Lars Peter Hansen[^Hansen]，1982. 
+- MM，Karl Pearson1，1894. 
+
+
+
+- GMM，Lars Peter Hansen，1982. 
 
 
 
@@ -366,23 +366,25 @@ $$
 #### 矩条件的强弱
 
 　　显然，GMM 估计量取决于权重矩阵。对于$\widehat{\mathbf{W}}$的灵活选择是GMM 的最大优点之一，因为不同矩条件的强弱程度一般不同。矩条件只是说明$\mathrm{E}(z_{i } \varepsilon_{i})=0$，但每个矩条件的方差$\mathrm{Var}(z_{i } \varepsilon_{i})$可以不同，参见右图[^矩条件的强弱]。
-  
-[^矩条件的强弱]:![矩条件的强弱](https://gitee.com/shao818/Figure/raw/master/null/image-20201118160559634.png)
 
+
+<center>
+[^矩条件的强弱]:![矩条件的强弱](https://gitee.com/shao818/Figure/raw/master/null/image-20201118160559634.png)
+</center>   
 
 $$
 \mathbf{Y}=\mathbf{X} \boldsymbol{\beta}+\boldsymbol{\varepsilon}
 $$
-      一个强的矩条件意味着其对应的方差较小（上图实线，矩条件1），是一个比较紧的约束，包含更大的信息量，故会通过$\widehat{\mathbf{W}}$  得到较大的权重，使得GMM估计量更有效率。具体来说，矩条件的协方差矩阵可写为：  
+　　一个强的矩条件意味着其对应的方差较小（上图实线，矩条件1），是一个比较紧的约束，包含更大的信息量，故会通过$\widehat{\mathbf{W}}$  得到较大的权重，使得GMM估计量更有效率。具体来说，矩条件的协方差矩阵可写为：  
       
 $$
 \mathbf{S} \equiv \operatorname{Var}\left(\mathbf{z}_{i} \varepsilon_{i}\right)=\mathrm{E}\left(\varepsilon_{i}^{2} \mathbf{z} \mathbf{z}_{i}^{\prime}\right) \tag{28}
 $$
-     以残差（比如$e_{i}$，2SLS残差，因为2SLS也是一致的）替代上式的扰动项$\varepsilon_{i}$，并以样本均值替代总体期望，可得对此协方差矩阵的一致估计
+　　以残差（比如$e_{i}$，2SLS残差，因为2SLS也是一致的）替代上式的扰动项$\varepsilon_{i}$，并以样本均值替代总体期望，可得对此协方差矩阵的一致估计
 $$
 \hat{\mathbf{S}} \equiv \frac{1}{n} \sum_{i=1}^{n} e_{i}^{2} \mathbf{z} \mathbf{z}_{i} \tag{29}
 $$
-    Hansen (1982)证明，如果让$\widehat{\mathbf{W}}=\hat{\mathbf{S}}^{-1}$  （方差矩阵的逆矩阵或“倒数”），则可使得 GMM 估计量的渐近方差最小化，其相应的GMM估计量称为“最优GMM”（optimal GMM）。自然地，既然存在最优GMM，一般就不会使用其他的权重矩阵了，故一般所说的GMM估计量默认就是最优GMM。
+　　Hansen (1982)证明，如果让$\widehat{\mathbf{W}}=\hat{\mathbf{S}}^{-1}$  （方差矩阵的逆矩阵或“倒数”），则可使得 GMM 估计量的渐近方差最小化，其相应的GMM估计量称为“最优GMM”（optimal GMM）。自然地，既然存在最优GMM，一般就不会使用其他的权重矩阵了，故一般所说的GMM估计量默认就是最优GMM。
 
 - 更详细的解释：
 
@@ -489,7 +491,7 @@ $$
 
 - Sargan 检验的统计量
 
-　　 Sargan 检验的统计量类似，只不过把Hansen统计量中的$A_{EGMM}$ 替换成了 $(\mathbf{Z} \mathbf{Z})^{-1} $，即
+　　 Sargan 检验的统计量类似，只不过把Hansen统计量中的$A_{EGMM}$ 替换成了 $(\mathbf{Z}\mathbf{Z})^{-1}$，即
 $$
 S=\left\|E_{N}\left(\mathbf{Z}^{\prime} \boldsymbol{\varepsilon}\right)\right\|_{\left(z^{\prime} z\right)^{-1}}=\frac{1}{N} \hat{\mathbf{E}}^{\prime} \mathbf{Z}(\mathbf{Z} \mathbf{Z})^{-1} \mathbf{Z}^{\prime} \hat{\mathbf{E}} \sim \chi_{j-k}^{2}\tag{41}
 $$
@@ -518,7 +520,7 @@ sysuse auto,clear
 gmm (mpg - {b1}*turn - {b2}*gear_ratio - {b0}), instruments(gear_ratio weight length headroom) onestep
 ```
 
->　　可以看到，两阶段最小二乘( `ivregress 2sls` )与GMM的一步估计（`gmm onestep`）结果完全相同。
+>可以看到，两阶段最小二乘( `ivregress 2sls` )与GMM的一步估计（`gmm onestep`）结果完全相同。
 
 #### 工具变量GMM估计（两步 GMM 估计）
 
@@ -587,7 +589,7 @@ gmm moment_pro [if] [in] [weight],
 - Weight matrix 选项
   - `wmatrix(wmtype[,independent])` ：指定权重矩阵; `wmtype` 可以是`robust` ,`cluster` `clustvar` , `hac kernel [lags]` ，或者 `unadjusted`；
   - `center`： 计算权重矩阵时的中心矩；
-  - `winitial(iwtype[, independent])`： 指定初始权重矩阵； `iwtype` 可以是`unadjested` , `identity` , `xt xtspec` ,或者 Stata 矩阵的名字。
+  - `winitial(iwtype[, independent])`： 指定初始权重矩阵； `iwtype` 可以是`unadjusted` , `identity` , `xt xtspec` ,或者 Stata 矩阵的名字。
 
 - SE/Robust 选项
   - `vce(vcetype[,independent])`： 其中 `vcetype` 可以是 `robust` , `cluster` `clustvar` , `bootstrap` , `jackknife` , `hac kernel lags` ,或者 `unadjusted`
@@ -657,7 +659,7 @@ $$
 
 - **提出问题：为什么当 $T$固定，$N\rightarrow \infty$时会出现偏误和不一致连续的情况？**
 
-  - 首先考虑没有外生向量的模型：
+  - 首先考虑没有外生变量的模型：
     $$
     y_{i,t}=\delta y_{i,t-1}+\alpha_{i}+\epsilon_{i,t} \quad \left| \delta\right|<1 \tag{44}
     $$
@@ -922,7 +924,7 @@ use E:\Mirror\StataLearn\StataData\abdata.dta,clear
 xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
 ```　
 
-　　 比较这两个命令输出的页脚说明了这两个估计器之间的关键区别。`xtdpdsys`将n的滞后差也作为工具纳入水平方程，而`xtabond`没有。`xtdpdsys`的工具变量变多了，但是模型的标准误降低了。　　　　
+　　 比较这两个命令输出的页脚说明了这两个估计器之间的关键区别。`xtdpdsys`将n的滞后差分也作为工具纳入水平方程，而`xtabond`没有。`xtdpdsys`的工具变量变多了，但是模型的标准误降低了。　　　　
 
 
 　　 这些GMM估计量的矩条件只有在特征误差不存在序列相关性的情况下才有效。由于白噪声的第一个差异必然是自相关的，我们只需要关注第二个和更高的自相关。我们可以使用`estat abond`测试自相关:　　　
@@ -938,8 +940,9 @@ xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
 $$
 E\left(\Delta y_{i(t-j)} \Delta \varepsilon_{i t}\right)=0 \quad j \geq 2\tag{66}
 $$   
-　　 我们可以在 Stata 中使用`estat abond`命令来测试这些条件。
-　　 从本质上来说，一般未观测到的的差分项$\Delta y_{it}$应与其因变量的第二期滞后$y_{i,t-2}$和之后的滞后项都无关。如果不是这样，我们又回到了一开始的问题，内生性。所以我们主要关心的是有没有2阶或者更高阶的序列相关性。 
+　　 我们可以在 Stata 中使用`estat abond`命令来测试这些条件。  
+　　 从本质上来说，一般未观测到的的差分项$\Delta y_{it}$应与其因变量的第二期滞后$y_{i,t-2}$和之后的滞后项都无关。如果不是这样，我们又回到了一开始的问题，内生性。所以我们主要关心的是有没有2阶或者更高阶的序列相关性。     
+
 　　 下面我们用`estat bond`命令来测试我们上述的例子：
 
 ```{stata engine.path = "D:/soft/stata/StataMP-64.exe"}
@@ -989,7 +992,7 @@ estat abond, artests(4)
 
 　　**那么，在估计模型时该选择哪种估计方法呢？**
 
-　　Bond (2002) 认为当被解释变量的一阶滞后项系数 不是很大时，如 ，FD-GMM 估计结果较好，而当 时，SYS-GMM 较好。
+　　Bond (2002) 认为当被解释变量的一阶滞后项系数$\rho$ 不是很大时，如$\rho <0.8$，FD-GMM 估计结果较好，而当 时，SYS-GMM 较好。
 
 　　此外，若对性别、户口、行业等不随时间变化变量感兴趣，则必须使用 SYS-GMM 估计。  
 
@@ -1042,7 +1045,7 @@ xtabond depvar [indepvars] [if] [in] [,options]
 - `depvar`：被解释变量；  
 - `indepvars`：严格外生的解释变量；  
 - `noconstant`：无常数项；   
-- `lags(p)`：表示使用被解释变量 p 阶滞后值作为解释变量，默认一阶滞后 `lags(1)`；   
+- `lags(p)`：表示使用被解释变量p阶滞后值作为解释变量，默认一阶滞后 `lags(1)`；   
 - `maxldep(q)`：表示最多使用 q阶被解释变量的滞后值作为工具变量，默认使用所有可能的滞后值；    
 - `endogenous()`：内生解释变量，可使用多次；  
 - `twostep`：两阶段估计，可修正 Sargan 统计量；    
@@ -1072,7 +1075,7 @@ xtabond n L(0/1).w L(0/2).(k ys) yr1980-yr1984,  ///
 
 　　主要选项的含义为：
 
-- `dgmmiv(varlist [, lagrange(flag [llag])])`：指定内生的被解释变量或者内生解释变量，以及其滞后项作为差分方程的 GMM 式工具变量，默认 `flag` 为 2，比如 `dgmmiv(y , lagrange(2 4))` 将变量的 **y** 的 2-4 阶滞后项作为工具变量，`dgmmiv(y)` 将变量的 **y** 的 2-n 阶滞后项作为工具变量；    
+- `dgmmiv(varlist [, lagrange(flag [llag])])`：指定内生的被解释变量或者内生解释变量，以及其滞后项作为差分方程的 GMM 式工具变量，默认 `flag` 为 2，比如 `dgmmiv(y , lagrange(2 4))`将变量y的2-4 阶滞后项作为工具变量，`dgmmiv(y)` 将变量的y的2-n 阶滞后项作为工具变量；    
 - `lgmmiv(varlist [, lag(#)])`：将被解释变量或者内生解释变量的一阶差分的 # 阶滞后作为水平方程的 GMM 型工具变量，默认阶数为 1；    
 - `iv(varlist [, nodifference])`：指定外生变量的一阶差分项作为差分方程的标准型的工具变量，加上 `nodifference` 后作为水平方程的标准型的工具变量；    
 - `div(varlist)`：为差分方程设定额外的标准型工具变量；    
