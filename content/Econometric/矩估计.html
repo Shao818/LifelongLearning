@@ -741,7 +741,7 @@ gmm (mpg - {b1}*turn - {b2}*gear_ratio - {b0}),  ///
 <div id="动态面板数据模型fd-gmm与sys-gmm" class="section level1">
 <h1>动态面板数据模型（FD-GMM与SYS-GMM）</h1>
 <p>　　动态面板数据模型，是指通过在静态面板数据模型中引入滞后被解释变量以反映动态滞后效应的模型。这种模型的特殊性在于被解释变量的动态滞后项与随机误差组成部分中的个体效应相关，从而造成估计的内生性。</p>
-<p>　　也就是说在动态面板模型允许使用过去的可观测值，考虑了过去结果对当前结果的影响。而实际上许多经济学问题本质上都是动态的，其中一些经济模型表明，当前的行为依赖于过去的行为，例如就业模型和公司投资问题<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>。</p>
+<p>　　也就是说在动态面板模型中允许使用过去的可观测值，考虑了过去结果对当前结果的影响。而实际上许多经济学问题本质上都是动态的，其中一些经济模型表明，当前的行为依赖于过去的行为，例如就业模型和公司投资问题<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>。</p>
 <div id="模型基本形式" class="section level2">
 <h2>模型基本形式</h2>
 <div id="ar1-模型" class="section level3">
@@ -834,7 +834,7 @@ plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon
   plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})=0 \tag{52}
   \]</span></p>
 <p>　　且只要<span class="math inline">\(\epsilon_{i,t}\)</span>不是自相关的，等式(49)和(51)的一致性都得到了保障。</p>
-<p>　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式(49还是等式(51)的估计比较好？而矩估计(MM)法则不需要考虑这个问题，<font color=blue >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font></p>
+<p>　　可以看出，等式(51)构建工具变量时比等式(49)多引入了一个滞后项，这导致缺失了一期的样本数据。这就又提出了一个问题，我们究竟是选择等式（49）还是等式（51）的估计比较好？而矩估计（MM）法则不需要考虑这个问题，<font color=blue >MM估计可以统一所有的估计量且消去样本容量减少的缺点。</font></p>
 </div>
 <div id="gmm" class="section level3">
 <h3>GMM</h3>
@@ -842,7 +842,7 @@ plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon
 <span class="math display">\[
 plim_{N \rightarrow \infty}\frac{1}{N(T-1)}\sum_{i=1}^{N}\sum_{t=2}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2}=E[(\epsilon_{i,t}-\epsilon_{i,t-1})y_{i,t-2} ]=0 \tag{53}
 \]</span>
-　　同理，等式(51)的矩条件为
+　　同理，等式(51)的矩条件为：
 <span class="math display">\[
 plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})\\=E[(\epsilon_{i,t}-\epsilon_{i,t-1})(y_{i,t-2}-y_{i,t-3})]=0 \tag{54}
 \]</span>
@@ -851,7 +851,7 @@ plim_{N \rightarrow \infty}\frac{1}{N(T-2)}\sum_{i=1}^{N}\sum_{t=3}^{T}(\epsilon
 <ul>
 <li><p>t = 2 时，矩条件变为：<span class="math inline">\(E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0\)</span>
 这意味着变量<span class="math inline">\(y_{i,0}\)</span>是有效的工具，因为它与<span class="math inline">\((y_{i,1}-y_{i,0})\)</span>高度相关而与<span class="math inline">\((\epsilon_{i,2}-\epsilon_{i,1})\)</span>不相关。</p></li>
-<li><p>t = 3 时，同理可得，矩条件为：<span class="math inline">\(E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}\)</span>同时也满足<span class="math inline">\(E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0\)</span>其中，<span class="math inline">\(y_{i,1}\)</span>与<span class="math inline">\((y_{i,2}-y_{i,1})\)</span>相关，而与<span class="math inline">\((\epsilon_{i,3}-\epsilon_{i,2})\)</span>不相关。<br />
+<li><p>t = 3 时，同理可得，矩条件为：<span class="math inline">\(E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}]\)</span>同时也满足，<span class="math inline">\(E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0\)</span>。其中，<span class="math inline">\(y_{i,1}\)</span>与<span class="math inline">\((y_{i,2}-y_{i,1})\)</span>相关，而与<span class="math inline">\((\epsilon_{i,3}-\epsilon_{i,2})\)</span>不相关。<br />
 　　</p></li>
 <li><p>t = 4 时，我们将得到三组矩条件：<span class="math inline">\(E[(\epsilon_{i,2}-\epsilon_{i,1})y_{i,0}]=0\)</span>；<span class="math inline">\(E[(\epsilon_{i,3}-\epsilon_{i,2})y_{i,1}\)</span>； <span class="math inline">\(E[(\epsilon_{i,4}-\epsilon_{i, 3})y_{i,2}]=0\)</span></p></li>
 </ul>
@@ -1177,7 +1177,7 @@ E\left(\Delta y_{i(t-j)} \Delta \varepsilon_{i t}\right)=0 \quad j \geq 2\tag{66
 \]</span><br />
 　　 我们可以在 Stata 中使用<code>estat abond</code>命令来测试这些条件。<br />
 　　 从本质上来说，一般未观测到的的差分项<span class="math inline">\(\Delta y_{it}\)</span>应与其因变量的第二期滞后<span class="math inline">\(y_{i,t-2}\)</span>和之后的滞后项都无关。如果不是这样，我们又回到了一开始的问题，内生性。所以我们主要关心的是有没有2阶或者更高阶的序列相关性。</p>
-<p>　　 下面我们用<code>estat bond</code>命令来测试我们上述的例子：</p>
+<p>　　 下面我们用<code>estat abond</code>命令来测试我们上述的例子：</p>
 <pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
 use E:\Mirror\StataLearn\StataData\abdata.dta,clear
 qui xtdpdsys n L(0/2).(w k) yr1980-yr1984 year, vce(robust)
@@ -1251,7 +1251,7 @@ estat abond, artests(4)</code></pre>
 </div>
 <div id="过度识别检验estat-overid" class="section level4">
 <h4>过度识别检验（estat overid）</h4>
-<p>　　检验工具变量是否是与干扰项相关，也就是工具变量是否为外生变量。
+<p>　　检验工具变量是否与干扰项相关，也就是工具变量是否为外生变量。
 　　</p>
 <p>　　原假设是：所有工具变量都是外生。其中包含 <code>hansen</code> 检验和<code>sargan</code> 检验，可以用 Stata 中的<code>xtabond2</code>命令实现。</p>
 </div>
@@ -1284,7 +1284,7 @@ estat abond, artests(4)</code></pre>
 <h3>FD-GMM 还是 SYS-GMM</h3>
 <p>　　需要强调的是，无论一阶差分GMM (FD-GMM)还是系统 GMM (SYS-GMM)，模型设定是不受影响的，并且二者仅在计量估计方法上不一样，即矩条件不同。SYS-GMM 使用的矩条件多，利用的信息也多，估计也更有效率，但其受到的限制也多，如假定被解释变量的一阶差分项与个体效应变量不相关。更多细节参考IV-GMM<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>。</p>
 <p>　　<strong>那么，在估计模型时该选择哪种估计方法呢？</strong></p>
-<p>　　Bond (2002) 认为当被解释变量的一阶滞后项系数<span class="math inline">\(\rho\)</span> 不是很大时，如<span class="math inline">\(\rho &lt;0.8\)</span>，FD-GMM 估计结果较好，而当 时，SYS-GMM 较好。</p>
+<p>　　Bond (2002) 认为当被解释变量的一阶滞后项系数<span class="math inline">\(\rho\)</span> 不是很大时，如<span class="math inline">\(\rho &lt;0.8\)</span>，FD-GMM 估计结果较好，而当<span class="math inline">\(\rho&gt;0.8\)</span>时，SYS-GMM 较好。</p>
 <p>　　此外，若对性别、户口、行业等不随时间变化变量感兴趣，则必须使用 SYS-GMM 估计。</p>
 </div>
 <div id="关于动态面板模型估计的-stata-命令-1" class="section level3">
@@ -1301,7 +1301,7 @@ estat abond, artests(4)</code></pre>
 <h4>动态面板模型案例</h4>
 <p>　　接下来，我们将使用 Arellano and Bond (1991)在研究企业雇佣员工数量的影响因素时的数据 <code>abdata.dta</code>，来说明 GMM 相关命令的应用。其中，模型设定如下：</p>
 <p><span class="math display">\[
-n_{i t}=\alpha_{1} n_{i(t-1)}+\alpha_{2} n_{i(t-2)}+\beta^{\prime}(L) x_{i t}+\lambda_{t} \dashv \eta_{i}+v_{i t}  \tag{67}
+n_{i t}=\alpha_{1} n_{i(t-1)}+\alpha_{2} n_{i(t-2)}+\beta^{\prime}(L) x_{i t}+\lambda_{t} + \eta_{i}+v_{i t}  \tag{67}
 \]</span></p>
 <ul>
 <li><p><span class="math inline">\(n_{i t}\)</span>企业<span class="math inline">\(i\)</span>在第<span class="math inline">\(t\)</span>年末雇佣员工数量的对数值；</p></li>
@@ -1501,7 +1501,7 @@ xtdpd n l(1/2).n L(0/1).w L(0/2).(k ys) yr1980-yr1984, ///
    ]</code></pre>
 <p>　　主要选项的含义为：　　　</p>
 <ul>
-<li><code>gmm()</code>：指定内生的被解释变量或者内生解释变量，以及其滞后项作为 GMM 式工具变量，<code>laglimits(a b)</code> 限定工具变量滞后的阶数，默认为1到n，<code>collapse</code> 系统自动删减工具变量地个数；　　　</li>
+<li><code>gmm()</code>：指定内生的被解释变量或者内生解释变量，以及其滞后项作为 GMM 式工具变量，<code>laglimits(a b)</code> 限定工具变量滞后的阶数，默认为1到n，<code>collapse</code> 系统自动删减工具变量的个数；　　　</li>
 <li><code>iv(varlist [, equation()])</code>：指定 IV 式工具变量，<code>equation({diff | level | both})</code> 对差分方程和水平方程进行选择；　　</li>
 <li><code>nolevel</code>：表示不估计水平方程，进行FD-GMM 估计，默认为SYS-GMM估计；</li>
 <li><code>robust</code>：异方差稳健标准误。　　</li>
@@ -2370,7 +2370,7 @@ y_{i t}=a_{0} y_{i t-1}+a_{1} x_{i t}+a_{2} k_{i t}+u_{i}+v_{i t-1} \tag{68}
 <ul>
 <li><code>xtabond</code>: <code>endogenous()</code> 选项来设定内生解释变量，在本例中为 <code>endogenous(k)</code>，如果限定使用<span class="math inline">\(k_{i t}\)</span> 工具变量的个数，比如只使用二阶和三阶滞后项，则可以设定为 <code>endogenous(k, lag(0 2))</code>; 如果内生变量为<span class="math inline">\(k_{i t}\)</span>的滞后一期，则可以设定为 <code>endogenous(k, lag(1 2))</code>，此时工具变量为滞后项<span class="math inline">\(k_{i t-1}\)</span>的二、三阶滞后项</li>
 <li><code>xtdpd</code>：<code>dgmmiv()</code> 和 <code>lgmmiv()</code>选项来设定内生变量 (包括被解释变量和解释变量)，当使用 FD-GMM 估计时，设定为 <code>dgmmiv(y k)</code>，而使用SYS-GMM估计时，则设定为<code>dgmmiv(y k) lgmmiv(y k)</code></li>
-<li><code>xtabond2</code>：<code>gmm()</code> 选项来设定内生变量 (包括被解释变量和解释变量)，对于内生被解释变量设定为 <code>gmm(l.y)</code> 或者 <code>gmm(y, lag(2 .))</code> ，为将解释变量的二阶及所有高阶滞后项作为工具变量；对于内生解释变量设定为<code>gmm(k)</code> ，其含义是将解释变量的一阶及所有高阶滞后项作为工具变量，若设定成<code>gmm(k, lag(2 3))</code>则为将解释变量的二阶和三阶滞后项作为工具变量</li>
+<li><code>xtabond2</code>：<code>gmm()</code> 选项来设定内生变量 (包括被解释变量和解释变量)，对于内生被解释变量设定为 <code>gmm(l.y)</code> 或者 <code>gmm(y, lag(2 .))</code> ，将解释变量的二阶及所有高阶滞后项作为工具变量；对于内生解释变量设定为<code>gmm(k)</code> ，其含义是将解释变量的一阶及所有高阶滞后项作为工具变量，若设定成<code>gmm(k, lag(2 3))</code>则为将解释变量的二阶和三阶滞后项作为工具变量</li>
 <li><code>xtdpdsys</code>：<code>endogenous()</code> 选项来设定内生解释变量，设定为<code>endogenous(k)</code> ，表示将内生解释变量 k 的二阶及所有高阶滞后项作为工具变量；设定为<code>endogenous(k lag(0, 2))</code> ，表示将内生解释变量 k 的二阶和三阶滞后项作为工具变量，其中 0 为变量 k 的当期值作为内生变量，2 表示内生变量 k 的滞后 2 阶和 3 阶项作为工具变量； 若设定为 <code>endogenous(k, lag(1, 3))</code>表示将内生解释变量 L.k ( k 的一阶滞后项) 的二、三、四阶滞后项 (即 L(2/4).L.k) 作为工具变量。</li>
 </ul>
 <pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
@@ -3080,7 +3080,7 @@ estat sargan  // 过度识别检验</code></pre>
 ## 
 ##         chi2(25)     =  61.26444
 ##         Prob &gt; chi2  =    0.0001</code></pre>
-<p>　　可以看出，该结果拒绝了原假设，即认为存在工具变量和干扰项是相关。 但是 Arellano and Bond (1991) 指出，当干扰项存在异方差时， Sargan检验倾向于过度拒绝原假设，因此得到的结论并不可信。建议采用两阶段估计，再执行 Sargan 检验比较稳妥。</p>
+<p>　　可以看出，该结果拒绝了原假设，即认为存在工具变量和干扰项是相关。 但是 Arellano and Bond (1991) 指出，<font color=red >当干扰项存在异方差时， Sargan检验倾向于过度拒绝原假设，因此得到的结论并不可信。建议采用两阶段估计，再执行 Sargan 检验比较稳妥。</font></p>
 <pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
 use E:\Mirror\StataLearn\StataData\abdata.dta, clear  // 部分版本的 Stata 可能无法执行
 quietly xtabond n L(0/1).w L(0/2).(k ys) yr1980-yr1984, twostep lags(2)   // 不使用 VCE(robust)
@@ -3100,9 +3100,9 @@ estat sargan  // 使用两阶段估计后的过度识别检验</code></pre>
 ##         chi2(25)     =  29.34445
 ##         Prob &gt; chi2  =    0.2498</code></pre>
 <p>　　可以看出，结果没有拒绝原假设，即工具变量与扰动项不相关。</p>
-<p>　　实际上，Sargan 检验是联合检验：(1) 模型的设定正确 (2) 工具变量合理。因此，若拒绝原假设，则说明前面两个假设至少有一个存在问题。此时，应该先考虑模型的设定是否有问题，进而分析工具变量的设定是否合理。</p>
-<p>　　关于工具变量，通常使用<span class="math inline">\(y_{t-s}(s \geq 2)\)</span>作为<span class="math inline">\(\Delta y_{i t-1}\)</span>的工具变量，但当<span class="math inline">\(T\)</span> 较大时，就会有很多个工具变量。显然，随着<span class="math inline">\(s\)</span>的增加，<span class="math inline">\(\rho_{s}=\operatorname{corr}\left(\Delta y_{i t-1}, y_{t-s}\right)\)</span>会越来越小。一般而言，当<span class="math inline">\(s&gt;6\)</span>以后，对应的工具变量很可能是弱工具变量，即<span class="math inline">\(y_{t-7}\)</span>与<span class="math inline">\(\Delta y_{i t-1}\)</span>的相关性很低。</p>
-<p>　　通过减少工具变量的使用，一定程度上可以避免弱工具变量问题。在 <code>xtabond</code> 命令中，可以使用 <code>maxldep(#)</code> 来限制工具变量的最大滞后阶数，进而达到限制工具变量总数的目的。例如，<code>xtabond y x, maxldep(5)</code> 意味着最多只用五个滞后项 (注意：不是五阶滞后)，即用<span class="math inline">\(y_{t-2}, \cdots y_{t-6}\)</span>作为的工具变量。</p>
+<p>　　实际上，Sargan 检验是联合检验：(1) 模型的设定正确 ；(2) 工具变量合理。因此，若拒绝原假设，则说明前面两个假设至少有一个存在问题。此时，应该先考虑模型的设定是否有问题，进而分析工具变量的设定是否合理。</p>
+<p>　　关于工具变量，通常使用<span class="math inline">\(y_{t-s}(s \geq 2)\)</span>作为<span class="math inline">\(\Delta y_{i t-1}\)</span>的工具变量，但当<span class="math inline">\(T\)</span> 较大时，就会有很多个工具变量。显然，随着<span class="math inline">\(s\)</span>的增加，<span class="math inline">\(\rho_{s}=corr\left(\Delta y_{i t-1}, y_{t-s}\right)\)</span>会越来越小。一般而言，当<span class="math inline">\(s&gt;6\)</span>以后，对应的工具变量很可能是弱工具变量，即<span class="math inline">\(y_{t-7}\)</span>与<span class="math inline">\(\Delta y_{i t-1}\)</span>的相关性很低。</p>
+<p>　　</font>通过减少工具变量的使用，一定程度上可以避免弱工具变量问题。</font>在 <code>xtabond</code> 命令中，可以使用 <code>maxldep(#)</code> 来限制工具变量的最大滞后阶数，进而达到限制工具变量总数的目的。例如，<code>xtabond y x, maxldep(5)</code> 意味着最多只用五个滞后项 (注意：不是五阶滞后)，即用<span class="math inline">\(y_{t-2}, \cdots y_{t-6}\)</span>作为的工具变量。</p>
 <p>　　未使用 <code>maxldep()</code> 选项，GMM 式工具变量为 L(2/.).n，具体如下：</p>
 <pre class="stata"><code>sysdir set PLUS &quot;D:\soft\stata\ado\plus&quot;
 use E:\Mirror\StataLearn\StataData\abdata.dta, clear  // 部分版本的 Stata 可能无法执行
@@ -3230,7 +3230,7 @@ xtabond n L(0/1).w L(0/2).(k ys) yr1980-yr1984, twostep lags(2) maxldep(5)</code
 </div>
 <div id="大t小n型面板数据" class="section level3">
 <h3>大T小N型面板数据</h3>
-<p>　　上面介绍的 FD-GMM 和 SYS-GMM 适用于 大 N 小 T 的短面板数据，当研究样本为长面板数据 (大 T 小 N) 时，比如省级面板数据，GMM 估计可能不是最有效的。根据 Bruno(2005) 的做法，基于 Bootstrap 偏差纠正的 LSDV 估计可以在一定程度上克服 N 较小的问题。</p>
+<p>　　<font color=red >上面介绍的 FD-GMM 和 SYS-GMM 适用于 大 N 小 T 的短面板数据，当研究样本为长面板数据 (大 T 小 N) 时，比如省级面板数据，GMM 估计可能不是最有效的。根据 Bruno(2005) 的做法，基于 Bootstrap 偏差纠正的 LSDV 估计可以在一定程度上克服 N 较小的问题。</font></p>
 <p>　　下面，将通过一个模拟例子，来对 FD-GMM、SYS-GMM 和 bias corrected LSDV 的估计效果进行比较。</p>
 <p>　　<strong>数据生成过程 (DPG)</strong>。该面板数据包含 10 个个体的 60 期数据，即<span class="math inline">\(N=10\)</span>，<span class="math inline">\(T=60\)</span>，变量具体构造如下：<br />
 　　
@@ -4552,6 +4552,6 @@ xtreg n w k, fe</code></pre>
 <li id="fn7"><p><a href="https://www.jianshu.com/p/3767ee0ed284">动态面板简介</a><a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p><a href="https://www.lianxh.cn/news/cc6c5ea80d70c.html">Stata实操陷阱：动态面板数据模型</a><a href="#fnref8" class="footnote-back">↩︎</a></p></li>
 <li id="fn9"><p><a href="https://www.lianxh.cn/blogs/38.html">IV-GMM</a><a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p><a href="https://www.lianxh.cn/news/b6713ec0cfa7a.html">xtdpdgmm</a><a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p><a href="https://www.lianxh.cn/news/b6713ec0cfa7a.html">xtdpdgmm：动态面板数据模型一网打尽</a><a href="#fnref10" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>

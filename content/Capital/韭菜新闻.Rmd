@@ -259,7 +259,7 @@ dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 
 
 ```{r}
-Keywords<-c("有色金属")
+Keywords<-c("二胎")
 ```
 
 # 关键词选股:`r Keywords`
