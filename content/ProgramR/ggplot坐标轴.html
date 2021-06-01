@@ -1,0 +1,143 @@
+---
+author:
+  - 水滴
+title: 'ggplot坐标轴的修改'
+date: 2021-05-11
+categories:
+  - R
+  - ggplot
+  - 坐标轴
+tags:
+  - R
+  - ggplot
+  - 坐标轴
+slug: ggplot_axis
+weight: 0004
+description: 使用R语言链接Mysql数据库进行数据查询
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="近期汇率走势" class="section level1">
+<h1>近期汇率走势</h1>
+<div id="人民币汇率走势" class="section level2">
+<h2>人民币汇率走势</h2>
+<p><font face="思源宋体 CN" size=4></p>
+<pre class="r"><code>tail(CNYUS)</code></pre>
+<pre><code>##           日期 中间价:美元兑人民币
+## 895 2017-09-19              6.5530
+## 896 2017-09-18              6.5419
+## 897 2017-09-15              6.5423
+## 898 2017-09-14              6.5465
+## 899 2017-09-13              6.5382
+## 900 2017-09-12              6.5277</code></pre>
+<pre class="r"><code>library(showtextdb)
+library(sysfonts)
+library(showtext)
+library(ggthemes)
+library(ggThemeAssist)
+gg &lt;- ggplot(CNYUS, aes(x = 日期, y = `中间价:美元兑人民币`))+
+      geom_line()+
+      scale_y_continuous(limits=c(6.2,7.25),expand=c(0,0))+
+      scale_x_date(date_labels = &quot;%m-%y&quot;,date_breaks = &quot;2 month&quot;,expand=c(0,0))+
+      labs(x = &quot;日期&quot;, 
+           y = &quot;人民币对美元汇率中间价&quot;,
+           title =&quot;图1 人民币对美元汇率中间价&quot;,fill=&quot;&quot;);
+gg &lt;-gg+theme_stata()</code></pre>
+<pre class="r"><code>font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg &lt;-gg+
+  theme(plot.background = element_rect(fill = &quot;antiquewhite&quot;,colour = NA, linetype = &quot;solid&quot;),
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 8,family=&quot;SourceHanSerifCN-Light&quot;));
+gg</code></pre>
+<p><img src="/ProgramR/ggplot坐标轴_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="美元汇率走势" class="section level2">
+<h2>美元汇率走势</h2>
+<pre class="r"><code>tail(US_index)</code></pre>
+<pre><code>##           日期 美元指数
+## 895 2017-12-22  93.2987
+## 896 2017-12-21  93.2662
+## 897 2017-12-20  93.3607
+## 898 2017-12-19  93.4576
+## 899 2017-12-18  93.7026
+## 900 2017-12-15  93.9475</code></pre>
+<pre class="r"><code>library(showtextdb)
+library(sysfonts)
+library(showtext)
+library(ggthemes)
+gg &lt;- ggplot(US_index, aes(x = 日期, y = `美元指数`))+
+      geom_line()+
+      scale_y_continuous(limits=c(85,105),expand=c(0,0))+
+      scale_x_date(date_labels = &quot;%m-%y&quot;,date_breaks = &quot;2 month&quot;,expand=c(0,0))+
+      labs(x = &quot;日期&quot;, 
+           y = &quot;美元汇率指数&quot;,
+           title =&quot;图2 美元汇率指数&quot;,fill=&quot;&quot;);
+gg &lt;-gg+theme_stata()</code></pre>
+<pre class="r"><code>font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg &lt;-gg+
+  theme(plot.background = element_rect(fill = &quot;antiquewhite&quot;,colour = NA, linetype = &quot;solid&quot;),
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size = 8,family=&quot;SourceHanSerifCN-Light&quot;));
+gg</code></pre>
+<p><img src="/ProgramR/ggplot坐标轴_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>CNYUS_US_index&lt;-merge(CNYUS,US_index,by=&quot;日期&quot;)
+colnames(CNYUS_US_index)&lt;-c(&quot;date&quot;,&quot;Firm_stock_price&quot;,&quot;Index_price&quot;)
+Firm_stock_price_Index_price&lt;-CNYUS_US_index
+head(Firm_stock_price_Index_price)</code></pre>
+<pre><code>##         date Firm_stock_price Index_price
+## 1 2017-12-15           6.6113     93.9475
+## 2 2017-12-18           6.6162     93.7026
+## 3 2017-12-19           6.6098     93.4576
+## 4 2017-12-20           6.6066     93.3607
+## 5 2017-12-21           6.5795     93.2662
+## 6 2017-12-22           6.5821     93.2987</code></pre>
+</div>
+</div>
+<div id="双坐标轴图" class="section level1">
+<h1>双坐标轴图</h1>
+<pre class="r"><code>Firm_stock_price_ceiling&lt;-ceiling(range(Firm_stock_price_Index_price$Firm_stock_price)[2])
+Firm_stock_price_floor&lt;-floor(range(Firm_stock_price_Index_price$Firm_stock_price)[1])
+Firm_stock_price_interval&lt;-(Firm_stock_price_ceiling-Firm_stock_price_floor)/10
+
+#指数数据
+Index_ceiling&lt;-ceiling(range(Firm_stock_price_Index_price$Index_price)[2])
+Index_floor&lt;-floor(range(Firm_stock_price_Index_price$Index_price)[1])
+Index_interval&lt;-(Index_ceiling-Index_floor)/10
+
+#乘子
+multiplicator&lt;-Index_ceiling/Firm_stock_price_ceiling
+
+font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg&lt;-ggplot()+
+  geom_line(data=Firm_stock_price_Index_price,aes(x=date,y=Firm_stock_price),stat=&quot;identity&quot;,size=0.5,color=&quot;red&quot;)+
+  geom_line(data=Firm_stock_price_Index_price,aes(x=date,y=Index_price/multiplicator),size=0.5,color=&quot;blue&quot;)+
+  scale_y_continuous(
+    limits = c(Firm_stock_price_floor, Firm_stock_price_ceiling),
+    breaks = c(seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval)),
+     label=seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval),
+     sec.axis=sec_axis(~./0.99,name=&quot;美元汇率指数（蓝色）&quot;,
+          breaks =c(seq(Firm_stock_price_floor,Firm_stock_price_ceiling,Firm_stock_price_interval)),
+          label=seq(round(Index_floor,2),Index_ceiling,Index_interval))
+    ,
+    expand=c(0,0))+
+  #设置X轴的标签
+  scale_x_date(limits = c(Firm_stock_price_Index_price$date[1],Sys.Date()),date_labels = &quot;%m-%y&quot;,date_breaks = &quot;2 month&quot;,expand=c(0,0))+
+  labs(x = &quot;日期&quot;, 
+       y = &quot;人民币对美元汇率（红色）&quot;,
+       title =&quot;图3 人民币兑美元汇率 VS 人民币汇率指数&quot;,
+       caption = &quot;数据来源：iFind数据库。&quot;,
+       tag = &quot;这是附注&quot;,
+       fill=&quot;&quot;)
+gg &lt;-gg+theme_stata()</code></pre>
+<pre class="r"><code>font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg &lt;-gg+
+  theme(plot.background = element_rect(fill = &quot;antiquewhite&quot;,colour = NA, linetype = &quot;solid&quot;),
+        plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0,size = 8),
+        plot.tag.position = &quot;bottomright&quot;,
+        text = element_text(size = 8,family=&quot;SourceHanSerifCN-Light&quot;));
+gg</code></pre>
+<p><img src="/ProgramR/ggplot坐标轴_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
