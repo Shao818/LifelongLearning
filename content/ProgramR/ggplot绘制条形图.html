@@ -1,0 +1,110 @@
+---
+author:
+  - 水滴
+title: 'ggplot绘制条形图'
+date: 2021-06-02
+categories:
+  - R
+  - ggplot
+  - 柱状图
+tags:
+  - R
+  - ggplot
+  - 柱状图
+slug: ggplot
+weight: 0004
+description: ggolot绘图系列。
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="数据的获取" class="section level1">
+<h1>数据的获取</h1>
+<pre class="r"><code>Mydata&lt;-dbGetQuery(con,&quot;select 日期,`出口总值:当月值`,`进口总值:当月值` from 进出口（月） order by 日期  desc&quot;)
+Mydata$日期&lt;-as.Date(Mydata$日期)
+Mydata&lt;-Mydata[1:5,]
+colnames(Mydata)&lt;-c(&quot;date&quot;,&quot;当月出口&quot;,&quot;当月进口&quot;)
+Mydata&lt;-melt(Mydata,id=&quot;date&quot;)
+Mydata</code></pre>
+<pre><code>##          date variable    value
+## 1  2021-04-30 当月出口 2639.238
+## 2  2021-03-31 当月出口 2410.855
+## 3  2021-02-28 当月出口 2048.088
+## 4  2021-01-31 当月出口 2638.774
+## 5  2020-12-31 当月出口 2818.325
+## 6  2021-04-30 当月进口 2210.636
+## 7  2021-03-31 当月进口 2275.315
+## 8  2021-02-28 当月进口 1674.883
+## 9  2021-01-31 当月进口 1997.065
+## 10 2020-12-31 当月进口 2048.416</code></pre>
+</div>
+<div id="绘制簇状条形图" class="section level1">
+<h1>绘制簇状条形图</h1>
+<pre class="r"><code>library(showtextdb)
+library(sysfonts)
+library(showtext)
+library(ggthemes)
+library(ggThemeAssist)
+font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg&lt;-ggplot(Mydata,aes(x = date,y = value,fill = variable))+
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, width=25) +
+  #identity表示条形的高度是变量值，&quot;dodge&quot;表示条形图并列，width表示柱子宽度，默认值是0.9
+  scale_y_continuous(limit=c(0,3000),expand = c(0,0))+   # y轴起点从0开始
+  scale_x_date(date_labels = &quot;%Y-%m&quot;)+
+  labs(title=&quot;2021年中国进出口&quot;,fill=&quot;图例&quot; )+
+  xlab(&quot;时间&quot;) + 
+  ylab(&quot;进出口金额（亿美元）&quot;)+
+  geom_text(aes(label = value), size= 2.5, color = &quot;black&quot;, family = &quot;SourceHanSerifCN-Light&quot;, position = position_dodge(20), vjust = -1)+   # 柱子添加文字数据标签
+  theme_bw() +  # 移除背景
+  theme_stata()+
+  theme(plot.background = element_rect(fill = &quot;antiquewhite&quot;,colour = NA, linetype = &quot;solid&quot;),
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(family=&quot;SourceHanSerifCN-Light&quot;),
+        axis.text.x = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.title.x = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.text.y = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.title.y = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        legend.title = element_text(size = 10,vjust = 0.5, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        legend.text = element_text(size = 10, color = &quot;black&quot;,face=&quot;bold&quot;, family=&quot;SourceHanSerifCN-Light&quot;),
+        legend.position=&quot;bottom&quot;,
+        legend.background = element_blank(),
+        legend.box = &quot;horizontal&quot;)
+gg</code></pre>
+<p><img src="/ProgramR/ggplot绘制条形图_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="绘制堆叠条形图" class="section level1">
+<h1>绘制堆叠条形图</h1>
+<pre class="r"><code>library(showtextdb)
+library(sysfonts)
+library(showtext)
+library(ggthemes)
+library(ggThemeAssist)
+font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+gg&lt;-ggplot(Mydata,aes(x = date,y = value,fill = variable))+
+  geom_bar(stat = &quot;identity&quot;, position =position_stack(reverse=T), width=20) +
+  #identity表示条形的高度是变量值，&quot;dodge&quot;表示条形图并列，width表示柱子宽度，默认值是0.9
+  scale_y_continuous(limit=c(0,5000),expand = c(0,0))+   # y轴起点从0开始
+  scale_x_date(date_labels = &quot;%Y-%m&quot;)+
+  labs(title=&quot;2021年中国进出口&quot;,fill=&quot;图例&quot; )+
+  xlab(&quot;时间&quot;) + 
+  ylab(&quot;进出口金额（亿美元）&quot;)+
+  geom_text(aes(label = value), size= 2.5, color = &quot;black&quot;, family = &quot;SourceHanSerifCN-Light&quot;, position =  position_stack(0.5), vjust = -1)+   # 柱子添加文字数据标签
+  theme(panel.grid=element_blank(),panel.border=element_blank(),axis.line=element_line(size=1,colour=&quot;black&quot;))+# 去除网格线，添加坐标线
+  theme_bw() +  # 移除背景
+  theme_stata()+
+  theme(plot.background = element_rect(fill = &quot;antiquewhite&quot;,colour = NA, linetype = &quot;solid&quot;),
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(family=&quot;SourceHanSerifCN-Light&quot;),
+        axis.text.x = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.title.x = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.text.y = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        axis.title.y = element_text(size = 10, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        legend.title = element_text(size = 10,vjust = 0.5, color = &quot;black&quot;, face = &quot;bold&quot;, family = &quot;SourceHanSerifCN-Light&quot;),
+        legend.text = element_text(size = 10, color = &quot;black&quot;,face=&quot;bold&quot;, family=&quot;SourceHanSerifCN-Light&quot;),
+        legend.position=&quot;bottom&quot;,
+        legend.background = element_blank(),
+        legend.box = &quot;horizontal&quot;)
+gg</code></pre>
+<p><img src="/ProgramR/ggplot绘制条形图_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
