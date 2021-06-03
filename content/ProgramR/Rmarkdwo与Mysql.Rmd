@@ -1,0 +1,70 @@
+---
+author:
+  - 水滴
+title: 'RSQLite'
+date: 2021-06-03
+categories:
+  - Rmarkdwon
+  - RSQLite
+tags:
+  - Rmarkdwon
+  - RSQLite
+slug: Rmarkdwon_RSQLite
+weight: 0004
+description: RSQLite 可以在R中方便的创建sqlite数据库，并进行检索， 这个R包依赖于DBI包。
+--- 
+
+# RSQLite包的简要介绍
+
+```{r}
+pacman::p_load(DBI,RSQLite)
+
+mydb <- dbConnect(SQLite(), "")
+dbWriteTable(mydb, "mtcars", mtcars)
+dbWriteTable(mydb, "iris", iris)
+dbListTables(mydb)
+dbGetQuery(mydb, 'SELECT * FROM mtcars LIMIT 5')
+```
+
+```{r}
+dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < 4.6')
+```
+
+```{sql, connection=mydb}
+SELECT * FROM iris WHERE "Sepal.Length" < 4.6
+```
+
+# 时间日期型数据
+
+## 获取当前日期
+
+
+在MySQ中，其标准的语法结构都是：
+
+```{sql, connection=mydb}
+select current_date;
+```
+
+MySQL中日期型数据的显示格式：YYYY-MM-DD（四位数的年-月份-日期）
+
+## 获取当前的系统时间  
+
+在MySQ中，其标准的语法结构都是：
+
+```{sql, connection=mydb}
+select current_time;
+```  
+
+
+## 获取当前系统日期与时间  
+
+```{sql, connection=mydb}
+select current_timestamp;
+```
+
+```{r}
+dbDisconnect(mydb) # 断开连接
+```
+
+> R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。
+

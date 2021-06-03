@@ -1,0 +1,162 @@
+---
+author:
+  - 水滴
+title: 'RSQLite'
+date: 2021-06-03
+categories:
+  - Rmarkdwon
+  - RSQLite
+tags:
+  - Rmarkdwon
+  - RSQLite
+slug: Rmarkdwon_RSQLite
+weight: 0004
+description: RSQLite 可以在R中方便的创建sqlite数据库，并进行检索， 这个R包依赖于DBI包。
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="rsqlite包的简要介绍" class="section level1">
+<h1>RSQLite包的简要介绍</h1>
+<pre class="r"><code>pacman::p_load(DBI,RSQLite)
+
+mydb &lt;- dbConnect(SQLite(), &quot;&quot;)
+dbWriteTable(mydb, &quot;mtcars&quot;, mtcars)
+dbWriteTable(mydb, &quot;iris&quot;, iris)
+dbListTables(mydb)</code></pre>
+<pre><code>## [1] &quot;iris&quot;   &quot;mtcars&quot;</code></pre>
+<pre class="r"><code>dbGetQuery(mydb, &#39;SELECT * FROM mtcars LIMIT 5&#39;)</code></pre>
+<pre><code>##    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
+<pre class="r"><code>dbGetQuery(mydb, &#39;SELECT * FROM iris WHERE &quot;Sepal.Length&quot; &lt; 4.6&#39;)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          4.4         2.9          1.4         0.2  setosa
+## 2          4.3         3.0          1.1         0.1  setosa
+## 3          4.4         3.0          1.3         0.2  setosa
+## 4          4.5         2.3          1.3         0.3  setosa
+## 5          4.4         3.2          1.3         0.2  setosa</code></pre>
+<pre class="sql"><code>SELECT * FROM iris WHERE &quot;Sepal.Length&quot; &lt; 4.6</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-3">Table 1: </span>5 records</caption>
+<thead>
+<tr class="header">
+<th align="right">Sepal.Length</th>
+<th align="right">Sepal.Width</th>
+<th align="right">Petal.Length</th>
+<th align="right">Petal.Width</th>
+<th align="left">Species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">4.4</td>
+<td align="right">2.9</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+</tr>
+<tr class="even">
+<td align="right">4.3</td>
+<td align="right">3.0</td>
+<td align="right">1.1</td>
+<td align="right">0.1</td>
+<td align="left">setosa</td>
+</tr>
+<tr class="odd">
+<td align="right">4.4</td>
+<td align="right">3.0</td>
+<td align="right">1.3</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+</tr>
+<tr class="even">
+<td align="right">4.5</td>
+<td align="right">2.3</td>
+<td align="right">1.3</td>
+<td align="right">0.3</td>
+<td align="left">setosa</td>
+</tr>
+<tr class="odd">
+<td align="right">4.4</td>
+<td align="right">3.2</td>
+<td align="right">1.3</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="时间日期型数据" class="section level1">
+<h1>时间日期型数据</h1>
+<div id="获取当前日期" class="section level2">
+<h2>获取当前日期</h2>
+<p>在MySQ中，其标准的语法结构都是：</p>
+<pre class="sql"><code>select current_date;</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-4">Table 2: </span>1 records</caption>
+<thead>
+<tr class="header">
+<th align="left">current_date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2021-06-03</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>MySQL中日期型数据的显示格式：YYYY-MM-DD（四位数的年-月份-日期）</p>
+</div>
+<div id="获取当前的系统时间" class="section level2">
+<h2>获取当前的系统时间</h2>
+<p>在MySQ中，其标准的语法结构都是：</p>
+<pre class="sql"><code>select current_time;</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-5">Table 3: </span>1 records</caption>
+<thead>
+<tr class="header">
+<th align="left">current_time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">03:13:55</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="获取当前系统日期与时间" class="section level2">
+<h2>获取当前系统日期与时间</h2>
+<pre class="sql"><code>select current_timestamp;</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-6">Table 4: </span>1 records</caption>
+<thead>
+<tr class="header">
+<th align="left">current_timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2021-06-03 03:13:55</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="r"><code>dbDisconnect(mydb) # 断开连接</code></pre>
+<blockquote>
+<p>R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。</p>
+</blockquote>
+</div>
+</div>
