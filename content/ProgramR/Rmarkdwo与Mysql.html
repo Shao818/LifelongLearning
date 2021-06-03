@@ -19,79 +19,22 @@ description: RSQLite 可以在R中方便的创建sqlite数据库，并进行检�
 
 <div id="rsqlite包的简要介绍" class="section level1">
 <h1>RSQLite包的简要介绍</h1>
+<blockquote>
+<p>R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。</p>
+</blockquote>
 <pre class="r"><code>pacman::p_load(DBI,RSQLite)
-
-mydb &lt;- dbConnect(SQLite(), &quot;&quot;)
-dbWriteTable(mydb, &quot;mtcars&quot;, mtcars)
-dbWriteTable(mydb, &quot;iris&quot;, iris)
-dbListTables(mydb)</code></pre>
-<pre><code>## [1] &quot;iris&quot;   &quot;mtcars&quot;</code></pre>
-<pre class="r"><code>dbGetQuery(mydb, &#39;SELECT * FROM mtcars LIMIT 5&#39;)</code></pre>
-<pre><code>##    mpg cyl disp  hp drat    wt  qsec vs am gear carb
-## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
-## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
-## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
-## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
-<pre class="r"><code>dbGetQuery(mydb, &#39;SELECT * FROM iris WHERE &quot;Sepal.Length&quot; &lt; 4.6&#39;)</code></pre>
-<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-## 1          4.4         2.9          1.4         0.2  setosa
-## 2          4.3         3.0          1.1         0.1  setosa
-## 3          4.4         3.0          1.3         0.2  setosa
-## 4          4.5         2.3          1.3         0.3  setosa
-## 5          4.4         3.2          1.3         0.2  setosa</code></pre>
-<pre class="sql"><code>SELECT * FROM iris WHERE &quot;Sepal.Length&quot; &lt; 4.6</code></pre>
-<div class="knitsql-table">
-<table>
-<caption><span id="tab:unnamed-chunk-3">Table 1: </span>5 records</caption>
-<thead>
-<tr class="header">
-<th align="right">Sepal.Length</th>
-<th align="right">Sepal.Width</th>
-<th align="right">Petal.Length</th>
-<th align="right">Petal.Width</th>
-<th align="left">Species</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">4.4</td>
-<td align="right">2.9</td>
-<td align="right">1.4</td>
-<td align="right">0.2</td>
-<td align="left">setosa</td>
-</tr>
-<tr class="even">
-<td align="right">4.3</td>
-<td align="right">3.0</td>
-<td align="right">1.1</td>
-<td align="right">0.1</td>
-<td align="left">setosa</td>
-</tr>
-<tr class="odd">
-<td align="right">4.4</td>
-<td align="right">3.0</td>
-<td align="right">1.3</td>
-<td align="right">0.2</td>
-<td align="left">setosa</td>
-</tr>
-<tr class="even">
-<td align="right">4.5</td>
-<td align="right">2.3</td>
-<td align="right">1.3</td>
-<td align="right">0.3</td>
-<td align="left">setosa</td>
-</tr>
-<tr class="odd">
-<td align="right">4.4</td>
-<td align="right">3.2</td>
-<td align="right">1.3</td>
-<td align="right">0.2</td>
-<td align="left">setosa</td>
-</tr>
-</tbody>
-</table>
-</div>
+#创建一个临时内存的数据库
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con &lt;- dbConnect(RSQLite::SQLite(), &quot;:memory:&quot;)
+dbListTables(con)</code></pre>
+<pre><code>## character(0)</code></pre>
+<pre class="r"><code>dbWriteTable(con, &quot;mtcars&quot;, mtcars)
+dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;mtcars&quot;</code></pre>
+<pre class="r"><code>dbListFields(con, &quot;mtcars&quot;)</code></pre>
+<pre><code>##  [1] &quot;mpg&quot;  &quot;cyl&quot;  &quot;disp&quot; &quot;hp&quot;   &quot;drat&quot; &quot;wt&quot;   &quot;qsec&quot; &quot;vs&quot;   &quot;am&quot;   &quot;gear&quot;
+## [11] &quot;carb&quot;</code></pre>
 </div>
 <div id="时间日期型数据" class="section level1">
 <h1>时间日期型数据</h1>
@@ -101,7 +44,7 @@ dbListTables(mydb)</code></pre>
 <pre class="sql"><code>select current_date;</code></pre>
 <div class="knitsql-table">
 <table>
-<caption><span id="tab:unnamed-chunk-4">Table 2: </span>1 records</caption>
+<caption><span id="tab:unnamed-chunk-4">Table 1: </span>1 records</caption>
 <thead>
 <tr class="header">
 <th align="left">current_date</th>
@@ -122,7 +65,7 @@ dbListTables(mydb)</code></pre>
 <pre class="sql"><code>select current_time;</code></pre>
 <div class="knitsql-table">
 <table>
-<caption><span id="tab:unnamed-chunk-5">Table 3: </span>1 records</caption>
+<caption><span id="tab:unnamed-chunk-5">Table 2: </span>1 records</caption>
 <thead>
 <tr class="header">
 <th align="left">current_time</th>
@@ -130,7 +73,7 @@ dbListTables(mydb)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">03:13:55</td>
+<td align="left">05:22:31</td>
 </tr>
 </tbody>
 </table>
@@ -141,7 +84,7 @@ dbListTables(mydb)</code></pre>
 <pre class="sql"><code>select current_timestamp;</code></pre>
 <div class="knitsql-table">
 <table>
-<caption><span id="tab:unnamed-chunk-6">Table 4: </span>1 records</caption>
+<caption><span id="tab:unnamed-chunk-6">Table 3: </span>1 records</caption>
 <thead>
 <tr class="header">
 <th align="left">current_timestamp</th>
@@ -149,14 +92,1137 @@ dbListTables(mydb)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">2021-06-03 03:13:55</td>
+<td align="left">2021-06-03 05:22:31</td>
 </tr>
 </tbody>
 </table>
 </div>
-<pre class="r"><code>dbDisconnect(mydb) # 断开连接</code></pre>
-<blockquote>
-<p>R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。</p>
-</blockquote>
+<pre class="r"><code>dbDisconnect(con) # 断开连接</code></pre>
+</div>
+</div>
+<div id="sql数据查询之跨表查询" class="section level1">
+<h1>SQL数据查询之跨表查询</h1>
+<pre class="r"><code>person&lt;-dbGetQuery(con, &quot;SELECT * FROM person&quot;)  
+person</code></pre>
+<pre><code>##    id       name age  sex  salary  hire_date dept_id
+## 1   1       alex  28 人妖   53000 2010-06-21       1
+## 2   2    wupeiqi  23   男    8000 2011-02-21       1
+## 3   3       egon  30   男    6500 2015-06-21       1
+## 4   4 jingnvshen  18   女    6680 2014-06-21       1
+## 5   5       歪歪  20   女    3000 2015-02-21       2
+## 6   6       星星  20   女    2000 2018-01-30       2
+## 7   7       格格  20   女    2000 2018-02-27       2
+## 8   8       周周  20   女    2000 2015-06-21       2
+## 9   9       月月  21   女    4000 2014-07-21       3
+## 10 10       安琪  22   女    4000 2015-07-15       3
+## 11 11     周明月  17   女    5000 2014-06-21       4
+## 12 12     苍老师  33   女 1000000 2018-02-21      NA</code></pre>
+<pre class="r"><code>dept&lt;-dbGetQuery(con,&quot;select * from dept&quot;)
+dept</code></pre>
+<pre><code>##   did  dname
+## 1   1 教学部
+## 2   2 销售部
+## 3   3 市场部
+## 4   4 人事部
+## 5   5 鼓励部</code></pre>
+<pre class="r"><code>pacman::p_load(DBI,RSQLite)
+#创建一个临时内存的数据库
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con &lt;- dbConnect(RSQLite::SQLite(), &quot;:memory:&quot;)
+dbListTables(con)</code></pre>
+<pre><code>## character(0)</code></pre>
+<pre class="r"><code>dbWriteTable(con, &quot;person&quot;,person)
+dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;person&quot;</code></pre>
+<pre class="r"><code>dbWriteTable(con, &quot;dept&quot;,dept)
+dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
+<pre class="sql"><code>select * from person</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-14">Table 4: </span>12 records</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="right">age</th>
+<th align="left">sex</th>
+<th align="right">salary</th>
+<th align="right">hire_date</th>
+<th align="right">dept_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>select * from person</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-15">Table 5: </span>12 records</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="right">age</th>
+<th align="left">sex</th>
+<th align="right">salary</th>
+<th align="right">hire_date</th>
+<th align="right">dept_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>select * from person,dept</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-16">Table 6: </span>60 records</caption>
+<thead>
+<tr class="header">
+<th align="right">id</th>
+<th align="left">name</th>
+<th align="right">age</th>
+<th align="left">sex</th>
+<th align="right">salary</th>
+<th align="right">hire_date</th>
+<th align="right">dept_id</th>
+<th align="right">did</th>
+<th align="left">dname</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">星星</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17561</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">格格</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">17589</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">周周</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">2000</td>
+<td align="right">16607</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">月月</td>
+<td align="right">21</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16272</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">安琪</td>
+<td align="right">22</td>
+<td align="left">女</td>
+<td align="right">4000</td>
+<td align="right">16631</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">周明月</td>
+<td align="right">17</td>
+<td align="left">女</td>
+<td align="right">5000</td>
+<td align="right">16242</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">苍老师</td>
+<td align="right">33</td>
+<td align="left">女</td>
+<td align="right">1000000</td>
+<td align="right">17583</td>
+<td align="right">NA</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>select * from person,dept where person.id = dept.did</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-17">Table 7: </span>5 records</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="right">age</th>
+<th align="left">sex</th>
+<th align="right">salary</th>
+<th align="right">hire_date</th>
+<th align="right">dept_id</th>
+<th align="right">did</th>
+<th align="left">dname</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>select * from person inner join dept  on person.id =dept.did;</code></pre>
+<div class="knitsql-table">
+<table>
+<caption><span id="tab:unnamed-chunk-18">Table 8: </span>5 records</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="right">age</th>
+<th align="left">sex</th>
+<th align="right">salary</th>
+<th align="right">hire_date</th>
+<th align="right">dept_id</th>
+<th align="right">did</th>
+<th align="left">dname</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">alex</td>
+<td align="right">28</td>
+<td align="left">人妖</td>
+<td align="right">53000</td>
+<td align="right">14781</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">教学部</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">wupeiqi</td>
+<td align="right">23</td>
+<td align="left">男</td>
+<td align="right">8000</td>
+<td align="right">15026</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="left">销售部</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">egon</td>
+<td align="right">30</td>
+<td align="left">男</td>
+<td align="right">6500</td>
+<td align="right">16607</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">市场部</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">jingnvshen</td>
+<td align="right">18</td>
+<td align="left">女</td>
+<td align="right">6680</td>
+<td align="right">16242</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="left">人事部</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">歪歪</td>
+<td align="right">20</td>
+<td align="left">女</td>
+<td align="right">3000</td>
+<td align="right">16487</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="left">鼓励部</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>

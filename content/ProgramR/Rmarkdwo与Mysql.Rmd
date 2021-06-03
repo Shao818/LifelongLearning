@@ -16,23 +16,29 @@ description: RSQLite 可以在R中方便的创建sqlite数据库，并进行检�
 
 # RSQLite包的简要介绍
 
+> R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。
+
 ```{r}
 pacman::p_load(DBI,RSQLite)
-
-mydb <- dbConnect(SQLite(), "")
-dbWriteTable(mydb, "mtcars", mtcars)
-dbWriteTable(mydb, "iris", iris)
-dbListTables(mydb)
-dbGetQuery(mydb, 'SELECT * FROM mtcars LIMIT 5')
+#创建一个临时内存的数据库
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbListTables(con)
 ```
 
 ```{r}
-dbGetQuery(mydb, 'SELECT * FROM iris WHERE "Sepal.Length" < 4.6')
+dbWriteTable(con, "mtcars", mtcars)
+dbListTables(con)
 ```
 
-```{sql, connection=mydb}
-SELECT * FROM iris WHERE "Sepal.Length" < 4.6
+```{r}
+dbListFields(con, "mtcars")
 ```
+
+
+
+
 
 # 时间日期型数据
 
@@ -41,7 +47,7 @@ SELECT * FROM iris WHERE "Sepal.Length" < 4.6
 
 在MySQ中，其标准的语法结构都是：
 
-```{sql, connection=mydb}
+```{sql, connection=con}
 select current_date;
 ```
 
@@ -51,20 +57,79 @@ MySQL中日期型数据的显示格式：YYYY-MM-DD（四位数的年-月份-日
 
 在MySQ中，其标准的语法结构都是：
 
-```{sql, connection=mydb}
+```{sql, connection=con}
 select current_time;
 ```  
 
 
 ## 获取当前系统日期与时间  
 
-```{sql, connection=mydb}
+```{sql, connection=con}
 select current_timestamp;
 ```
 
 ```{r}
-dbDisconnect(mydb) # 断开连接
+dbDisconnect(con) # 断开连接
 ```
 
-> R中连接数据库的包， 都依赖于DBI包, 除了RSQLite, 还有RMySQL, RPostgreSQL等连接其他数据库的包。
 
+# SQL数据查询之跨表查询
+
+
+```{r include=FALSE}
+pacman::p_load(RMySQL,RMariaDB,zeallot)
+con <- dbConnect(MariaDB(), host="", dbname="learning", user="root", password="Zh_xq1234@")#,host="127.0.0.1", port=3306
+```
+
+
+```{r}
+person<-dbGetQuery(con, "SELECT * FROM person")  
+person
+```
+
+```{r}
+dept<-dbGetQuery(con,"select * from dept")
+dept
+```
+
+
+```{r}
+pacman::p_load(DBI,RSQLite)
+#创建一个临时内存的数据库
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+dbListTables(con)
+```
+
+```{r}
+dbWriteTable(con, "person",person)
+dbListTables(con)
+```
+
+```{r}
+dbWriteTable(con, "dept",dept)
+dbListTables(con)
+```
+
+
+```{sql, connection=con,, max.print = 20}
+select * from person
+```
+
+```{sql, connection=con,, max.print = 20}
+select * from person
+```
+
+```{sql, connection=con,max.print = 100}
+select * from person,dept
+```
+
+```{sql, connection=con,max.print = 100}
+select * from person,dept where person.id = dept.did
+```
+
+
+```{sql, connection=con,max.print = 100}
+select * from person inner join dept  on person.id =dept.did;
+```
