@@ -16,6 +16,8 @@ weight: 0001
 description: 使用R语言绘图
 ---
 
+<font face="思源宋体 CN" >
+
 # 数据集概览  
 
 使用的数据集是R包内置的iris数据集，是由Edgar Anderson记录的3种鸢尾花形态数据。其中一个种类与另外两个种类是线性可分离的，后两个种类是非线性可分离的。
@@ -168,6 +170,7 @@ p
 
 
 
+
 ```{r}
 #图一：使用scale_color_manual函数
 ggplot(iris,aes(x = Sepal.Length,
@@ -289,3 +292,4 @@ ggsave(file = "test.pdf",
        height = 6)
 ```
 
+</font>
