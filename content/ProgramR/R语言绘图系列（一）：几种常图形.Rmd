@@ -1,0 +1,291 @@
+---
+author:
+  - 水滴
+title: 'R语言绘图系列（一）：几种常图形'
+date: 2021-06-08
+categories:
+  - R
+  - ggplot
+  - 绘图
+tags:
+  - R
+  - ggplot
+  - 绘图
+slug: figure
+weight: 0001
+description: 使用R语言绘图
+---
+
+# 数据集概览  
+
+使用的数据集是R包内置的iris数据集，是由Edgar Anderson记录的3种鸢尾花形态数据。其中一个种类与另外两个种类是线性可分离的，后两个种类是非线性可分离的。
+
+iris以鸢尾花的特征作为数据来源，常用在分类操作中。该数据集由3种不同类型的鸢尾花的各50个样本数据构成。其中的一个种类与另外两个种类是线性可分离的，后两个种类是非线性可分离的。  
+
+该数据集包含了4个属性：  
+①Sepal.Length（花萼长度），单位是cm；  
+②Sepal.Width（花萼宽度），单位是cm；   
+③Petal.Length（花瓣长度），单位是cm；   
+④Petal.Width（花瓣宽度），单位是cm；   
+⑤Species（种类）：Iris Setosa（山鸢尾）、Iris     Versicolour（杂色鸢尾），以及Iris Virginica（维吉尼亚鸢尾）。    
+
+
+```{r}
+head(iris)
+```
+
+
+我们用相同的数据，通过plot函数跟ggplot函数分别绘制散点图来简单理解一下两者的差异：  
+
+
+
+```{r}
+plot(iris$Sepal.Length,iris$Sepal.Width)
+```
+
+
+```{r}
+pacman::p_load(ggplot2,formatR)
+ggplot(data=iris,
+       aes(x=Sepal.Length,y=Sepal.Width))+
+  geom_point(color="darkred")
+```  
+
+
+从上述代码可以看出，ggplot绘图有以下两个特点：  
+(1)有明确的开始(以ggplot函数开始)与终止(一条语句一幅画) ；  
+(2)ggplot2语句可以理解成一条语句一幅画，然后通过图层叠加，叠加通过“+”号将绘图的语句连接起来。    
+
+# ggplot绘图
+
+##  绘制画布
+
+
+
+上面介绍的ggplot2绘图有明确的开始，即以ggplot函数作为开始的标志，那么ggplot()有什么用呢？
+
+```{r}
+usage(ggplot)
+```
+
+其中，data指的要绘图的数据集，它会被制定为绘图环境，载入之后就不需要写大量的$符号来提取data.frame里面的向量的操作。如果数据都是向量，那么也可不指定，但要在声明中标注data=NULL，否则会有不必要的报错。   
+
+## 数据与图形属性之间的映射关系称mapping。   
+
+ggplot对象的data存储了整个属性框的内容，而mapping则确定如何使用这些数据。图形的可视属性包括如形状、颜色、透明度等美学属性，确定美学属性与数据之间的对应关系一般用aes函数。常见的图形属性包括x、y、size、color、group.
+
+比如，当data=iris时，mapping= aes(x = Sepal.Length, y = Sepal.Width)表示将花 萼长度作为x轴变量，将花萼宽度作为y轴变量。如果需要将Species映射到形状或者颜色属性，可以添加shape=Species或者colour = Species. 使用ggplot函数绘制底层画布
+
+
+```{r}
+ggplot(data = iris, aes(x = Sepal.Length,
+                             y = Sepal.Width,
+                             colour = Species,
+                             shape = Species))+
+geom_point()
+```
+
+除了数据与映射之外，一个图层还应该至少包含位置、stat、position这三个图形属性。  
+
+##　几何对象　　
+
+几何对象简单来说就是采用展示数据的图形类型。如散点图、条形图等，ggplot2包提供了许多的图形类型供用户使用。
+
+| 几何对象函数   | 描述                           | 几何对象函数    | 描述                       |
+| -------------- | ------------------------------ | --------------- | -------------------------- |
+| geom_abline    | 线，由斜率和截距指定           | geom_jitter     | 点，自动添加了扰动         |
+| geom_area      | 面积图                         | geom_line       | 线                         |
+| geom_bar       | 条形图                         | geom_path       | 几何路径                   |
+| geom_bin2d     | 二维封箱的热图                 | geom_point      | 点                         |
+| geom_blank     | 空的几何对象，什么都不画       | geom_pointrange | 一条垂直线，线中间有一个点 |
+| geom_boxplot   | 箱线图                         | geom_polygon    | 多边形                     |
+| geom_contour   | 等高线图                       | geom_quantile   | 一组分位数线               |
+| geom_crossbar  | 类似于箱线图，但无触须和极值点 | geom_rect       | 二维长方形                 |
+| geom_density   | 密度图                         | geom_ribbon     | 彩虹图                     |
+| geom_density2d | 二维密度图                     | geom_rug        | 触须                       |
+| geom_errorbar  | 误差线                         | geom_segment    | 线段                       |
+| geom_errorbarh | 水平误差线                     | geom_smooth     | 平滑的条件均值             |
+| geom_freqploy  | 频率多边形                     | geom_step       | 阶梯图                     |
+| geom_hex       | 六边形图                       | geom_text       | 文本                       |
+| geom_histogram | 直方图                         | geom_tile       | 瓦片                       |
+| geom_hline     | 水平线                         |                 |                            |
+
+
+```{r}
+ggplot(data = iris)+   #绘制底层画布
+geom_point(aes(x = Sepal.Length,
+                y = Sepal.Width,
+                  colour = Species,
+                      shape = Species))
+```
+
+## 统计变换   
+
+统计类型stat是指对数据所应用的统计类型和方法。  
+上述代码中没有指定统计类型，但自动获得identity，因为ggplot2会默认为每一种几何类型都指定一种默认的统计类型，反之亦然。其中stat_identity表示不做任何的统计变换。运行代码如下：  
+
+```{r}
+ggplot(iris)+
+  geom_bar(aes(x = Sepal.Length,
+               stat = "bin", 
+               binwidth = 0.5))
+```
+
+## 标尺设置
+
+`aes`函数设定了数据与图形属性的映射关系，但是数据怎么映射为属性则是标尺(Scale) 的功能。
+对于任何一个图形属性，如x，y，alpha，color，fill，linetype，shape，size等，ggplot2都提供以下4种标尺：  
+(1)scale_*_continuous：将数据的连续取值映射为图形属性的取值   
+(2)scale_*_discrete：将数据的离散取值映射为图形属性的取值    
+(3)scale_*_identity：将数据的值作为图形属性的取值      
+(4)scale_*_mannual：将数据的离散取值作为手工指定的图形属性的取值    
+
+随机从iris数据集的150个样本中抽取100个样本，并绘制条形图以反映100个样本中各个鸢尾花，并绘制条形图以反映100个样本中各个鸢尾花种类的数量情况，然后提供修改标尺参数做前后对比图。代码如下：   
+
+```{r}
+set.seed(1234)
+my_iris <- iris[sample(1:150,100,replace = FALSE),]
+p <- ggplot(my_iris) + 
+   geom_bar(aes(x = Species,fill = Species))
+p 
+
+```
+
+```{r}
+#修改标尺参数前的图形
+p <- p +
+   scale_fill_manual(
+   values = c("orange","olivedrab","navy"),    #颜色设置
+   breaks = c("setosa","versicolor","virginica"),  #图例和轴要显示的分段点
+   name = "my_Species",   #图例和轴使用的名称
+   labels = c("set","ver","vir")   #修改标尺参数后的图
+)  
+p
+```
+
+
+可以使用scale_color_manual函数或scale_color_brewer函数修改图形的颜色。比如对iris数据集中的Sepal.Length与Sepal.Width的散点图分别使用scale_color_manual函数或scale_color_brewer函数修改图形颜色，代码如下：  
+
+
+
+```{r}
+#图一：使用scale_color_manual函数
+ggplot(iris,aes(x = Sepal.Length,
+                y = Sepal.Width,
+                colour = Species))+
+  scale_color_manual(values = c("orange","olivedrab","navy"))+
+  geom_point(size = 2)
+```
+
+
+```{r}
+#图二：使用scale_color_brewer函数
+ggplot(iris,aes(x = Sepal.Length,
+                y = Sepal.Width,
+                colour = Species))+
+  scale_color_brewer(palette = "Set1") +
+  geom_point(size = 2)
+```
+
+## 坐标系的转换  
+
+
+ggplot2默认的坐标系是笛卡尔坐标系    
+(1)可以使用以下方法指定坐标系的取值范围coord_cartesian(xlim = c(0,5),ylim = c(0.3))。    
+(2)如果要让x轴跟y轴交换位置，则可以使用coord_flip函数。     
+(3)如果要使用角度坐标系，可以使用以下方法进行转换：coord_polar(theta = "x",start =0,direction = 1)     ，这里theta指定角度对应的变量，start指定离12点钟方向的偏离值若direction = 1，则表示顺时针方向；若direction = -1，则表示逆时针方向。    
+
+```{r}
+# 1.饼状图 = 堆叠长条图+角度坐标系
+pie <-ggplot(my_iris,aes(x = factor(1),
+                         fill = Species))+
+  geom_bar(width = 1) #堆叠长条图
+  pie + coord_polar(theta = "y")
+```
+
+```{r}
+# 2. 靶心图 = 饼状图 + polar coordinates
+pie + coord_polar()
+```
+
+```{r}
+#3. 锯齿图 = 柱状图 + polar coordinates
+cxc = ggplot(my_iris,aes(x = Species))+
+  geom_bar(width = 1,
+          colour = "black")
+
+```
+
+
+
+```{r}
+cxc+coord_polar()
+```
+
+## 分面  
+
+分面就是分组绘图，即根据定义的规则将数据分为多个子集，每个子集按照一定的规则单独绘图，排布在一个页面上。ggplot2提供两种分面函数：facet_grid函数和facet_wrap函数。   
+
+
+### facet_grid函数   
+
+facet_grid函数的原型如下：  
+
+```{r}
+usage(facet_grid)
+```
+
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+my_iris1 <-iris %>% gather(feature_name,
+                           feature_value,
+                           one_of(c("Sepal.Length",
+                                    "Sepal.Width",
+                                    "Petal.Length",
+                                    "Petal.Width"))) #数据变换
+my_iris1
+
+ggplot(my_iris1)+
+  geom_violin(aes(x = Species,
+                  y = feature_value))+ #绘制小提琴图
+  facet_grid(feature_name ~ Species,
+             scales = "free") #分面
+```
+
+### facet_wrap函数
+
+facet_wrap函数会生成一个动态调整的一维布局，根据“~位置变量1+位置变量2+...”来确定每个子集的位置，先逐行排列，放不下了再移到下一行。以my_iris1数据集作为例子，操作代码如下：  
+
+```{r}
+ggplot(my_iris1)+
+  geom_violin(aes(x = Species,
+                  y = feature_value))+
+  facet_wrap(~feature_name + Species,
+             scales = "free")
+```
+
+# 保存图形
+
+ggplot2包提供了ggsave函数进行图形保存
+格式如下：
+
+
+```{r}
+usage(ggsave)
+```
+
+其中，filename为保存的文件名和路径，width为图像宽度，height为图像高度，例如在当前工作目录下生成一个名为“test”的PDF图形，代码如下：
+
+```{r}
+ggplot(iris,aes(x = Sepal.Length,
+                y = Sepal.Width,
+                colour = Species))+
+  geom_point(size = 2)
+ggsave(file = "test.pdf",
+       width = 10,
+       height = 6)
+```
+

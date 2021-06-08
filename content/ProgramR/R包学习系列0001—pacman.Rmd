@@ -1,0 +1,286 @@
+---
+author:
+  - 水滴
+title: 'R包学习系列0001:pacman'
+date: 2021-06-08
+categories:
+  - R包
+  - R包管理
+  - pacman
+tags:
+  - R包
+  - R包管理
+  - pacman
+slug: pacman
+weight: 0002
+description: R包学习系列用以记录自己的R包学习历程，方便在需要的时候温故知新和成为工作学习的有力工具。
+---
+
+<font face="思源宋体 CN" >
+
+`pacman`包是一个整合了基础包`library`相关函数的包，用于更方便地对R包进行管理。该包可以添加到`.Rprofile`以便于显式地指定该包的函数，增加工作效率。其中关键函数p_load可以很好地提升论坛提问与博文，它会自动加载包，如果没有找到，会自动安装缺失包。
+
+`pacman`包中的函数都以`p_xxx`的格式存在，其中`xxx`是函数执行的功能。比如`p_load`允许用户载入一个或多个包，用于替换`library`或`require`函数，如果包不在本地存在，它会自动为你安装。对于大多数的pacman函数，参数不需要指定为字符串。  
+
+# 包的基本管理
+
+## 速查表  
+
+
+
+
+| Pacman 函数         | Base 等价                              | 描述               |
+| ------------------- | -------------------------------------- | ------------------ |
+| `p_load`            | `install.packages` + `library`         | 载入与安装包       |
+| `p_install`         | `install.packages`                     | 从CRAN安装包       |
+| `p_load_gh`         | NONE                                   | 载入和安装Github包 |
+| `p_install_gh`      | NONE                                   | 从Github安装包     |
+| `p_install_version` | `install.packages` &  `packageVersion` | 安装包的最小版本   |
+| `p_temp`            | NONE                                   | 暂时安装包         |
+| `p_unload`          | `detach`                               | 从搜索路径卸下包   |
+| `p_update`          | `update.packages`                      | 更新过期包         |
+
+
+##  仅仅安装包
+
+`p_load`是通常使用的工具，可以安装、加载和更新包。函数形式如下
+
+```{r}
+library("pacman")
+p_load(formatR)
+usage(p_load)
+```
+`...`参数传入包名，比如你需要用下面的方式安装一系列包：
+
+
+```
+packs <- c("XML", "devtools", "RCurl", "fakePackage", "SPSSemulate")
+success <- suppressWarnings(sapply(packs, require, character.only = TRUE))
+install.packages(names(success)[!success])
+sapply(names(success)[!success], require, character.only = TRUE)
+```
+
+使用pacman可以简化为：  
+
+```
+pacman::p_load(XML, devtools, RCurl, fakePackage, SPSSemulate)
+```
+## 仅仅安装包  
+
+
+有些用户想仅仅安装包，这可以使用`p_install`（别名为`p_get`）。
+
+```
+p_install(dbConnect, qdap, reports)
+```
+## 从Github安装和载入包 
+
+pacman提供了从Github上安装和载入包的函数，其实就是基于devtools包的函数：
+
+```
+p_install_gh(c("Dasonk/githubSearch", "trinker/regexr", "hadley/httr@v0.4"))
+```
+
+
+
+```
+p_load_gh("Dasonk/githubSearch", "trinker/regexr", "hadley/httr@v0.4")
+```
+
+
+## 安装特定版本的包  
+
+有时候需要安装特定版本的包，可以使用：
+
+```
+p_install_version(
+    c("pacman", "testthat"),
+    c("0.2.0", "0.9.1")
+)
+```
+
+## 暂时安装 
+
+```{r}
+p_temp(aprof)
+
+p_isinstalled(aprof)
+p_isloaded(aprof)
+```
+
+## 卸载
+`p_temp`允许用户暂时安装一个包，线程一关闭即消失：  
+
+另一个好用的函数是可以将某个包从当前路径卸载（不是删除），但基本的R包不能被卸载（R启动就用到的包）。
+
+格式如下：
+
+```{r}
+usage(p_unload)
+```
+
+```{r}
+p_load(lattice)
+p_isloaded(lattice)
+p_unload(lattice)
+p_isloaded(lattice)
+```
+
+## 更新包
+
+```{r}
+usage(p_update)
+```
+
+有时候想只查询，不实际更新：  
+
+```{r}
+p_update(FALSE)
+```
+
+## 删除包
+
+```{r}
+usage(p_delete)
+```
+
+
+## 列出已加载包   
+
+```{r}
+usage(p_loaded)
+```
+
+
+- 返回除了基础包的其他包，下面可以返回所有包：  
+
+```{r}
+p_loaded(all = TRUE)
+```
+
+- 检查包：
+
+```{r}
+p_loaded(base, MASS)
+```
+
+
+## 测试某包是否加载   
+
+- 用法：
+
+```{r}
+usage(p_isloaded)
+```
+
+
+
+```{r}
+p_isloaded(methods, stats)
+```
+
+
+# 本地包信息
+
+## 速查表  
+
+
+
+| `p_author`                         | `packageDescription`                               | Author of Package              |
+| ---------------------------------- | -------------------------------------------------- | ------------------------------ |
+| `p_citation`                       | `citation`                                         | Citation for Package           |
+| `p_data`                           | `data`                                             | List Package Data Sets         |
+| `p_depends` &  `p_depends_reverse` | `package_dependencies` &  `dependsOnPkgs`          | 包依赖或反向依赖               |
+| `p_exists`                         | `available.packages` &  `list.files` + `.libPaths` | 检查包是否存在于本地或者是CRAN |
+| `p_functions`                      | `loadNamespace` + `getNamespaceExports`            | 包函数                         |
+| `p_help`                           | `help`                                             | HTML/PDF Manuals查看           |
+| `p_information`                    | `packageDescription`                               | 包信息                         |
+| `p_interactive`                    | NONE                                               | 交互式搜索包                   |
+| `p_news`                           | `news`                                             | 包NEWS                         |
+| `p_version`                        | `packageVersion` & `R.Version`                     | 包版本                         |
+| Pacman Function                    | Base Equivalent                                    | 描述                           |
+| `p_vignette`                       | `browseVignettes`                                  | 包 Vignettes查看               |
+
+
+## 检测操作系统
+
+
+```{r}
+p_detectOS()
+```
+
+## 包的引用信息
+
+
+
+
+```{r}
+p_cite(ggplot2)
+```
+
+## 检查在CRAN上是否可以获取ggplot2包  
+
+
+```{r}
+p_iscran(ggplot2)
+```
+
+## 输出CRAN上可以获取的R包 
+
+
+```{r}
+p_cran()
+```
+
+
+
+
+## 在CRAN上是否存在ggplot2包 
+
+
+```{r}
+p_exists(ggplot2, F)
+```
+
+
+## 在本地库中是否存在ggplot2包 
+
+
+```{r}
+p_exists(ggplot2, T)
+```
+
+## 输出ggplot2包中的所有函数 
+
+
+```{r}
+p_funs(ggplot2) 
+```
+
+## 从网络上获取ggplot2包的帮助文件
+
+
+```{r eval=FALSE, include=FALSE}
+p_help(ggplot2, web = TRUE)
+```
+
+## 输出ggplot2包的相关信息 
+
+
+```{r}
+p_info(ggplot2)
+```
+
+
+
+## 输出ggplot2包中的数据集
+
+
+```{r}
+p_data(ggplot2)  
+```
+
+
+
+<font size=2>
+
