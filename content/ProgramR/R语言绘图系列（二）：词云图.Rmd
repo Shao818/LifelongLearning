@@ -57,7 +57,7 @@ wordcloud2(demoFreqC, size = 0.8)
 
 
 ```{r}
-p1<-wordcloud2(demoFreqC, size = 0.5);p1
+wordcloud2(demoFreqC, size = 0.5)
 ```
 
 ## 调整词云图的形状  
