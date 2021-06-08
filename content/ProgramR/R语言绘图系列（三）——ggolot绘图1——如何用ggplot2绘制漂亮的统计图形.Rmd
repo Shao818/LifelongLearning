@@ -624,16 +624,16 @@ ggplot(chic, aes(x = date, y = temp)) +
 ```{r, fig.showtext=TRUE,fig.align="center"}
 library(showtext)
 font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
-theme_set(theme_bw(base_size = 12, base_family = "Roboto Condensed"))
+theme_set(theme_bw(base_size = 12, base_family = "SourceHanSerifCN-Light"))
 ```
 
 
-##　改变多行文本之间的空间(间距)　　
+## 改变多行文本之间的空间(间距)　　  
 
 
 当标题有多行文本的时候，使用 lineheight 参数可以改变行距：
 
-```{r}
+```{r, fig.showtext=TRUE,fig.align="center"}
 ggplot(chic, aes(x = date, y = temp)) +
   geom_point(color = "firebrick") +
   labs(x = "Year", y = "Temperature (°F)") +

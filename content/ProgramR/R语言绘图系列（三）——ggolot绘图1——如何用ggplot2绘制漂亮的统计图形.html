@@ -374,7 +374,7 @@ ggplot(chic_high, aes(x = temp, y = o3)) +
   labs(x = &quot;Temperature (°F)&quot;, y = &quot;Temperature (°F) + random noise&quot;) +
   xlim(c(0, 100)) + ylim(c(0, 150)) +
   coord_fixed()</code></pre>
-<pre><code>## Warning: Removed 50 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
 <p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>x 轴上的 0-50 与 y 轴的 0-50 长度是相同的，拥有相同的比例。</p>
 <p>而 ratio 大于 1 时 y 轴上的单位比 x 轴上的单位长，反之则短。</p>
@@ -383,7 +383,7 @@ ggplot(chic_high, aes(x = temp, y = o3)) +
   labs(x = &quot;Temperature (°F)&quot;, y = &quot;Temperature (°F) + random noise&quot;) +
   xlim(c(0, 100)) + ylim(c(0, 150)) +
   coord_fixed(ratio = 1/5)</code></pre>
-<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 54 rows containing missing values (geom_point).</code></pre>
 <p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>
 <div id="使用函数来改变标签" class="section level2">
@@ -477,56 +477,17 @@ ggplot(chic, aes(x = date, y = temp)) +
 <p>你也可以为所有的文本元素设置非默认字体，下面将 Roboto Condensed 字体设置作为所有图形的默认字体：</p>
 <pre class="r"><code>library(showtext)
 font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
-theme_set(theme_bw(base_size = 12, base_family = &quot;Roboto Condensed&quot;))</code></pre>
-<p>##　改变多行文本之间的空间(间距)　　</p>
+theme_set(theme_bw(base_size = 12, base_family = &quot;SourceHanSerifCN-Light&quot;))</code></pre>
+</div>
+<div id="改变多行文本之间的空间间距" class="section level2">
+<h2>改变多行文本之间的空间(间距)　　</h2>
 <p>当标题有多行文本的时候，使用 lineheight 参数可以改变行距：</p>
 <pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
   geom_point(color = &quot;firebrick&quot;) +
   labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
   ggtitle(&quot;Temperatures in Chicago\nfrom 1997 to 2001&quot;) +
   theme(plot.title = element_text(lineheight = .8, size = 16))</code></pre>
-<pre><code>## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): Windows字体数据
-## 库里没有这样的字体系列
-
-## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): Windows字体数据
-## 库里没有这样的字体系列
-
-## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): Windows字体数据
-## 库里没有这样的字体系列</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列
-
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列</code></pre>
-<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-## Windows字体数据库里没有这样的字体系列</code></pre>
-<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>本期完整代码及示例数据下载：
 <a href="https://osf.io/3kbw5/" class="uri">https://osf.io/3kbw5/</a></p>
 <p>最后，我们诚挚地邀请对ggplot2或R语言绘图感兴趣的同学可以加入我们，共同完成后续内容的整理。如有意向，可以联系统计联盟小助手微信：<a href="mailto:Hpa201904或者邮箱uunotebook@163.com" class="email">Hpa201904或者邮箱uunotebook@163.com</a>。</p>
