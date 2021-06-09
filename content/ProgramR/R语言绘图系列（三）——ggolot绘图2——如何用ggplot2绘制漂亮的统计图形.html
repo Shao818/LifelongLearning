@@ -1,0 +1,396 @@
+---
+author:
+  - 水滴
+title: 'R语言绘图系列（三）：ggolot绘图2：图例、背景与网格线'
+date: 2021-06-09
+categories:
+  - R
+  - 绘图
+  - ggplot
+  - 坐标轴
+tags:
+  - R
+  - 绘图
+  - ggplot
+  - 坐标轴
+slug: ggolot_2
+weight: 0004
+description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如何调整图形坐标轴的内容和外观、修改图形标题等内容。
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p><font face="思源宋体 CN" ></p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210609212856.png" /></p>
+<blockquote>
+<p>R语言绘图系列（三）：ggolot绘图1：基本介绍、坐标轴与标题。</p>
+</blockquote>
+<div id="图例" class="section level1">
+<h1>图例</h1>
+<div id="添加图例" class="section level2">
+<h2>添加图例</h2>
+<p>当数据中包含分组变量，并按照分组变量绘制图形时，通常都需要添加一个图例来标识分组数据。本例数据中，我们将根据 season 变量给图像上色，用 ggplot 的方式来表达就是：我们将变量 season 映射到 color 美学。</p>
+<p>关于将变量映射到美学的一点解释：</p>
+<p>Aesthetics 美学</p>
+<p>美学描述了给定图形元素的各个方面，如位置、形状、大小、颜色、线条等：</p>
+<div class="figure">
+<img src="https://gitee.com/shao818/Figure/raw/master/20210609213002.png" alt="" />
+<p class="caption">Aesthetics 美学</p>
+</div>
+<p>除了上图所示的例子之外，还可能在数据可视化中遇到许多其他的美学问题。例如，如果我们想要显示文本，我们可能必须指定字体类型，字体名称，字体大小等，如果图形对象重叠，我们可能必须指定它们是否部分透明等。所有的美学都可以分为两类：一类可以表示连续数据，另一类不能。在上图的例子中，位置、大小、颜色和线条宽度可以表示连续的数据，而形状和线类型通常只能表示离散数据。</p>
+<ul>
+<li>Scale 尺度</li>
+</ul>
+<p>要将数据值映射到美学上，我们需要指定哪些数据值对应于哪些特定的美学值。例如，如果我们的图形有一个 x 轴，那么我们需要指定哪些数据值落在沿这个轴的特定位置上。类似地，我们可能需要指定哪些数据值由特定的形状或颜色表示。数据值和美学值之间的映射是通过尺度 scale 创建的，scale 定义了数据和美学之间的独特映射。</p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210609213127.png" /></p>
+<p>Scale 连接了数据值和美学值，上图中的数字 1 到 4 分别被映射到了一个位置尺度，形状尺度和颜色尺度，对于每一个尺度，每个数字对应一个唯一的位置，形状或颜色。最重要的是，尺度必须是一对一的，即对于每个特定的数据值存在一个美学值，反之亦然。如果一个尺度不是一对一的，那么得到的图形就会变得模糊。</p>
+<p>首先，aes 选定了映射到各个美学属性的数据（变量）；然后，scale 将数据映射到真正的图形元素。如下面的代码：</p>
+<pre class="r"><code>pacman::p_load(tidyverse, colorspace, corrr,  cowplot, 
+   ggdark, ggforce, ggrepel, ggridges, ggsci, 
+    ggtext, ggthemes, grid, gridExtra, patchwork,
+    rcartocolor, scico, showtext, shiny, 
+    plotly, highcharter, echarts4r)</code></pre>
+<p>aes 中的 fill = time 只是指定了映射到 fill （填充色）的数据是 Lunch 和 Dinner，也就是将 Lunch 的数据映射到一种颜色，将 Dinner 的数据映射为另一种颜色。而 scale 负责将 Lunch 的数据映射为红色，将 Dinner 的数据映射为青色，如下图所示：</p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210609214007.png" /></p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210609214021.png" /></p>
+<p>代码中之所以没有出现 scale 的部分，是因为 ggplot2 有默认的映射，这些已经自动完成了。而如果你想要手动修改一些图形元素的映射时，则需要调用各种各样的 scale 函数，有许多不同类型的 scale，下面是一些常见的：</p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210609214112.png" /></p>
+<p>回归正题，ggplot2 在将分组变量映射到美学元素时，会自动添加一个图例：</p>
+<pre class="r"><code># 文件置于工作目录下
+chic &lt;- readr::read_csv(&quot;chicago-nmmaps.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   city = col_character(),
+##   date = col_date(format = &quot;&quot;),
+##   death = col_double(),
+##   temp = col_double(),
+##   dewpoint = col_double(),
+##   pm10 = col_double(),
+##   o3 = col_double(),
+##   time = col_double(),
+##   season = col_character(),
+##   year = col_double()
+## )</code></pre>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<blockquote>
+<p>默认情况下图例标题 season 是我们在 color 参数中指定的。</p>
+</blockquote>
+</div>
+<div id="关闭图例" class="section level2">
+<h2>关闭图例</h2>
+<p>如果不需要图例，可以这样进行删除：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>你也可以根据具体情况使用 guides(color = “none”) 或 scale_color_discrete (guide = “none”) 删除特定的图例，同时保留一些其他的。例如，我们可以保留形状的图例，删除颜色的图例：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season, shape = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  guides(color = &quot;none&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="移除图例标题" class="section level2">
+<h2>移除图例标题</h2>
+<p>删除图例上方的标题：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.title = element_blank())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>也可以通过设置图例标题名为 NULL ，或者通过 scale_color_discrete(name = NULL) or labs(color = NULL) 来删除图例标题：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  scale_color_discrete(name = NULL)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  labs(color = NULL)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="改变图例位置" class="section level2">
+<h2>改变图例位置</h2>
+<p>默认情况下图例会放在图形右边，如果你不想把图例放在右边，可以使用 theme 函数中的 legend.position 参数进行修改，可选项有：top，right（默认），bottom 和 left。</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.position = &quot;top&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>也可以通过指定一个相对 x 和 y 坐标范围从 0 (左或下)到 1 (右或上) 的矢量来将图例放置在面板中：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = NULL) +
+  theme(legend.position = c(.15, .15),
+        legend.background = element_rect(fill = &quot;transparent&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<blockquote>
+<p>同时这里也修改了默认的白色背景为透明背景，以保证图例不会遮挡任何数据点</p>
+</blockquote>
+</div>
+<div id="改变图例方向" class="section level2">
+<h2>改变图例方向</h2>
+<p>正如你看到的，图例的方向默认是竖直的，但当你选择将图例放在底部或顶部时，也可以将图例水平放置：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.position = c(.5, .97), legend.background = element_rect(fill = &quot;transparent&quot;)) +
+  guides(color = guide_legend(direction = &quot;horizontal&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="改变图例标题的风格" class="section level2">
+<h2>改变图例标题的风格</h2>
+<p>图例标题的外观可以通过调整主题元素 legend.title 来改变：</p>
+<pre class="r"><code>library(showtext)
+font_add(&quot;SourceHanSerifCN-Light&quot;, &quot;SourceHanSerifCN-Light.otf&quot;)
+ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.title = element_text(family = &quot;SourceHanSerifCN-Light&quot;, color = &quot;chocolate&quot;,
+                                    size = 14, face = &quot;bold&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="改变图例标题内容" class="section level2">
+<h2>改变图例标题内容</h2>
+<p>修改图例标题内容的最简单方法是 labs() 函数：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = &quot;Seasons\nindicated\nby colors:&quot;) +
+  theme(legend.title = element_text(family = &quot;SourceHanSerifCN-Light&quot;, color = &quot;chocolate&quot;,
+                                    size = 14, face = &quot;bold&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>关于图例的更多细节可以通过 scale_color_discrete(name = ‘title’) 或 guides(color = guide_legend(‘title’)) 进行修改：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.title = element_text(family = &quot;SourceHanSerifCN-Light&quot;, color = &quot;chocolate&quot;,
+                                    size = 14, face = &quot;bold&quot;)) +
+  scale_color_discrete(name = &quot;Seasons\nindicated\nby colors:&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="改变图例中的元素顺序" class="section level2">
+<h2>改变图例中的元素顺序</h2>
+<p>对于图例中各个元素的排序，更改时可以通过改变变量 season 的水平来实现：</p>
+<pre class="r"><code>chic$season &lt;-
+  factor(chic$season, levels = c(&quot;Winter&quot;, &quot;Spring&quot;, &quot;Summer&quot;, &quot;Autumn&quot;))
+ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="改变图例标签" class="section level2">
+<h2>改变图例标签</h2>
+<p>使用月份来替换季节 season 作为图例标签的内容，通过 scale_color_discrete() 函数来提供一个名称向量：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  scale_color_discrete(name = &quot;Seasons:&quot;, labels = c(&quot;Mar—May&quot;, &quot;Jun—Aug&quot;, &quot;Sep—Nov&quot;, &quot;Dec—Feb&quot;)) +
+  theme(legend.title = element_text(
+    family = &quot;SourceHanSerifCN-Light&quot;, color = &quot;chocolate&quot;, size = 14, face = 2 ))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="更改图例框的背景颜色" class="section level2">
+<h2>更改图例框的背景颜色</h2>
+<p>使用 legend.key() 函数中的 element_rect 进行修改</p>
+<p>rect 设置主要用于设置图例和面板，主要参数如下：</p>
+<pre><code>element_rect(fill = NULL, colour = NULL, size = NULL, linetype = NULL, color = NULL)
+
+</code></pre>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.key = element_rect(fill = &quot;darkgoldenrod1&quot;),
+        legend.title = element_text(family = &quot;SourceHanSerifCN-Light&quot;, color = &quot;chocolate&quot;,
+size = 14, face = 2)) +
+  scale_color_discrete(&quot;Seasons:&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="改变图例符号的大小" class="section level2">
+<h2>改变图例符号的大小</h2>
+<p>默认情况下图例中的点的大小可能会看不清楚，特别是没有方框时。可以使用 guides 进行调整：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(legend.key = element_rect(fill = NA),
+        legend.title = element_text(color = &quot;chocolate&quot;, size = 14, face = 2)) +
+  scale_color_discrete(&quot;Seasons:&quot;) +
+  guides(color = guide_legend(override.aes = list(size = 6)))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="在图例上留下一个图层" class="section level2">
+<h2>在图例上留下一个图层</h2>
+<p>假设你有两个不同的 geoms 映射到同一个变量。例如，颜色作为同一数据的 point 图层和 rug 图层的美学。默认情况下，图例将同时包含点和线：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  geom_rug()</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>可以使用 show.legend = FALSE 来关闭其中一个图层（此处为 rug 图层）：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = season)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  geom_rug(show.legend = FALSE)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="手动添加图例项" class="section level2">
+<h2>手动添加图例项</h2>
+<p>除非你将美学属性（颜色，大小等）映射给了一个变量，否则 ggplot2 不会自动地添加一个图例。但有时我们想要手动添加一个图例，这样你就能清楚地知道你在画什么：
+这是一个默认图像：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = o3)) +
+  geom_line(color = &quot;gray&quot;) +
+  geom_point(color = &quot;darkorange2&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Ozone&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p>我们可以通过将 guide 映射到变量来强制生成图例。我们使用 aes() 映射线和点，但不是映射到数据集中的变量，而是映射到单个字符串（这样我们为每个字符串只获得一种颜色）。</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = o3)) +
+  geom_line(aes(color = &quot;line&quot;)) +
+  geom_point(aes(color = &quot;points&quot;)) +
+  labs(x = &quot;Year&quot;, y = &quot;Ozone&quot;) +
+  scale_color_discrete(&quot;Type:&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>现在已经比较接近了，但这还不是我们想要的。我们想要灰色和红色！为了更改颜色，需要使用 scale_color_manual() 函数，同时我们使用 guide() 函数修改图例美学：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = o3)) +
+  geom_line(aes(color = &quot;line&quot;)) +
+  geom_point(aes(color = &quot;points&quot;)) +
+  labs(x = &quot;Year&quot;, y = &quot;Ozone&quot;) +
+  scale_color_manual(name = NULL,  guide = &quot;legend&quot;,
+                     values = c(&quot;points&quot; = &quot;darkorange2&quot;,  &quot;line&quot; = &quot;gray&quot;)) +
+  guides(color = guide_legend(override.aes = list(linetype = c(1, 0),  shape = c(NA, 16))))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+</div>
+<div id="使用其它图例风格" class="section level2">
+<h2>使用其它图例风格</h2>
+<p>正如前面的几个例子，分类变量（如 season）的默认图例是 guide_legend()，如果你将一个连续变量映射到美学，ggplot2 默认情况下不会使用 guide_legend()，而是使用 guide_colorbar()(或 guide_colourbar)：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = temp)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = &quot;Temperature (°F)&quot;)</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p>然而，通过使用 guide_legend()，你可以强制图例在给定的断点数目中显示离散的颜色，就像分类变量的情况一样：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = temp)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = &quot;Temperature (°F)&quot;) +
+  guides(color = guide_legend())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p>你也可以使用 binned 颜色图例：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = temp)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = &quot;Temperature (°F)&quot;) +
+  guides(color = guide_bins())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p>或者离散颜色条的 binned 图例：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp, color = temp)) +
+  geom_point() +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;, color = &quot;Temperature (°F)&quot;) +
+  guides(color = guide_colorsteps())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+</div>
+<div id="背景与网格线" class="section level1">
+<h1>背景与网格线</h1>
+<div id="修改网格线的美学属性" class="section level2">
+<h2>修改网格线的美学属性</h2>
+<p>网格线分为两种：表示刻度的网格线（主网格线）和网格线之间的小网格线（副网格线）。网格线可以通过修改 panel.grid 的默认值来更改，或为每一组网格线使用 panel.grid.major（主网格线）和 panel.grid.minor（副网格线）：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.grid.major = element_line(color = &quot;gray10&quot;, size = .5),
+        panel.grid.minor = element_line(color = &quot;gray70&quot;, size = .25))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>你甚至可以为所有四个不同的级别的网格线（x/y轴主、副网格线）进行分别修改：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.grid.major = element_line(size = .5, linetype = &quot;dashed&quot;),
+        panel.grid.minor = element_line(size = .25, linetype = &quot;dotted&quot;),
+        panel.grid.major.x = element_line(color = &quot;red1&quot;),
+        panel.grid.major.y = element_line(color = &quot;blue1&quot;),
+        panel.grid.minor.x = element_line(color = &quot;red4&quot;),
+        panel.grid.minor.y = element_line(color = &quot;blue4&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p>当然，你可以删除网格线：</p>
+<div id="删除副网格线" class="section level3">
+<h3>删除副网格线</h3>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.grid.minor = element_blank())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+</div>
+<div id="删除全部网格线" class="section level3">
+<h3>删除全部网格线</h3>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.grid = element_blank())</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p>此外，你还可以定义主要和次要网格线之间的间断：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  scale_y_continuous(breaks = seq(0, 100, 10), minor_breaks = seq(0, 100, 2.5))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+</div>
+</div>
+<div id="改变面板背景颜色" class="section level2">
+<h2>改变面板背景颜色</h2>
+<p>为了改变面板区域的背景颜色（填充），需要调整主题元素 panel.background：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;#1D8565&quot;, size = 2) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.background = element_rect( fill = &quot;#64D2AA&quot;, color = &quot;#64D2AA&quot;, size = 2))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p>注意，即使我们指定了面板背景的轮廓，它的真实颜色也没有改变。这是因为在paneal.ground 的顶部还有一个图层，即 panel.border。确保使用一个透明的填充，否则你的数据隐藏在这个图层后面。</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;#1D8565&quot;, size = 2) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.border = element_rect(fill = &quot;#64D2AA99&quot;, color = &quot;#64D2AA&quot;, size = 2))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+</div>
+<div id="改变图像的背景颜色" class="section level2">
+<h2>改变图像的背景颜色</h2>
+<p>类似地，为了改变 plot 区域的背景颜色填充，我们需要修改 plot.background 的主题元素：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(plot.background = element_rect(fill = &quot;gray60&quot;, color = &quot;gray30&quot;, size = 2))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(plot.background = element_rect(fill = &quot;gray60&quot;, color = &quot;gray30&quot;, size = 2))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p>在 panel.background 和 plot.background 中设置相同的颜色来实现一个独特的背景颜色，或者设置面板的背景填充为 transparent 或 NA：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(panel.background = element_rect(fill = NA),
+        plot.background = element_rect(fill = &quot;gray60&quot;,  color = &quot;gray30&quot;, size = 2))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+<div id="图边距margins" class="section level2">
+<h2>图边距（Margins）</h2>
+<p>有时在图形边距上增加一点空间是很有用的。与前面的例子类似，我们可以修改 theme() 函数的参数 plot.margin。在前面的例子中，我们已经通过使用 plot.background 改变背景颜色来说明默认的边距。现在让我们在左右两边都添加额外的空间。参数 plot.margin 可以处理各种不同的单位（厘米、英寸等），但它需要使用 grid 包中的函数来定义这些单位。这里我使用了 5 厘米左右的边距：</p>
+<pre class="r"><code>ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = &quot;firebrick&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;Temperature (°F)&quot;) +
+  theme(plot.background = element_rect(fill = &quot;gray60&quot;),
+        plot.margin = margin(t = 1, r = 3, b = 1, l = 8, unit = &quot;cm&quot;))</code></pre>
+<p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图2——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<blockquote>
+<p>边缘边的顺序是上top、右right、下bottom、左left</p>
+</blockquote>
+<ul>
+<li><p><a href="https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/#prep">A ggplot2 Tutorial for Beautiful Plotting in R：</a></p></li>
+<li><p><a href="https://clauswilke.com/dataviz/">数据可视化基础：</a></p></li>
+<li><p><a href="https://osf.io/3kbw5/">数据及代码下载：</a></p></li>
+</ul>
+<p><font size=2></p>
+</div>
+</div>
