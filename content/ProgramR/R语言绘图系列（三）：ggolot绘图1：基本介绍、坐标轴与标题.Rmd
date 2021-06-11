@@ -1,0 +1,682 @@
+---
+author:
+  - 水滴
+title: 'R语言绘图系列（三）：ggolot绘图1：基本介绍、坐标轴与标题'
+date: 2021-06-11
+categories:
+  - R
+  - 绘图
+  - ggplot
+  - 基本介绍
+  - 坐标轴
+  - 标题
+tags:
+  - R
+  - 绘图
+  - ggplot
+  - 基本介绍
+  - 坐标轴
+  - 标题
+slug: ggolot_1
+weight: 0004
+description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如何调整图形坐标轴的内容和外观、修改图形标题等内容。
+--- 
+
+<font face="思源宋体 CN" >
+
+
+
+
+>ggplot2是由Hadley Wickham开发的一个功能十分强大的R语言绘图程序包，它能够非常轻松的画出各种好看的统计图形。  关于ggplot2的教程有很多， Scherer博士的这篇[blog](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/)是我目前为止看到过的最棒的ggplot2教学，讲得非常全面且详细。因此，在自己学习的同时希望将它分享给更多相关专业的同学。  
+
+
+>本文翻译整理了Cédric Scherer的这篇blog，为了让它更加容易理解，也参考了其它相关的资料，对部分内容进行了补充和改写。此外，这项工作也得到了Cédric Scherer博士本人的授权以及支持。   
+
+ggplot2是一个基于图形语法(The Grammar of Graphics)的绘图系统。简单来说，你只需要提供数据(data)，并告诉ggplot2如何将变量映射到美学(aesthetics)，使用什么图形元素(geoms)，然后它将会处理剩余的细节。  
+
+# 什么是图形语法？  
+
+Wilkinson创建了图形语法来描述所有统计图形背后的基本特性。图形语法是对“什么是统计图形”这个问题的回答。ggplot2建立在Wilkinson语法的基础上，它关注于图层(layer)的优先地位，并对其进行调整，以便在R中使用。
+
+简而言之，图形语法告诉我们图形将数据映射到几何对象(点、线、条)的美学属性(颜色、形状、大小)。
+
+图形还可以包括关于绘图坐标系统的数据和信息的统计变换。分面(facet)可用于绘制数据的不同子集。这些独立组件的组合构成了完整的图形。
+
+所有的图形都是由数据(data)、你想要可视化的信息和一个映射(map，如何将数据变量映射到美学属性的描述)组成的。
+
+有五个映射组件：   
+
+1）图层：几何元素和统计变换的集合。几何元素(geoms)代表了你在图中所看到的东西：如点、线、多边形等等；统计转换(stats)对数据进行总结：例如，对观察数据进行分类和计数以创建直方图，或拟合线性模型等。   
+2）尺度(Scale)：将数据空间中的值映射到美学空间中的值。这包括颜色、形状和大小的使用。尺度还会绘制图例和坐标轴，这使得从图中读取原始数据的值成为可能(反向映射)；   
+3）坐标系统：描述数据坐标如何映射到图形的平面上。它还提供轴线(axes)和网格线(gridlines)来帮助阅读图表。我们通常使用笛卡尔坐标系，但也有其他一些方法，包括极坐标和地图投影。    
+4）分面：指定如何分解数据子集并将其显示为小的图形。   
+5）主题：控制更精细的显示点，如字体大小和背景颜色。虽然ggplot2谨慎地选择了默认值，但你可能需要参考其他参考资料来创建有吸引力的图。   
+由于本文涉及大量的统计图形元素，在正式进入教程之前，希望明确这些元素的名称，以免引起混乱。   
+
+下面展示了一个常见的统计图形（直方图）的基本结构和常见的元素：   
+
+<div class="fullwidth">
+
+![](https://i.loli.net/2021/06/08/4cbfgS7ZwrPOUBR.png)
+
+</div>
+
+以及常见的统计图形名称：
+
+- Scatter plot 散点图
+- Line plot 线图
+- Histogram plot 直方图
+- Box plot 箱形图
+
+# 绘图前准备工作  
+
+## 需要安装的R包
+
+- tidyverse：同样出自Hadley     
+- Wickham大神之手，包含了ggplot2，dplyr，tidyr，readr，purrr，tibble，stringr, forcats等多个包：  
+- ggplot2：数据可视化   
+- dplyr：数据预处理  
+- tidyr：清理数据，转为ggplot可用的格式   
+- readr：读取数据   
+- purr：提供好用的编程函数  
+- tibble：data.frame升级款   
+- stringr：处理字符，查找、替换等   
+- forcats：处理因子问题  
+- showtext：一个字体包   
+
+以下为blog教程中的R包安装代码，自己根据需要安装。  
+
+
+```{r}
+pacman::p_load(tidyverse, colorspace, corrr,  cowplot, 
+   ggdark, ggforce, ggrepel, ggridges, ggsci, 
+    ggtext, ggthemes, grid, gridExtra, patchwork,
+    rcartocolor, scico, showtext, shiny, 
+    plotly, highcharter, echarts4r)
+```
+
+## 加载数据集
+
+
+本文使用的数据来自National Morbidity and Mortality Air Pollution Study(全国空气污染发病率和死亡率研究，NMMAPS[2])，选取了Chicago市1997-2000年的数据。
+
+```{r}
+# 文件置于工作目录下
+chic <- readr::read_csv("chicago-nmmaps.csv")
+```
+
+# 从一个默认的ggplot开始  
+
+ggplot2的语法与R的基础绘图语法不同，根据基本元素，一个默认的ggplot图需要指定以下内容：数据，美学和几何图形。
+
+##  定义一个绘图对象  
+
+ggplot2绘图的第一步就是要指定绘图所需要的数据以及坐标轴对应的变量：  
+
+```{r}
+g <- ggplot(chic, aes(x = date, y = temp))
+```
+
+
+ggplot(data = df)：告诉ggplot2我们将要处理的数据，本例中为chic，此处省略了data=;
+
+aes(x = var1, y = var2)：大多数情况下，你可能需要绘制两个变量，一个在x轴上，另一个在 y轴上。这些属于位置美学，这里，我们将变量date映射到x轴，变量temp映射到y轴。之后也将会映射其他变量到各种各样的美学属性，如颜色、大小和形状。
+
+ggplot2允许你将当前的ggobject(绘图对象)存储为变量，在本示例中称为g。你可以稍后通过添加其他图层来扩展这个ggobject：可以是一次添加所有图层，也可以将它赋值给相同的或另一个变量。  
+
+
+> Tips：赋值给一个变量的同时显示该变量的方法就是将整行代码用()括起来。
+
+
+如果运行上述代码，只会创建下面的面板：  
+
+
+```{r}
+g
+```
+
+为什么?
+
+这是因为ggplot2不知道我们希望如何绘制该数据——我们仍然需要提供一个几何图形！  
+
+
+##　根据数据添加几何对象　　
+
+有许多不同的几何图形(通常都是以geom_开头)，你可以向ggplot添加一些默认的几何对象(如散点、线条、直方等等)，也可以添加一些扩展包提供的更多几何对象。
+
+例如，通过添加geom_point()来创建一个散点图：　　
+
+```{r}
+g + geom_point()
+```
+
+
+这个数据也可以使用线图 line plot 来展示：
+
+```{r}
+g + geom_line()
+```
+
+你也可以将多种几何图形组合起来，这是一个神奇而有趣的开始：
+
+
+```{r}
+g + geom_line() + geom_point()
+```
+
+
+## 更改几何图形的属性
+
+在 geom_* 命令中，你可以操纵一些美学属性，如颜色、形状和大小：  
+
+```{r}
+g + geom_point(color = "firebrick", # 设置散点颜色
+               shape = "diamond",  # 设置散点形状
+               size = 2) # 设置散点大小
+```
+
+> Tips：ggplot2能够理解color和colour，以及简写的col。  
+
+你也可以使用R预设颜色[3]或者十六进制颜色，甚至也可以使用 RGB() 函数添加 RGB/RGBA 颜色。常用颜色的十六进制和 rgb 格式 。
+
+- RGB或RGBA颜色：
+RGB是三原色(Red Green Blue)的简称，多出来的 A 表示透明度。
+
+例如rgb(255, 0, 0) 中的数字表示 3 原色的程度，取值范围是 0-255，都是 0 就是没有颜色，没有色彩就是一片黑暗，也就是黑色。对应的全为 255 则为白色，不同程度的搭配可以得到以万为单位的颜色种类。
+
+
+```{r}
+g + geom_point(color = rgb(178, 34, 34, maxColorValue = 255), 
+               shape = "diamond", 
+               size = 2)
+```
+
+- 十六进制颜色：
+三原色每一种颜色强度最低为 0，最高为 255，通常都以 16 进制数值表示，那么 255 对应于十六进制就是 FF，并把三个数值依次并列起来 ，以#开头。
+
+例如，颜色值#FF0000为红色，因为红色的值达到了最高值 FF（即十进制的255），其余两种颜色强度为 0。在例如“ #FFFF00 ”表示黄色，因为当红色和绿色都为最大值，且蓝色为 0 时，产生的就是黄色。
+
+ 
+
+```{r}
+g + geom_point(color = "#b22222", 
+               shape = "diamond", 
+               size = 2)
+```
+
+每个 geom 对象自带其属性（叫做参数），同样的参数可能产生不同的变化，这依赖于你使用的 geom 对象，比如下面的例子：
+
+```{r}
+g + geom_point(color = "firebrick", 
+               shape = "diamond", 
+               size = 2) +
+    geom_line(color = "firebrick", # 设置线条颜色
+              linetype = "dotted",  # 设置线型
+              size = .3) # 设置线的大小
+```
+
+## 改变默认的 ggplot2 主题
+
+为了展示ggplot的“多才多艺”，让我们通过设置一个不同的内置主题来摆脱ggplot2灰色的默认外观，例如theme_bw()——通过调用theme_set()，所有后面的plot将拥有相同的黑白主题。红点现在看起来好看多了!
+
+```{r}
+theme_set(theme_bw())
+g + geom_point(color = "firebrick")
+```
+
+如果需要设置回默认主题，运行下面代码即可。  
+
+```{r}
+theme_set(theme_grey()) # 设置灰色主题
+```
+
+>更多关于如何使用内置主题以及如何自定义主题的信息将会在主题部分详细叙述。
+
+# Working with axes (坐标轴)  
+
+## 修改坐标轴标题  
+
+坐标轴标题的修改使用labs()函数，这里我们分别为 x 轴和 y 轴提供了一个字符串作为标题：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") + # 设置散点颜色
+  labs(x = "Year",  # 设置x轴标签
+       y = "Temperature (°F)") # 设置y轴标签
+```
+
+也可以使用xlab()和ylab()实现同样的操作：  
+
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") + # 设置散点颜色
+  xlab("Year") + # 设置x轴标签
+  ylab("Temperature (°F)") # 设置y轴标签
+```
+
+对于此处标题中的温度符号 ℉ ，你可以简单地通过添加符号本身 “ ℉ ” 来完成。
+
+也可以采用另一种复杂一点的方法，即使用 expression() 函数建立表达式，这在添加一些数学公式或复杂符号(如上下标)时非常有用。  
+
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", 
+       y = expression(paste("Temperature (", degree ~ F, ")"^"(Hey, why should we use metric units?!)")))
+```
+
+## 增加坐标轴与坐标轴标题之间的空间  
+
+
+theme()函数是修改特定主题元素（文本、标题、符号、背景等）的基本命令，我们将会大量使用它！
+
+现在来修改文本元素：
+可以在theme()调用中 element_text()来改变所有或特定文本元素的属性，这里是坐标轴标题：
+
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", # 设置x轴标签
+       y = "Temperature (°F)") + # 设置y轴标签
+  theme(axis.title.x = element_text(vjust = 0, size = 15),
+        axis.title.y = element_text(vjust = 2, size = 15))
+```
+
+- size 调整字号大小；
+- vjust 指的是垂直对齐，它的范围通常在 0 到 1之间，但你也可以指定该范围之外的值。  
+
+> 注意，即使我们水平移动 y 轴上的轴标题，我们也需要指定 vjust（从标签的角度来看这是正确的）。  
+
+你也可以通过指定两个文本元素的边距来改变距离： 
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.title.x = element_text(margin = margin(t = 10), size = 15),
+        axis.title.y = element_text(margin = margin(r = 10), size = 15))
+```
+
+margin 中的t(top)和r(right)用于调整 x 轴和 y 轴标题的位置，你也可以定义 margin(t, r, b, l) 来调整坐标轴标签的位置；简单来说，r 和 l 可以调整 Temperature (°F) 进行左右平移，而 t 和 b 可以调整 Year 上下平移。  
+
+## 改变坐标轴标题的美学属性  
+
+这里再次使用 theme() 函数来修改 axis.title 或者 axis.title.x、axis.title.y 元素。
+
+对于坐标轴标题，可以在 element_text() 中可以修改默认的size、color 和 face(大小、颜色和字体)：  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", 
+       y = "Temperature (°F)") +
+  theme(axis.title = element_text(size = 15, 
+                                  color = "firebrick", 
+                                  face = "italic"))
+```
+
+face 参数用来调整字体，如 bold 粗体，italic 斜体，以及 bold.italic 斜粗体（同时将x轴和y轴的标题文字调整为大小15，火砖色，斜体）。
+
+axis.title 是对 x 轴和 y 轴的坐标轴标题同时进行修改，你也可以使用 axis.title.x 和 axis.title.y 分别对 x 轴和 y 轴标题进行修改：  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.title.x = element_text(color = "sienna", size = 15),
+        axis.title.y = element_text(color = "orangered", size = 15))
+```
+
+
+将x轴的标题文字修改为大小15，颜色为sienna黄土色， y轴的标题文字调整为大小15，橘色）
+
+你也可以使用 axis.title 和 axis.title.y 的组合，因为 axis.title.x 将会继承来自 axis.title 的值：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.title = element_text(color = "sienna", size = 15),
+        axis.title.y = element_text(color = "orangered", size = 15))
+```
+
+实际上与上图一致，但这里首先是同时修改了x轴和y轴，然后又修改了y轴。
+
+也可以在对两个坐标轴标题修改一些属性的同时为其中一个坐标轴标题单独修改一些属性：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.title = element_text(color = "sienna", size = 15, face = "bold"),
+        axis.title.y = element_text(face = "bold.italic"))
+```
+
+首先是同时修改了 x 轴和 y 轴的标题为大小15，黄土色以及粗体，然后又将 y 轴的标题修改为斜粗体。  
+
+## 改变坐标轴文本(数字刻度)的美学属性
+
+类似地，我们使用 axis.text 或 axis.text.x 和 axis.text.y 来修改坐标轴刻度的外观：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.text = element_text(color = "dodgerblue", size = 12),
+        axis.text.x = element_text(face = "italic"))
+```
+
+## 旋转坐标轴刻度文本  
+
+承接前面所述，theme 函数中的文本元素参数 angle 允许你旋转坐标文本，使用 hjust 和vjust，你可以水平(0 =左，1 =右)和垂直(0 =上，1 =下)调整文本的位置：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.text.x = element_text(angle = 50, vjust = 1, hjust = 1, size = 12))
+```
+
+## 移除坐标轴标题以及文本刻度  
+
+
+我们可以使用 theme_blank() 来移除坐标轴标题，但更简单的方法是使用 labs()：  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = NULL, y = "")
+```
+
+>Tips：NULL相当于完全移除了标题，类似于 element.blank()，而“ ”将保留标题空间，但什么也不显示。  
+
+如果你不想让坐标轴显示刻度，也可以这样进行删除：  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())
+```
+
+上述代码中的 axis.ticks.y 指 y 轴的刻度，而 axis.text.y 则是指 y 轴的刻度文本。  
+
+## 限制坐标轴范围  
+
+有时候你需要更仔细地看某个范围内的数据的图像，可以这样做：  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  ylim(c(0, 50))
+```
+
+这样只显示了 Temperature（y轴）在 0 到 50 之间的数据，相当于放大显示了部分数据。
+
+也可以使用 scale_y_continuous(limits = c(0, 50)) 或 coord_cartesian(ylim = c(0, 50)) 。区别是：前者移除了所有不在范围内的数据点，而后者只是像 ylim(0, 50)一样调整了图像的显示范围。
+
+你或许会好奇两者有什么区别，让我们比较下面两幅图： 
+
+![](https://i.loli.net/2021/06/09/3XqT2t5jVUFsGab.png)  
+
+
+你或许已经注意到左边的图在 y 轴限制范围外的部分是空的，而右边的图在范围之外的数据点仍然存在。
+
+或许你会想：这样的区别似乎无关紧要。继续来看下面的箱形图：  
+
+
+![](https://i.loli.net/2021/06/09/3p5kPB9DYnULQlX.png)
+
+因为 scale_x|y_continuous() 首先截取了数据，而 coord_cartesian() 只是截取了图像，范围之外的数据仍然存在，导致我们对箱线图的估计完全不同，而且是错误的，至少在这种情况下这不是你的目标！你细品。
+
+## 强迫R绘制从原点开始绘图  
+
+```{r}
+chic_high <- dplyr::filter(chic, temp > 25, o3 > 20) # 选取部分数据
+ggplot(chic_high, aes(x = temp, y = o3)) +
+  geom_point(color = "darkcyan") +
+  labs(x = "Temperature higher than 25°F",
+       y = "Ozone higher than 20 ppb") +
+  expand_limits(x = 0, y = 0)
+```
+
+个人感觉这个功能有点鸡肋，也就是当你的数据范围比较大时，绘图的起始点仍然从 0 开始。
+
+使用 coord_cartesian(xlim = c(0, NA), ylim = c(0, NA)) 可以达到同样的效果。
+
+```{r}
+ggplot(chic_high, aes(x = temp, y = o3)) +
+  geom_point(color = "darkcyan") +
+  labs(x = "Temperature higher than 25°F",
+       y = "Ozone higher than 20 ppb") +
+  coord_cartesian(xlim = c(0, NA), ylim = c(0, NA))
+```
+
+或者像这样：
+
+```{r}
+ggplot(chic_high, aes(x = temp, y = o3)) +
+  geom_point(color = "darkcyan") +
+  labs(x = "Temperature higher than 25°F",
+       y = "Ozone higher than 20 ppb") +
+  expand_limits(x = 0, y = 0) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  coord_cartesian(clip = "off")
+```
+
+注意与上图的区别，原点的位置变了。
+
+![](https://i.loli.net/2021/06/09/EQVspWFfC1y7GHU.png)
+
+参数 clip = "off" 允许在面板区域之外绘制，也就是把图层画在画布之外。关于这个问题的详细描述参见这篇文章[5]，此处调用它是为了确保 c(0,0) 处的刻度没有被切掉。  
+
+
+##  相同比例的坐标轴  
+
+就是让 x 轴和 y 轴的刻度比例保持一致。为了展示，让我们画出原始温度与添加了一些随机噪声(在原有数值上添加随机数)的温度的散点图。
+
+coord_equal()是一个具有指定比率的坐标系统，默认值 ratio = 1 确保 x 轴上的一个单位与 y 轴上的一个单位具有相同的长度：  
+
+```{r}
+ggplot(chic, aes(x = temp, y = temp + rnorm(nrow(chic), sd = 20))) +
+  geom_point(color = "sienna") +
+  labs(x = "Temperature (°F)", y = "Temperature (°F) + random noise") +
+  xlim(c(0, 100)) + ylim(c(0, 150)) +
+  coord_fixed()
+```
+
+x 轴上的 0-50 与 y 轴的 0-50 长度是相同的，拥有相同的比例。
+
+而 ratio 大于 1 时 y 轴上的单位比 x 轴上的单位长，反之则短。
+
+
+```{r}
+ggplot(chic, aes(x = temp, y = temp + rnorm(nrow(chic), sd = 20))) +
+  geom_point(color = "sienna") +
+  labs(x = "Temperature (°F)", y = "Temperature (°F) + random noise") +
+  xlim(c(0, 100)) + ylim(c(0, 150)) +
+  coord_fixed(ratio = 1/5)
+```
+
+## 使用函数来改变标签   
+
+
+有时修改一下(刻度)标签是很方便的，可以添加单位或百分比符号而不将它们添加到数据中。在这种情况下，你可以使用函数来完成：
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = NULL) +
+  scale_y_continuous(label = function(x) {return(paste(x, "Degrees Fahrenheit"))})
+```
+
+就是把原有的刻度与表示单位的字符串“粘贴”在了一起。
+
+#  Working with titles (标题)  
+
+## 添加一个图形标题   
+
+使用 ggtitle() 函数来可以为图形添加一个标题:  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  ggtitle("Temperatures in Chicago")
+```
+
+或者你也可以使用 labs() 你可以添加一些参数，如补充的副标题、标签tag、备注caption：  
+
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)",
+       title = "Temperatures in Chicago",
+       subtitle = "Seasonal pattern of daily temperatures from 1997 to 2001",
+       caption = "Data: NMMAPS",
+       tag = "Fig. 1")
+```
+
+## 标题加粗并在基线处添加空格  
+
+因为图标题属于主题元素，所以我们使用 theme() 函数和文本元素 axis.title 和 axis.text 来修改字体和边距。
+
+以下所有主题元素的修改不仅适用于标题，也适用于所有其他标签，如plot.subtitle, plot.caption, plot.caption, legend.title, legend.text, axis.title 和 axis.text  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)",
+       title = "Temperatures in Chicago") +
+  theme(plot.title = element_text(face = "bold",
+                                  margin = margin(10, 0, 10, 0),
+                                  size = 14))
+```
+
+
+margin 函数中的四个参数依次为 t (top)，r (right)，b (bottom) 和 l (left)，可以这样来记：“t-r-oub-l-e”。
+
+##  调整标题位置
+
+一般对齐(左、中、右)由 hjust (表示水平调整)来控制，当然也可以调整垂直对齐，使用vjust来控制。  
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = NULL,
+       title = "Temperatures in Chicago",
+       caption = "Data: NMMAPS") +
+  theme(plot.title = element_text(hjust = 1, size = 16, face = "bold.italic"))
+```
+
+
+也可以根据面板区域通过 plot.title.position 和 plot.caption.position 指定标题、副标题和 caption 的对齐方式。
+
+在大多数情况下，后者在设计上确实是更好的选择，许多人都很喜欢这个新功能，特别是在 y 轴标签很长的情况下，对齐看起来很糟糕：
+
+```{r}
+g <- ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  scale_y_continuous(label = function(x) {return(paste(x, "Degrees Fahrenheit"))}) +
+  labs(x = "Year", y = NULL,
+       title = "Temperatures in Chicago between 1997 and 2001 in Degrees Fahrenheit",
+       caption = "Data: NMMAPS") +
+  theme(plot.title = element_text(size = 14, face = "bold.italic"),
+        plot.caption = element_text(hjust = 0))
+```
+
+下面来调整对齐方式：
+
+```{r}
+g + theme(plot.title.position = "plot",
+          plot.caption.position = "plot")
+```
+
+调整之后标题是与y轴标签对齐，而不是与y轴对齐，这样看起来好多了。
+
+##　在标题中使用非传统字体
+
+除了 ggplot 的默认字体外，你可以使用不同的字体。有几个软件包可以帮助你使用安装在你电脑上的字体(如office程序中的字体)。
+
+这里，我使用了showtext包，它可以方便地在R图中使用各种类型的字体(TrueType、OpenType、Type 1、web 字体等)。
+
+在我们加载软件包之后，你需要导入字体，这些必须安装在你的设备上。例如使用 Google 字体，可以通过函数font_add_google()导入，但你也可以用 font_add() 添加其他字体。　　
+
+> Tips：在使用 Google 字体的情况下，您必须安装该字体并重启 rstudio 才能使用该字体.   
+
+
+
+现在，我们可以使用这些字体：
+
+```{r, fig.showtext=TRUE,fig.align="center"}
+library(showtext)
+font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)",
+       title = "Temperatures in Chicago",
+       subtitle = "Daily temperatures in °F from 1997 to 2001") +
+  theme(plot.title = element_text(family = "SourceHanSerifCN-Light", hjust = .5, size = 25),
+        plot.subtitle = element_text(family = "SourceHanSerifCN-Light", hjust = .5, size = 15))
+```
+
+你也可以为所有的文本元素设置非默认字体，下面将 Roboto Condensed 字体设置作为所有图形的默认字体：
+
+
+```{r, fig.showtext=TRUE,fig.align="center"}
+library(showtext)
+font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
+theme_set(theme_bw(base_size = 12, base_family = "SourceHanSerifCN-Light"))
+```
+
+
+## 改变多行文本之间的空间(间距)　　  
+
+
+当标题有多行文本的时候，使用 lineheight 参数可以改变行距：
+
+```{r, fig.showtext=TRUE,fig.align="center"}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "firebrick") +
+  labs(x = "Year", y = "Temperature (°F)") +
+  ggtitle("Temperatures in Chicago\nfrom 1997 to 2001") +
+  theme(plot.title = element_text(lineheight = .8, size = 16))
+```
+
+本期完整代码及示例数据下载：
+https://osf.io/3kbw5/
+
+最后，我们诚挚地邀请对ggplot2或R语言绘图感兴趣的同学可以加入我们，共同完成后续内容的整理。如有意向，可以联系统计联盟小助手微信：Hpa201904或者邮箱uunotebook@163.com。
+
+作者：郭治辰，江西师范大学心理统计与测量专业硕士在读，研究领域为项目反应理论，认知诊断，计算机化自适应测验，智能测评。　　
+
+
+
+参考资料[^R语言统计与绘图]:   
+
+[1]
+blog网址: https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/
+
+[2]
+数据集百度云链接: https://pan.baidu.com/s/1L9YpsuyaiIIeaWcXwybP4w提取码：aaaa
+
+[3]
+R预设颜色: http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
+
+[4]
+常用颜色的十六进制和 rgb 格式: https://blog.csdn.net/qq_37959401/article/details/79615979?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-3&spm=1001.2101.3001.4242
+
+[5]
+这篇文章: https://guangchuangyu.github.io/2018/05/ggplot2-clip/
+
+[^R语言统计与绘图]:[R语言统计与绘图](https://mp.weixin.qq.com/s/RKNAt0upMJTu2MvNuavgCw#tocbar-1sk53av)  
+
+
+</font>

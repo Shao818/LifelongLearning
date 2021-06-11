@@ -1,0 +1,410 @@
+---
+author:
+  - 水滴
+title: 'R语言绘图系列（三）：ggolot绘图3：分面图'
+date: 2021-06-11
+categories:
+  - R
+  - 绘图
+  - ggplot
+  - 分面图
+tags:
+  - R
+  - 绘图
+  - ggplot
+  - 分面图
+slug: ggolot_3
+weight: 0004
+description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如何调整图形坐标轴的内容和外观、修改图形标题等内容。
+--- 
+
+>ggplot2中提供的大多数语法旨在创建单一的图形。然而，有时候我们需要根据某些变量对数据进行分组绘图，或者将多个单一的图形组合到同一个面板来呈现。本期内容主要介绍如何使用ggplot2进行分组绘图，以及组合、叠加多个图形。
+
+<center>
+![图形元素图](https://gitee.com/shao818/Figure/raw/master/20210611123158.png)
+</center>
+
+# 加载数据集
+
+
+本文使用的数据来自National Morbidity and Mortality Air Pollution Study(全国空气污染发病率和死亡率研究，NMMAPS[2])，选取了Chicago市1997-2000年的数据。
+
+```{r}
+pacman::p_load(tidyverse, colorspace, corrr,  cowplot, 
+   ggdark, ggforce, ggrepel, ggridges, ggsci, 
+    ggtext, ggthemes, grid, gridExtra, patchwork,
+    rcartocolor, scico, showtext, shiny, 
+    plotly, highcharter, echarts4r)
+```
+
+```{r}
+# 文件置于工作目录下
+chic <- readr::read_csv("chicago-nmmaps.csv")
+head(chic,10)
+```
+
+# 分面 Facet
+
+分面是指通过一个或多个变量来分割数据，并将这些数据子集绘制在一起。ggplot2中有两个函数来创建分面图形：facet_wrap和facet_grid函数；  
+
+**两者的区别是：**
+- facet_wrap 创建基于单个变量的图形带；
+- facet_grid创建由两个变量分割而成的的网格；
+
+![](https://gitee.com/shao818/Figure/raw/master/20210611123544.png)
+
+
+由此可见，我们不需要同时指定nrow和ncol两个参数，指定其中一个即可得到各种图形排列方式。注意最后一种情况，默认的排列方式为左对齐。
+
+## 基于单一变量创建分面图形
+
+实例展示：  
+
+数据集（可在文末提供的链接下载）：
+
+### 简单绘图
+
+```{r}
+# 首先绘制包含全部数据的完整图形
+g <- ggplot(chic, aes(x = date, y = temp)) +
+    geom_point(color = "chartreuse4", alpha = .3) +
+    labs(x = "Year", y = "Temperature (°F)") +
+theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+g
+
+```
+
+### 简单分面
+
+
+
+```{r}
+# 按照变量year分组绘制
+g + facet_wrap(~ year)
+```
+
+因为有4个子图形，因此ggplot默认排列成2*2的形式，也可以像之前描述的那样手动更改：
+
+### 设定分面
+
+
+```{r}
+
+g + facet_wrap(~ year, ncol = 3)
+```
+
+## 让多个子图形的量尺自由变化
+
+ggplot2中，分面图形默认使用相同的量尺（坐标轴刻度比例）。但有时需要根据你自己的数据来决定图形的量尺（尽管这并不是一个好的做法，因为这会让读者对数据产生错误的印象）。可以通过设置scales = ‘free’ 来做到这一点：
+
+
+```{r}
+g + facet_wrap(~ year, nrow = 2, scales = "free")
+```
+
+## 基于两个变量创建网格图  
+
+当涉及到两个分类变量时，可以使用facet_grid函数。此时，变量的顺序决定了行数和列数：
+
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(color = "orangered", alpha = .3) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  labs(x = "Year", y = "Temperature (°F)") +
+  facet_grid(year ~ season)
+```
+
+实际上，函数facet_wrap也可以接受两个变量，你仍然可以控制网格设计：  
+
+```{r}
+
+g + facet_wrap(year ~ season, nrow = 4, scales = "free_x")
+# free_x是指x轴的量尺可以自由变化，而y轴保持不变
+```
+
+这与facet_grid函数的排列方式是不同的。
+
+## 修改Strip文本的样式  
+
+通过使用theme函数，你可以改变strip文本（即每个子图形的标题）和strip文本框的外观：
+
+```{r}
+g + facet_wrap(~ year, nrow = 1, scales = "free_x") +
+  theme(strip.text = element_text(face = "bold", color = "chartreuse4",
+                                  hjust = 0, size = 20),
+# 修改文本为粗体，颜色为黄绿色，左对齐，字号20
+        strip.background = element_rect(fill = "chartreuse3", linetype = "dotted"))
+# 修改文本框填充色为黄绿色，线条类型为虚线（dotted）
+```
+
+Tips：
+
+- vjust和hjust是ggplot中控制图形元素在平面内移动的两个参数；
+
+- vjust(vrtical justification)，垂直移动，取值在0-1之间，0代表向上端对齐，1代表向下端对齐；
+
+- hjust(horizontal justification)，水平移动，取值在0-1之间，0代表左对齐，1代表右对齐。
+
+
+下面两个函数允许结合ggtext包提供的element_textbox()函数来突出显示特定的标签：
+
+```{r}
+pacman::p_load(ggtext,rlang)
+element_textbox_highlight <- function(..., hi.labels = NULL, hi.fill = NULL,
+                                      hi.col = NULL, hi.box.col = NULL, hi.family = NULL) {
+  structure(
+    c(element_textbox(...),
+      list(hi.labels = hi.labels, hi.fill = hi.fill, hi.col = hi.col, hi.box.col = hi.box.col, hi.family = hi.family)
+    ),
+    class = c("element_textbox_highlight", "element_textbox", "element_text", "element")
+  )
+}
+
+element_grob.element_textbox_highlight <- function(element, label = "", ...) {
+  if (label %in% element$hi.labels) {
+    element$fill <- element$hi.fill %||% element$fill
+    element$colour <- element$hi.col %||% element$colour
+    element$box.colour <- element$hi.box.col %||% element$box.colour
+    element$family <- element$hi.family %||% element$family
+  }
+  NextMethod()
+}
+```
+
+实例展示：
+
+```{r}
+g + facet_wrap(year ~ season, nrow = 4, scales = "free_x") +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_textbox_highlight(
+      family = "Playfair", size = 12, face = "bold",
+      fill = "white", box.color = "chartreuse4", color = "chartreuse4",
+      halign = .5, linetype = 1, r = unit(5, "pt"), width = unit(1, "npc"),
+      padding = margin(5, 0, 3, 0), margin = margin(0, 1, 3, 1),
+      hi.labels = c("1997", "1998", "1999", "2000"),
+      hi.fill = "chartreuse4", hi.box.col = "black", hi.col = "white"))
+```
+
+```{r}
+ggplot(chic, aes(x = date, y = temp)) +
+  geom_point(aes(color = season == "Summer"), alpha = .3) +
+  labs(x = "Year", y = "Temperature (°F)") +
+  facet_wrap(~ season, nrow = 1) +
+  scale_color_manual(values = c("gray40", "firebrick"), guide = "none") +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    strip.background = element_blank(),
+    strip.text = element_textbox_highlight(
+      size = 12, face = "bold",
+      fill = "white", box.color = "white", color = "gray40",
+      halign = .5, linetype = 1, r = unit(0, "pt"), width = unit(1, "npc"),
+      padding = margin(2, 0, 1, 0), margin = margin(0, 1, 3, 1),
+      hi.labels = "Summer", hi.family = "Bangers",
+      hi.fill = "firebrick", hi.box.col = "firebrick", hi.col = "white"))
+```
+
+# 组合图形  
+
+除了根据分组变量分割数据来创建多个子图形之外，也可以将多个图形直接“粘贴”在一起。
+
+有几种方法可以组合图形。  
+
+##  patchwork包
+
+在我看来，最简单的方法是由ThomasLin Pedersen编写的patchwork包：
+
+实例展示：
+
+```{r}
+# 先单独画两个图
+p1 <- ggplot(chic, aes(x = date, y = temp,
+                       color = season)) +
+        geom_point() +
+        geom_rug() +
+        labs(x = "Year", y = "Temperature (°F)")
+p2 <- ggplot(chic, aes(x = date, y = o3)) +
+        geom_line(color = "gray") +
+        geom_point(color = "darkorange2") +
+        labs(x = "Year", y = "Ozone")
+# 组合图形
+library(patchwork)
+p1 + p2
+```
+
+还可以通过“dividing”两个图来改变顺序：
+
+
+```{r}
+p1 / p2
+```
+
+再或者这样：
+
+```{r}
+(g+p2)/p1
+```
+
+##  cowplot 包  
+
+Claus Wilke的cowplot包提供了将多个plot组合在一起的函数：  
+
+```{r}
+pacman::p_load(cowplot)
+plot_grid(plot_grid(g, p1), p2, ncol = 1)
+# 首先将g和p1横向组合在一起，得到的图形再跟p2纵向组合（ncol=1）
+```
+
+## gridExtra 包
+
+```{r}
+pacman::p_load(gridExtra)
+grid.arrange(g, p1, p2, layout_matrix = rbind(c(1, 2), c(3, 3)))
+```
+
+此外，patchwork包也可以定义布局的思路，它允许创建复杂的组合：
+
+
+```{r}
+layout <- "
+AABBBB#
+AACCDDE
+##CCDD#
+##CC###
+"
+p2 + p1 + p1 + g + p2 +
+  plot_layout(design = layout)
+
+```
+
+看上去有点复杂，但对照图形就很容易看懂了，ABCDE同样代指单个图形
+
+## 组合图形的修改
+
+将图形组合在一起后，我们还可以再次对每个子图形进行修改。  
+
+仍然是在patchwork包中，组合后每个子图形可以使用[[ ]]进行索引并修改；  
+
+实例展示：  
+
+```{r}
+p12 <- p1 + p2
+# 提取第2个子图形并修改其主题
+p12[[2]] <- p12[[2]] + theme_light()
+p12
+# 或者直接修改所有子图形的主题：
+p1 + p12 & theme_minimal()
+```
+
+>除了设置主题外，其它对图形的操作同样适用。
+
+
+## 为组合图形添加标题等内容  
+
+
+一旦图形被组合起来，它们就开始形成一个单一的对象。这也意味着标题、副标题和题注通常会与整个整体有关，而不是单独的子图形。可以使用plot_annotation()函数将标题等添加到组合图中。
+
+实例展示：   
+
+**（这里开始使用了ggplot2提供的mpg数据集）**
+
+```{r}
+p1 <- ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy))
+
+p2 <- ggplot(mpg) + 
+  geom_bar(aes(x = as.character(year), fill = drv), position = "dodge") + 
+  labs(x = "year")
+
+p3 <- ggplot(mpg) + 
+  geom_density(aes(x = hwy, fill = drv), colour = NA) + 
+  facet_grid(rows = vars(drv))
+
+p4 <- ggplot(mpg) + 
+  stat_summary(aes(x = drv, y = hwy, fill = drv), geom = "col", fun.data = mean_se) +
+  stat_summary(aes(x = drv, y = hwy), geom = "errorbar", fun.data = mean_se, width = 0.5)
+
+# 添加标题和题注
+p34 <- p3 + p4 + plot_annotation(
+  title = "A closer look at the effect of drive train in cars",
+  caption = "Source: mpg dataset in ggplot2"
+)
+p34
+```
+
+```{r}
+
+# 然后再调用plot_annotation中的主题设定函数对主题进行格式化
+p34 + plot_annotation(theme = theme_gray(base_family = "mono"))
+# 或者
+p34 & theme_gray(base_family = "mono")
+```
+
+另一种类型的注释，特别是在科学文献中所知的，是给每个子图形添加标签，然后用于在文本和说明中识别它们。ggplot2有用于此目的的标记元素，patchwork提供了使用tag_levels参数自动设置此功能，它可以自动生成顺序级别的拉丁字符，阿拉伯数字，或罗马数字。
+
+
+```{r}
+
+p123 <- p1 | (p2 / p3)
+p123 + plot_annotation(tag_levels = "I") # Uppercase roman numerics
+```
+
+还可以使用嵌套来定义新的标签级别：  
+
+
+```{r}
+
+p123[[2]] <- p123[[2]] + plot_layout(tag_level = "new")
+p123 + plot_annotation(tag_levels = c("I", "a"))
+```
+
+可以看到，patchwork包提供了多个可能性来组合排列图形，从简单的使用“+”等符号将多个图形拼接在一起，到使用嵌套，布局和注释创建高级的自定义布局的组合图形。
+
+# 图形的叠加  
+
+与前面的图形拼接不同，图形叠加是指将一个图叠放在一个图形上方。这可能不太常见，但有时还是需要这样做，以便更好地对数据进行展示和说明。
+
+实例展示：  
+
+```{r}
+
+# 仍然使用patchwork包中的inset_element函数
+p1 + inset_element(p2, left = 0.5, bottom = 0.4, right = 0.9, top = 0.95)
+```
+
+叠加图形的位置由给定插图的左、右、上和下位置来指定。默认情况是在给定区域中使用从0到1的npc单位，但也可以任何的grid::unit()单位进行调整。默认设置为面板区域，但可以通过align_to参数更改。结合所有这些，我们可以放置一个从右上角插入15mm的图形：
+
+
+```{r}
+p1 +  inset_element(p2, 
+left = 0.4, 
+    bottom = 0.4, 
+    right = unit(1, "npc") - unit(15, "mm"), 
+    top = unit(1, "npc") - unit(15, "mm"),
+    align_to = "full")
+```
+
+也可以将组合后的图形进行叠加：
+
+```{r}
+p24 <- p2 / p4 + plot_layout(guides = "collect")
+p1 + inset_element(p24, left = 0.5, bottom = 0.05, right = 0.95, top = 0.9)
+```
+
+叠加得到的图形也可以这样设置主题：
+
+```{r}
+
+p12 <- p1 + inset_element(p2, left = 0.5, bottom = 0.5, right = 0.9, top = 0.95)
+p12 & theme_bw()
+```
+
+或者添加标签：
+
+```{r}
+p12 + plot_annotation(tag_levels = 'A')
+```
+
+
+> - [参考资料](https://mp.weixin.qq.com/s/IHDi255ZKRSVEk7c8ZcDwA)

@@ -1,0 +1,710 @@
+---
+author:
+  - 水滴
+title: 'R语言绘图系列（三）：ggolot绘图0：主题、注解、图例、坐标轴、配色、分面'
+date: 2021-06-11
+categories:
+  - R
+  - 绘图
+  - ggplot
+  - 主题
+  - 注解
+  - 图例
+  - 坐标轴
+  - 配色
+  - 分面  
+tags:
+  - R
+  - 绘图
+  - ggplot
+  - 主题
+  - 注解
+  - 图例
+  - 坐标轴
+  - 配色
+  - 分面  
+slug: ggolot_0
+weight: 0004
+description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如何调整图形坐标轴的内容和外观、修改图形标题等内容。
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p><font face="思源宋体 CN" ></p>
+<p>R具有强大的统计计算功能和便捷的数据可视化系统。目前R主要支持四套图形系统：基础图形（base）、网格图形（grid）、lattice图形和ggplot2。其中ggplot2凭借强大的语法特性和优雅的图形外观，逐渐成为R中数据可视化的主流选择。</p>
+<p>《R数据可视化手册》重点讲解R的绘图系统，指导读者通过绘图系统实现数据可视化，主要侧重于解决具体问题，是R数据可视化的实战秘籍。书中绝大多数的绘图案例都是以强大、灵活制图而著称的R包ggplot2实现的，充分展现了ggplot2生动、翔实的一面。</p>
+<p>本文根据《R数据可视化手册》一书整理ggplot2包的图形参数（<strong>图形外观、注解、图例、坐标轴、分面、配色</strong>）。</p>
+<hr />
+<div id="修改图形外观" class="section level2">
+<h2>1. 修改图形外观</h2>
+<div id="修改图形标题" class="section level3">
+<h3>1.1 修改图形标题</h3>
+<pre><code>ggtitle() # 设置标题，如 ggtitle(&quot;标题&quot;)
+labs(title = &quot;标题&quot;)  # 与上面等效</code></pre>
+<p>标题如果太长，可以使用<code>\n</code>来换行。</p>
+<p>将图形标题移到图形内部的两种方法：
+一：将一个负的vjust值与ggtitle()配合使用，绘图区域上方会留有空白。</p>
+<pre><code>ggtitle(&quot;标题&quot;) + theme(plot.title=element_text(vjust = -2.5))</code></pre>
+<p>二：将标题当作文本注解添加在图形内。</p>
+<pre><code>annotate(&quot;text&quot;, x=mean(range(数据框名$x轴变量名)), y=Inf, 
+         label=&quot;标题&quot;, vjust=1.5, size=6)  
+# x的位置为x值域（最大值与最小值）的中间
+# vjust需为正值
+# 标题可设置字体大小、样式、颜色、字体簇等，参见annotate()函数。</code></pre>
+</div>
+<div id="修改文本外观" class="section level3">
+<h3>1.2 修改文本外观</h3>
+<p>文本外观包括<code>主题项目</code>外观和<code>文本几何对象</code>外观。
+<strong>主题项目</strong>包括图形中的所有非数据元素，如图形标题、图例、坐标轴标签、刻度标签、分面标签；
+<strong>文本几何对象</strong>是指在图形内部使用<code>geom_text()</code>或<code>annotate()</code>添加的文本对象。</p>
+<div id="主题项目" class="section level4">
+<h4>1.2.1 主题项目</h4>
+<p>使用theme()并通过element_text()设定对应项目的属性。<img src="https://gitee.com/shao818/Figure/raw/master/640" alt="图片" /></p>
+<pre><code># 设置x轴标签外观
+theme(axis.title.x=element_text(size=16, lineheight=.9, family=&quot;Times&quot;,
+                                face=&quot;bold.italic&quot;, colour=&quot;red&quot;))
+主题元素中字体大小(size)单位为磅(pt)</code></pre>
+</div>
+<div id="文本几何对象" class="section level4">
+<h4>1.2.2 文本几何对象</h4>
+<pre><code>geom_text(aes(label=weightLb), size=4, family=&quot;Times&quot;, colour=&quot;red&quot;)
+annotate(&quot;text&quot;, x=15, y=53, label=&quot;Some text&quot;,size = 7, family=&quot;Times&quot;,
+         fontface=&quot;bold.italic&quot;, colour=&quot;red&quot;)
+对于文本几何对象，字体大小的单位为毫米（mm）</code></pre>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133122.png" /></p>
+<center>
+字体样式不一样，其他相同
+</center>
+</div>
+</div>
+<div id="修改默认主题" class="section level3">
+<h3>1.3 修改默认主题</h3>
+<pre><code>theme_grey()  # 灰色主题(默认)
+theme_bw()  # 黑白主题
+theme_set(theme_bw())   # 设为默认主题
+
+theme_grey(base_size=16, base_family=&quot;Times&quot;)
+# 设置内置主题的基本字体和字体大小</code></pre>
+<p>使用现成的主题并使用theme()微调参数，<strong>theme()必须接在指定主题的语句之后</strong>，在主题之前theme()无效，如<code>theme_bw() + theme()</code>有效。</p>
+</div>
+<div id="自定义主题" class="section level3">
+<h3>1.4 自定义主题</h3>
+<p>修改主题，配合相应的element_xx对象添加theme()函数。</p>
+<p><strong>主题文本属性</strong>：填充色fill、颜色colour、线型linetype、大小size、角度angle、样式face、字体簇family、对齐(hjust、vjust)、行间距lineheight等。</p>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133140.png" /></p>
+<div class="figure">
+<img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="" />
+<p class="caption">图片</p>
+</div>
+</div>
+<div id="隐藏网格线" class="section level3">
+<h3>1.5 隐藏网格线</h3>
+<pre><code>分别隐藏主网格线、主次网格线
+theme(panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank()) 
+
+分别隐藏纵向主网格线、纵向次网格线
+theme(panel.grid.major.x = element_blank(),  
+      panel.grid.minor.x = element_blank()) 
+
+分别隐藏横向主网格线、横向次网格线
+theme(panel.grid.major.y = element_blank(), 
+      panel.grid.minor.y = element_blank()) </code></pre>
+</div>
+</div>
+<div id="图形注解" class="section level2">
+<h2>2. 图形注解</h2>
+<p>向图形添加独立的图形元素或文本元素帮助读者解读数据。</p>
+<div id="添加文本" class="section level3">
+<h3>2.1 添加文本</h3>
+<pre><code>使用annotate()函数可以添加任意类型的几何对象
+annotate(&quot;text&quot;, x=3, y=48, label=&quot;需添加文本&quot;)  
+x，y为坐标位置</code></pre>
+<p>文本属性：字体簇family、样式fontface、颜色colour、大小size、对齐hjust/vjust、角度angle、行间距lineheight等。</p>
+<p><code>geom_text()</code>和<code>annotate()</code>函数区别：</p>
+<ul>
+<li>geom_text()会根据数据创建许多的文本对象；</li>
+<li>annotate()向图形添加一个单独的文本对象，想要添加独立文本对象时可使用annotate()函数。</li>
+</ul>
+</div>
+<div id="添加数学公式" class="section level3">
+<h3>2.2 添加数学公式</h3>
+<p>使用<code>annotate(geom="text")</code>并设置<code>parse=TRUE</code>。</p>
+<pre><code>annotate(&quot;text&quot;, x=2, y=0.3, parse=TRUE, label=&quot;数学公式&quot;) 
+x，y为坐标位置
+公式表达式示例：
+label= &quot;&#39;Function: &#39; * y==frac(1, sqrt(2*pi)) * e^{-x^2/2}&quot;)</code></pre>
+<p>在表达式中加入纯文本：在双引号内使用单引号选中纯文本，如<code>'Function: '</code>；
+在R的数学表达式语法中，不能简单地把一个变量直接放到另一个变量旁边却不在中间加上任何记号。要显示两个相邻的变量，需要在变量之间放置一个<code>*</code>操作符；
+在表达式中使用乘号：使用<code>%*%</code>符号；
+数学表达式示例参见 <code>?plotmath</code>；
+图示参见 <code>?demo(plotmath)</code>。</p>
+</div>
+<div id="添加直线" class="section level3">
+<h3>2.3 添加直线</h3>
+<div id="手动设置直线位置" class="section level4">
+<h4>2.3.1 手动设置直线位置</h4>
+<pre><code># 添加横线
+geom_hline()  # 如geom_hline(yintercept=60) 
+# 添加竖线 
+geom_vline()  # 如geom_vline(xintercept=14)
+# 添加有角度的直线 
+geom_abline() # 如geom_abline(intercept=37.4, slope=1.75)
+
+intercept指截距；slope指斜率。</code></pre>
+</div>
+<div id="自动设置直线位置" class="section level4">
+<h4>2.3.2 自动设置直线位置</h4>
+<p>可以通过计算公式将数值映射到yintercept、xintercept等上。</p>
+</div>
+<div id="离散型坐标轴" class="section level4">
+<h4>2.3.3 离散型坐标轴</h4>
+<p>坐标轴为离散型变量或者因子，不能以字符串形式指定截距，仍以数字形式指定，第一个水平为数值1，第二个水平为数值2…</p>
+<pre><code>geom_vline(xintercept = 2)  # 指定第二个水平
+geom_vline(xintercept = which(levels(PlantGrowth$group)==&quot;ctrl&quot;))  # 计算数值</code></pre>
+</div>
+</div>
+<div id="添加线段和箭头" class="section level3">
+<h3>2.4 添加线段和箭头</h3>
+<div id="添加线段" class="section level4">
+<h4>2.4.1 添加线段</h4>
+<p>使用annotate(“segment”)函数。</p>
+<pre><code>annotate(&quot;segment&quot;, x=1, xend=10, y=-.25, yend=-.25)
+# x，y为坐标位置，表示线段起点，xend，yend为线段终点</code></pre>
+</div>
+<div id="添加箭头或平头" class="section level4">
+<h4>2.4.2 添加箭头或平头</h4>
+<pre><code>library(grid) # 使用grid包的arrow()函数
+annotate(&quot;segment&quot;, x=1850, xend=1820, y=-.8, yend=-.95, 
+         colour=&quot;blue&quot;, size=2, # 设置线段的颜色、大小等
+         arrow=arrow()) # 箭头默认角度（angle）30度，默认长度（length）0.2英寸。
+
+修改箭头的参数
+arrow=arrow(ends=&quot;both&quot;, angle=90, length=unit(.2,&quot;cm&quot;))</code></pre>
+</div>
+<div id="离散型坐标轴-1" class="section level4">
+<h4>2.4.3 离散型坐标轴</h4>
+<p>如果坐标为离散型变量或因子，则第一个水平为数值1，第二个水平为数值2… x 和 y 的位置由拥有坐标值1, 2, 3等的类别项表示。</p>
+</div>
+</div>
+<div id="添加矩形阴影" class="section level3">
+<h3>2.5 添加矩形阴影</h3>
+<p>使用annotate(“rect”)函数。</p>
+<pre><code>annotate(&quot;rect&quot;, xmin=1950, xmax=1980, 
+         ymin=-1, ymax=1,  # xmin，xmax，ymin，ymax为矩形四点
+         alpha=.1, fill=&quot;blue&quot;) # 设置矩形透明度和填充颜色</code></pre>
+<p>每一个图层都是按照添加到ggplot对象的先后顺序绘制的，若要改变图层顺序，则改变添加对象的顺序。</p>
+</div>
+<div id="高亮某一元素" class="section level3">
+<h3>2.6 高亮某一元素</h3>
+<p>如果要高亮某元素，可以使用原始变量数据绘图，并为图形指定不同的颜色来达到高亮的效果。</p>
+</div>
+<div id="添加误差线" class="section level3">
+<h3>2.7 添加误差线</h3>
+<p>geom_errorbar()函数将变量映射到ymin和ymax的值。</p>
+<div id="普通条形图和折线图" class="section level4">
+<h4>2.7.1 普通条形图和折线图</h4>
+<p>普通条形图和折线图，添加误差线的方法是相同的。</p>
+<pre><code>geom_errorbar(aes(ymin=变量-se, ymax=变量+se), width=.2) 
+# se为标准误差；width指定误差线末端宽度
+# 可以设置误差线的大小size、颜色colour</code></pre>
+</div>
+<div id="分组条形图" class="section level4">
+<h4>2.7.2 分组条形图</h4>
+<p>对于分组条形图，各误差线也需并列(dodged)。
+误差线的并列宽度应与geom_bar()的并列宽度(默认0.9)相同。</p>
+<pre><code>geom_bar(position=&quot;dodge&quot;) + 
+geom_errorbar(aes(ymin=变量-se, ymax=变量+se), 
+              position=position_dodge(0.9),  # 指定误差线并列宽度
+              width=.2) # 指定误差线末端宽度</code></pre>
+</div>
+<div id="折线图的特殊之处" class="section level4">
+<h4>2.7.3 折线图的特殊之处</h4>
+<p>在折线图中，如果误差线的颜色与线和点的颜色不同，则应先绘制误差线，这样就会位于点和线的下层；
+并且应当同时并列所有的几何元素，它们就会同误差线对齐；</p>
+<pre><code>pd &lt;- position_dodge(.3) # 保存并列参数，需要重复使用
+ggplot(cabbage_exp, aes(x=Date, y=Weight, colour=Cultivar, group=Cultivar)) +
+       geom_errorbar(aes(ymin=Weight-se, ymax=Weight+se), 
+       width=.2, size=0.25, colour=&quot;black&quot;, position=pd) +  # 设定误差线的宽度、大小、颜色和并列宽度
+       geom_line(position=pd) + 
+       geom_point(position=pd, size=2.5) # 设定点的并列宽度和大小
+# 先绘制误差项，在绘制线和点，误差项、线、点的并列宽度是一样的。</code></pre>
+</div>
+</div>
+<div id="分面绘制添加注解" class="section level3">
+<h3>2.8 分面绘制添加注解</h3>
+<div id="分面添加文本注解" class="section level4">
+<h4>2.8.1 分面添加文本注解</h4>
+<p>如果使用annotate()函数，添加的文本注解会在所有分面上出现。
+使用分面变量创建新数据框，并设定每个分面要绘制的值。然后配合新数据框使用geom_text()函数。</p>
+<pre><code>p &lt;- ggplot(mpg, aes(x=displ, y=hwy)) + 
+            geom_point() + 
+            facet_grid(. ~ drv)
+# 存有每个分面所需标签的数据框           
+f_labels &lt;- data.frame(drv = c(&quot;4&quot;, &quot;f&quot;, &quot;r&quot;), 
+                       label = c(&quot;4wd&quot;, &quot;Front&quot;, &quot;Rear&quot;))
+geom_text(x=6, y=40, aes(label=label), data=f_labels)</code></pre>
+</div>
+<div id="分面添加公式" class="section level4">
+<h4>2.8.2 分面添加公式</h4>
+<p>略复杂，参考《R数据可视化手册》。</p>
+</div>
+</div>
+</div>
+<div id="图例参数" class="section level2">
+<h2>3. 图例参数</h2>
+<div id="移除图例" class="section level3">
+<h3>3.1 移除图例</h3>
+<pre><code>指定需要移除图例的标度
+guides(fill=FALSE)  # 移除标度fill的图例
+scale_fill_discrete(guide=FALSE)  # 移除标度fill的图例
+theme(legend.position=&quot;none&quot;) # 移除所有图例
+
+移除图例标题
+guides(fill=guide_legend(title=NULL)) # 移除标度fill的图例标题 
+scale_fill_hue(guide = guide_legend(title=NULL)) # 与上面效果相同
+# 其他图形属性如colour或shape，替换fill即可</code></pre>
+<div id="图形属性" class="section level4">
+<h4>图形属性</h4>
+<p>图形属性有fill、colour、shape等，当变量映射到不同的图形属性时要使用不同的标度。</p>
+<pre><code>图形属性fill
+scale_fill_discrete() # 默认
+scale_fill_hue()  # 与上面等价
+scale_fill_manual()
+scale_fill_grey()
+scale_fill_brewer()
+
+图形属性colour ：针对线和点
+scale_colour_discrete()
+scale_colour_hue()
+scale_colour_manual()
+scale_colour_grey()
+scale_colour_brewer()
+
+图形属性shape ：针对点
+scale_shape_manual()
+
+scale_linetype()</code></pre>
+</div>
+</div>
+<div id="图例位置" class="section level3">
+<h3>3.2 图例位置</h3>
+<pre><code>theme(legend.position=...)  
+# 位置参数为top、left、right或bottom 
+# 或指定坐标 c(x,y)，x和y在0-1之间。
+
+legend.justification = c(x,y) 
+# 指定图例框的哪一部分被放置到legend.position所指定的位置上。
+# 默认情况下，图例的中心(0.5, 0.5)被置于给定的坐标处</code></pre>
+<div id="图例添加边界" class="section level4">
+<h4>图例添加边界</h4>
+<pre><code>theme(legend.background=element_rect(fill=&quot;white&quot;, colour=&quot;black&quot;))  
+# 填充白色，黑色边框
+theme(legend.background=element_blank())  # 移除图例整体的边框
+theme(legend.key=element_blank())   # 移除每个图例项目周围的边框</code></pre>
+</div>
+</div>
+<div id="图例项目顺序" class="section level3">
+<h3>3.3 图例项目顺序</h3>
+<div id="修改图例顺序" class="section level4">
+<h4>3.3.1 修改图例顺序</h4>
+<pre><code># 调整 limits 参数修改项目顺序
+scale_fill_discrete(limits=c(&quot;trt1&quot;, &quot;trt2&quot;, &quot;ctrl&quot;))  
+limits参数改变的是图例项目顺序，但是x轴上的顺序没有改变；
+修改x轴的顺序就要设置scale_x_discrete()的limits参数。</code></pre>
+</div>
+<div id="反转图例顺序" class="section level4">
+<h4>3.3.2 反转图例顺序</h4>
+<pre><code>guides(fill=guide_legend(reverse=TRUE))  # 反转图例的顺序
+其他的图形属性如colour或size，替换fill即可</code></pre>
+</div>
+</div>
+<div id="图例标题标签" class="section level3">
+<h3>3.4 图例标题、标签</h3>
+<div id="修改图例标题" class="section level4">
+<h4>3.4.1 修改图例标题</h4>
+<p>使用labs()函数。</p>
+<pre><code>labs(fill=&quot;标题&quot;) 其他图形属性如colour或size替换fill
+scale_fill_discrete(name=&quot;标题&quot;)  # 同上，colour或size替换fill
+
+# 如果有多个变量被映射到带有图例的图形属性（即除x和y以外的图形属性），可以分别设置每个图例的标题。
+labs(colour=&quot;标题&quot;, size=&quot;另一个标题&quot;) 
+
+一个变量被分别映射到两个图形属性，则默认会生成一个组合了两种情况的图例
+shape=sex, colour=sex  # sex同时映射到shape和colour上
+# 仅修改shape的标题，会得到两个分离的图例
+labs(shape=&quot;Male/Female&quot;) 
+# 同时修改shape和colour的标题，还是原来的图例，只是修改了标题
+labs(shape=&quot;Male/Female&quot;, colour=&quot;Male/Female&quot;)  </code></pre>
+</div>
+<div id="修改图例标签" class="section level4">
+<h4>3.4.2 修改图例标签</h4>
+<p>使用labels()参数。</p>
+<pre><code>scale_fill_discrete(labels=c(&quot;标签1&quot;,&quot;标签2&quot;,&quot;标签3&quot;)) 
+只改变了图例的标签，x轴的标签没有变化，可以通过scale_x_discrete()修改
+
+如果同时修改了图例项目顺序，则要保证以相同的顺序设置标签
+scale_fill_discrete(limits=c(&quot;trt1&quot;, &quot;trt2&quot;, &quot;ctrl&quot;), 
+                    labels=c(&quot;Treatment 1&quot;, &quot;Treatment 2&quot;, &quot;Control&quot;))
+
+一个变量被分别映射到两个图形属性，默认会生成一个组合了两种情况的图例
+shape=sex, colour=sex # sex同时映射到shape和colour上
+# 修改一个标度中的标签，得到两个分离的图例
+scale_shape_discrete(labels=c(&quot;Female&quot;, &quot;Male&quot;)) 
+# 同时修改两个标度中的标签，还是原来的图例，只是修改了图例标签
+scale_shape_discrete(labels=c(&quot;Female&quot;, &quot;Male&quot;)) +  scale_colour_discrete(labels=c(&quot;Female&quot;, &quot;Male&quot;))</code></pre>
+</div>
+</div>
+<div id="图例标题标签外观" class="section level3">
+<h3>3.5 图例标题、标签外观</h3>
+<div id="图例标题外观" class="section level4">
+<h4>3.5.1 图例标题外观</h4>
+<p>使用<code>theme(legend.title=element_text())</code>参数。</p>
+<pre><code># 修改图例的字体样式、字体簇、颜色、大小等。
+theme(legend.title=element_text(face=&quot;italic&quot;, family=&quot;Times&quot;, colour=&quot;red&quot;, size=14))   </code></pre>
+</div>
+<div id="图例标签外观" class="section level4">
+<h4>3.5.2 图例标签外观</h4>
+<p>使用<code>theme(legend.text=element_text())</code>参数。</p>
+<pre><code># 修改图例标签的字体样式、字体簇、颜色、大小等。
+theme(legend.text=element_text(face=&quot;italic&quot;, family=&quot;Times&quot;, colour=&quot;red&quot;, size=14))  </code></pre>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133221.png" /></p>
+</div>
+</div>
+<div id="多行文本标签" class="section level3">
+<h3>3.6 多行文本标签</h3>
+<p>设置labels参数，使用<code>\n</code>来表示新行。</p>
+<pre><code>scale_fill_discrete(labels=c(&quot;Control&quot;,&quot;Type 1\ntreatment&quot;,&quot;Type 2\ntreatment&quot;)) 
+
+使用theme()增加图例说明的高度并减小各行的间距。
+library(grid)  # 使用grid包中的unit()函数
+theme(legend.text=element_text(lineheight=.8), 
+      legend.key.height=unit(1, &quot;cm&quot;)) </code></pre>
+</div>
+</div>
+<div id="坐标轴" class="section level2">
+<h2>4 坐标轴</h2>
+<div id="交换x轴和y轴" class="section level3">
+<h3>4.1 交换x轴和y轴</h3>
+<pre><code>coord_flip() # 翻转坐标轴</code></pre>
+</div>
+<div id="坐标轴显示直线" class="section level3">
+<h3>4.2 坐标轴显示直线</h3>
+<pre><code># 显示坐标轴直线，并设置为黑色
+theme(axis.line = element_line(colour=&quot;black&quot;)) 
+其他参数：大小size；
+两边界线末端仅部分重叠，完全重叠设置：lineend=&quot;square&quot;；</code></pre>
+</div>
+<div id="设置连续型坐标轴范围" class="section level3">
+<h3>4.3 设置连续型坐标轴范围</h3>
+<pre><code>xlim() # 设置连续性x轴的最小值和最大值
+ylim() # 同上
+ylim(0, max(PlantGrowth$weight)) # y轴最大值为weight变量的最大值
+
+ylim()是scale_y_continuous()设定范围的简便写法。
+
+调整参数limits可以设定x轴范围
+scale_y_continuous(limits=c(0, 10)) # 设定范围0-10，x轴同理</code></pre>
+<p><strong>注意</strong>：ggplot2包有两种设置值域的方式，第一种是修改标度；第二种是应用一个坐标变换。<strong>当你修改x标度和y标度的范围时，任何在范围以外的数据都会被移除</strong>，换言之，超出范围的数据不仅不会被展示，而且会被完全移出考虑处理的数据范围，<strong>统计量的计算都会基于修剪后的数据</strong>。</p>
+<p>通过<strong>坐标变换，数据则不会被修剪</strong>。从本质上讲，只是将数据放大或缩小到指定的范围。</p>
+<pre><code>coord_cartesian(ylim = c(5, 6.5))</code></pre>
+</div>
+<div id="坐标轴顺序" class="section level3">
+<h3>4.4 坐标轴顺序</h3>
+<div id="反转连续型坐标轴" class="section level4">
+<h4>4.4.1 反转连续型坐标轴</h4>
+<pre><code>xlim(6.5, 3.5)  # 指定反序范围反转，先写最大值，再写最小值
+scale_x_reverse()   # 反转x轴，不设定值域范围
+scale_x_reverse(limits=c(8, 0))   # 反转x轴并设定值域范围
+以上y轴同理</code></pre>
+</div>
+<div id="离散型坐标轴-2" class="section level4">
+<h4>4.4.2 离散型坐标轴</h4>
+<pre><code>设定参数limits来修改坐标轴顺序
+scale_x_discrete(limits=c(&quot;trt1&quot;,&quot;ctrl&quot;,&quot;trt2&quot;)) 
+如忽略因子中某些类别，则输入：limits=c(&quot;trt1&quot;,&quot;ctrl&quot;)
+
+反转因子顺序
+scale_x_discrete(limits=rev(levels(PlantGrowth$group)))
+# PlantGrowth$group为因子变量</code></pre>
+</div>
+</div>
+<div id="设置坐标轴缩放比例" class="section level3">
+<h3>4.5 设置坐标轴缩放比例</h3>
+<pre><code>coord_fixed() # 默认1：1，指坐标轴单位长度表示的数值范围是1:1
+coord_fixed(ratio=1/2)  # 通过设定参数ratio可以指定其他固定比例</code></pre>
+<p>可以在<code>scale_y_continuous()</code>和<code>scale_x_continuous()</code>中调整参数breaks，从而将刻度间距设为相同。</p>
+<pre><code>p + coord_fixed() +
+scale_y_continuous(breaks=seq(0, 420, 30)) +
+scale_x_continuous(breaks=seq(0, 420, 30))</code></pre>
+</div>
+<div id="刻度线和刻度标签" class="section level3">
+<h3>4.6 刻度线和刻度标签</h3>
+<div id="移除刻度线刻度标签和网格线" class="section level4">
+<h4>4.6.1 移除刻度线、刻度标签和网格线</h4>
+<pre><code>theme(axis.ticks=element_blank()) # 移除两坐标轴刻度线，无法仅隐藏单个坐标轴的刻度线
+theme(axis.text.x = element_blank()) # 仅移除x轴刻度标签，y轴同
+
+scale_y_continuous(breaks=NULL) 
+# 移除y轴刻度线、刻度标签和y轴网格线，仅对连续型坐标轴有效</code></pre>
+</div>
+<div id="设置刻度线位置" class="section level4">
+<h4>4.6.2 设置刻度线位置</h4>
+<pre><code>调整参数breaks可以修改刻度线的位置
+scale_y_continuous(breaks=c(4, 5, 6, 7，8))  # x轴同理
+使用seq()函数可以生成刻度线的位置向量，如seq(4, 8, by=1)</code></pre>
+</div>
+<div id="修改刻度标签文本" class="section level4">
+<h4>4.6.3 修改刻度标签文本</h4>
+<pre><code>调整参数labels可以修改刻度标签文本
+scale_y_continuous(breaks=c(50, 56), 
+                   labels=c(&quot;Tiny&quot;, &quot;short&quot;))
+# 标签较长可以使用换行符（\n）另起一行。</code></pre>
+</div>
+<div id="修改刻度标签外观" class="section level4">
+<h4>4.6.4 修改刻度标签外观</h4>
+<p>对于较长的标签，可以使用<strong>旋转角度</strong>或者<strong>另起一行</strong>的方式来增加可阅读性。</p>
+<pre><code>theme(axis.text.x = element_text(angle=30, hjust=1, vjust=1)) 
+# 刻度标签旋转30°
+# 参数hjust和vjust设置横向对齐（左对齐/居中/右对齐）和纵向对齐（顶部对齐/居中/底部对齐）。
+# 其他文本属性包括大小size、颜色colour、样式face和字体族family等；
+# size=rel(0.9))意为当前主题基础字体大小的0.9倍。</code></pre>
+</div>
+</div>
+<div id="坐标轴标签" class="section level3">
+<h3>4.7 坐标轴标签</h3>
+<div id="移除坐标轴标签" class="section level4">
+<h4>4.7.1 移除坐标轴标签</h4>
+<pre><code>theme(axis.title.x=element_blank()) # 移除x轴标签，不留出空白空间
+xlab(&quot;&quot;)  # 通过设置空字符来不显示x轴标签，但是会留出空间，表示存在空白文本
+# 以上y轴同</code></pre>
+</div>
+<div id="修改坐标轴标签文本" class="section level4">
+<h4>4.7.2 修改坐标轴标签文本</h4>
+<pre><code>xlab() # 修改x轴标签文本
+ylab() # 修改y轴标签文本
+
+labs(x = &quot;x轴标签&quot;, y = &quot;y轴标签&quot;) 
+scale_x_continuous(name=&quot;x轴标签&quot;) 
+# scale_y_continuous()、scale_x_discrete()也适用</code></pre>
+</div>
+<div id="修改坐标轴标签外观" class="section level4">
+<h4>4.7.3 修改坐标轴标签外观</h4>
+<pre><code>theme(axis.title.x=element_text(face=&quot;italic&quot;, colour=&quot;darkred&quot;, size=14))
+可以设置旋转angle、对齐(hjust/vjust)、大小size、颜色colour、样式face和字体簇family等；
+y轴一般不旋转，而是用\n表示另起一行；</code></pre>
+</div>
+</div>
+<div id="对数坐标轴" class="section level3">
+<h3>4.8 对数坐标轴</h3>
+<div id="转换为对数坐标轴" class="section level4">
+<h4>4.8.1 转换为对数坐标轴</h4>
+<pre><code>scale_x_log10() # x轴为对数轴
+scale_y_log10() # y轴为对数轴</code></pre>
+</div>
+<div id="对数坐标轴刻度标签" class="section level4">
+<h4>4.8.2 对数坐标轴刻度标签</h4>
+<pre><code>scale_x_log10(breaks=10^(-1:5))  # 值域过大会自动输出为科学记数法
+scale_y_log10(breaks=10^(0:3))
+
+scales包的trans_format()函数可使刻度标签使用指数记数法
+library(scales)
+scale_x_log10(breaks=10^(-1:5), 
+              labels=trans_format(&quot;log10&quot;, math_format(10^.x))) </code></pre>
+</div>
+<div id="对数坐标轴刻度位置" class="section level4">
+<h4>4.8.3 对数坐标轴刻度位置</h4>
+<p>较复杂，有需要建议参考《R数据可视化手册》。</p>
+</div>
+</div>
+<div id="绘制环状图形" class="section level3">
+<h3>4.9 绘制环状图形</h3>
+<p>较复杂，有需要建议参考《R数据可视化手册》。</p>
+</div>
+<div id="日期坐标轴" class="section level3">
+<h3>4.10 日期坐标轴</h3>
+<p>时间有关的对象有两类：日期对象（精确到天）和日期时间对象（精确到秒）。</p>
+<div id="日期坐标轴-1" class="section level4">
+<h4>4.10.1 日期坐标轴</h4>
+<pre><code>坐标轴上的日期刻度间距使用seq()函数设定
+
+datebreaks &lt;- seq(as.Date(&quot;1992-06-01&quot;), as.Date(&quot;1993-06-01&quot;), by=&quot;2 month&quot;)
+scale_x_date(breaks=datebreaks) # 使用设定的日期刻度分割点
+
+调整日期刻度标签的格式
+library(scales) # 使用scales包中的date_format()函数来指定格式
+scale_x_date(breaks=datebreaks, labels=date_format(&quot;%Y %b&quot;))
+日期格式应放入一个字符串中传递给date_format()。
+
+日期刻度标签的外观的调整跟前面刻度参数调整一样。
+theme(axis.text.x = element_text(angle=30, hjust=1))</code></pre>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133307.png" /></p>
+<center>
+常用的日期格式
+</center>
+</div>
+<div id="时间坐标轴" class="section level4">
+<h4>4.10.2 时间坐标轴</h4>
+<pre><code>手动指定刻度分割点和标签
+scale_x_continuous(breaks=c(0, 20, 40, 60, 80, 100), labels=c(&quot;0:00&quot;, &quot;0:20&quot;, &quot;0:40&quot;, &quot;1:00&quot;, &quot;1:20&quot;, &quot;1:40&quot;))
+
+其他设定参见《R数据可视化手册》</code></pre>
+</div>
+</div>
+</div>
+<div id="分面" class="section level2">
+<h2>5. 分面</h2>
+<div id="使用分面将数据分割绘制到子图中" class="section level3">
+<h3>5.1 使用分面将数据分割绘制到子图中</h3>
+<p>使用<code>facet_grid()</code>或<code>facet_wrap()</code>函数，并指定根据哪个变量来分割数据。</p>
+<div id="使用facet_grid分面" class="section level4">
+<h4>5.1.1 使用facet_grid()分面</h4>
+<p>进行纵向排布、横向排布或同时进行纵横向排布。</p>
+<pre><code># drv和cyl为数据集中指定进行分割的变量
+facet_grid(drv ~ .) # 纵向排列根据drv变量分面
+facet_grid(. ~ cyl) # 横向排列根据cyl变量分面
+facet_grid(drv ~ cyl) # 同时根据drv纵向、cyl横向分面</code></pre>
+</div>
+<div id="使用facet_wrap分面" class="section level4">
+<h4>5.1.2 使用facet_wrap()分面</h4>
+<p>使用<code>facet_wrap()</code>时，各子图将像纸上的文字一样被<strong>依次横向排布并换行</strong>。</p>
+<pre><code>facet_wrap( ~ class) # class为变量</code></pre>
+<p>facet_wrap()默认使用相等数量的行和列，比如说分面为4时，行与列为2x2；分面为5时，为3x3。</p>
+<p>修改行与列数目，通过<code>nrow</code>或<code>ncol</code>赋值实现。</p>
+<pre><code>facet_wrap( ~ class, nrow=2)
+facet_wrap( ~ class, ncol=4)</code></pre>
+<p>分面方向的选择依赖于你更倾向于鼓励读图者进行哪种类型的比较。</p>
+</div>
+</div>
+<div id="在不同坐标轴下使用分面" class="section level3">
+<h3>5.2 在不同坐标轴下使用分面</h3>
+<p>使每个分面的坐标轴不一样，将标度设置为“free_x”、“free_y”或“free”。</p>
+<pre><code>facet_grid(drv ~ cyl, scales=&quot;free_y&quot;) # 使用自由的y标度
+facet_grid(drv ~ cyl, scales=&quot;free&quot;) # 使用自由的x标度和y标度</code></pre>
+<p>通过设置只有的坐标轴标度，各个子图将拥有自己的坐标轴值域。
+无法直接设置各行或各列的值域，但是可以通过丢弃不想要的数据（以缩减值域）或通过添加几何对象geom_blank()（以扩展值域）的方式控制值域的大小。</p>
+</div>
+<div id="修改分面的文本标签" class="section level3">
+<h3>5.3 修改分面的文本标签</h3>
+<p>分面变量一般为离散型变量或者分类变量，直接修改分面变量各水平的名称就可以修改分面的文本标签。</p>
+<pre><code># 修改分面变量各水平
+levels(数据框名$分面变量)[levels(数据框名$分面变量)==&quot;水平1&quot;] &lt;- &quot;修改后的水平1&quot;
+levels(数据框名$分面变量)[levels(数据框名$分面变量)==&quot;水平2&quot;] &lt;- &quot;修改后的水平2&quot;
+levels(数据框名$分面变量)[levels(数据框名$分面变量)==&quot;水平3&quot;] &lt;- &quot;修改后的水平3&quot;</code></pre>
+<div id="贴标函数label_both" class="section level4">
+<h4>5.3.1 贴标函数label_both()</h4>
+<p><strong>作用</strong>：将在每个分面上<strong>同时打印出变量的名称和变量的值</strong>。</p>
+<pre><code>facet_grid(drv ~ ., labeller = label_both)</code></pre>
+</div>
+<div id="贴标函数label_parsed" class="section level4">
+<h4>5.3.2 贴标函数label_parsed()</h4>
+<p><strong>作用</strong>：可以<strong>读入字符串</strong>，并将其作为R<strong>数学表达式</strong>来解析。
+在修改分面变量水平时，各水平可以输入为数学表达式。</p>
+<pre><code>facet_grid(drv ~ ., labeller = label_parsed)</code></pre>
+<p><strong>注意</strong>：上面两个贴标函数适用于facet_grid()函数，可能不适用于facet_wrap()函数。</p>
+</div>
+</div>
+<div id="修改分面标签和标题的外观" class="section level3">
+<h3>5.4 修改分面标签和标题的外观</h3>
+<p>使用主题系统，通过设置strip.text来控制文本的外观，设置strip.background以控制背景的外观。</p>
+<pre><code>facet_grid(. ~ Date) +
+theme(strip.text = element_text(face=&quot;bold&quot;, size=rel(1.5)),
+      strip.background = element_rect(fill=&quot;lightblue&quot;, colour=&quot;black&quot;,
+size=1))
+# 可以设置背景颜色、边框颜色、边框轮廓粗细、字体大小、颜色、样式、字体簇等。</code></pre>
+</div>
+</div>
+<div id="配色" class="section level2">
+<h2>6. 配色</h2>
+<div id="设置对象的颜色" class="section level3">
+<h3>6.1 设置对象的颜色</h3>
+<p>对于几何对象，设置colour或者fill参数的值。</p>
+<pre><code>ggplot(birthwt, aes(x=bwt)) + 
+geom_histogram(fill=&quot;red&quot;, colour=&quot;black&quot;)</code></pre>
+<p>一般而言，colour参数控制的是线条、多边形轮廓的颜色，而fill参数控制的是多边形的填充色。</p>
+<p>对于点形来说，情况略微有些不同。大多数的点形，整个点的颜色是由colour控制的，而不是fi11。例外的情况是21-25号点，它们不仅有填充色，也有边界色。</p>
+</div>
+<div id="将变量映射到颜色上" class="section level3">
+<h3>6.2 将变量映射到颜色上</h3>
+<p>对于几何对象，将colour或fill参数的值设置为数据中某一列的列名即可。</p>
+<pre><code># 将变量映射到fill 参数
+ggplot(cabbage_exp, aes(x=Date, y=Weight, fill=Cultivar)) +
+geom_bar(colour=&quot;black&quot;, position=&quot;dodge&quot;)
+# 将变量映射到点的colour 参数
+ggplot(mtcars, aes(x=wt, y=mpg, colour=cyl)) + geom_point()</code></pre>
+</div>
+<div id="对离散型变量使用不同的调色板" class="section level3">
+<h3>6.3 对离散型变量使用不同的调色板</h3>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133404.png" /></p>
+<center>
+不同的调色板
+</center>
+<div id="默认调色板" class="section level4">
+<h4>6.3.1 默认调色板</h4>
+<pre><code>library(gcookbook) # 为了使用数据集
+ggplot(uspopage, aes(x=Year, y=Thousands, fill=AgeGroup)) + geom_area() + 
+scale_fill_discrete()  # 默认调色板
+# + scale_fill_hue() # 也是默认调色板</code></pre>
+</div>
+<div id="colorbrewer调色板" class="section level4">
+<h4>6.3.2 ColorBrewer调色板</h4>
+<p>查看ColorBrewer包中的调色板。</p>
+<pre><code>library(RColorBrewer) # 加载包
+display.brewer.all() # 展示该包中所有的调色板名称</code></pre>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133434.png" /></p>
+<p>ColorBrewer调色板可以通过名称来选择</p>
+<pre><code>scale_fill_brewer(palette=&quot;Oranges&quot;)  
+选择Oranges调色板，还可以选择其他的调色板</code></pre>
+</div>
+<div id="灰度调色板" class="section level4">
+<h4>6.3.3 灰度调色板</h4>
+<p>灰度调色板适合黑白打印。标度范围是0～1（其中0对应黑色，1对应白色），灰度调色板的默认范围是0.2～0.8，但这个可以更改。</p>
+<pre><code>scale_fill_grey(start=0.7, end=0)
+倒转方向并且更改灰度范围</code></pre>
+</div>
+</div>
+<div id="对离散型变量使用自定义调色板" class="section level3">
+<h3>6.4 对离散型变量使用自定义调色板</h3>
+<p>用<code>scale_colour_manual()</code>函数来自定义颜色；填充色标度，使用<code>scale_fill_manual()</code>代替即可。</p>
+<pre><code>scale_colour_manual(values=c(&quot;red&quot;, &quot;blue&quot;))
+scale_colour_manual(values=c(&quot;#CC6666&quot;, &quot;#7777DD&quot;))</code></pre>
+<p>参数values向量中的元素顺序自动匹配离散标度对应因子水平的顺序。
+查看因子顺序：<code>levels(因子名)</code>。</p>
+<p>变量是字符型向量而非因子形式，那么它会被自动转化为因子；顺序也默认地按字母表排序。</p>
+<pre><code>自定义颜色分配的顺序，可以使用带有名称的向量参数
+scale_colour_manual(values=c(m=&quot;blue&quot;, f=&quot;red&quot;))</code></pre>
+</div>
+<div id="使用色盲友好型调色板" class="section level3">
+<h3>6.5 使用色盲友好型调色板</h3>
+<p>使用函数<code>scale_fill_manual()</code>，调色板（cb_palette）用自定义的。</p>
+<pre><code># 自定义调色板(颜色选用对色盲友好的颜色)
+cb_palette &lt;- c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;, &quot;#009E73&quot;, &quot;#F0E442&quot;,
+                &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;) 
+scale_fill_manual(values=cb_palette)</code></pre>
+</div>
+<div id="对连续性变量使用自定义调色板" class="section level3">
+<h3>6.6 对连续性变量使用自定义调色板</h3>
+<p>对连续型变量使用自定义渐变式的调色板，可以是默认颜色、两色渐变<code>scale_colour_gradient()</code>、三色渐变<code>scale_colour_gradient2()</code>和四色渐变<code>scale_colour_gradientn()</code>。</p>
+<pre><code>两色渐变
+scale_colour_gradient(low=&quot;black&quot;, high=&quot;white&quot;)
+
+渐变色中间用白色划分
+library(scales) # muted()函数需要的包，muted()会针对输入的颜色输出一个饱和度较低的颜色
+scale_colour_gradient2(low=muted(&quot;red&quot;), mid=&quot;white&quot;, high=muted(&quot;blue&quot;),
+midpoint=110)
+
+n个颜色的渐变色
+scale_colour_gradientn(colours = c(&quot;darkred&quot;, &quot;orange&quot;, &quot;yellow&quot;, &quot;white&quot;))</code></pre>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/20210611133500.png" /></p>
+</div>
+<div id="根据数值设定阴影颜色" class="section level3">
+<h3>6.7 根据数值设定阴影颜色</h3>
+<p>较复杂，有需要参考《R数据可视化手册》。</p>
+<blockquote>
+<p><a href="https://mp.weixin.qq.com/s/9f0HpwOwqB1T5ZQrUg_Nsg">参考资料1</a><br />
+<a href="https://mp.weixin.qq.com/s/_6Z9B-3GIruMA4XvCThTcA">参考资料2</a></p>
+</blockquote>
+<p><font size=2></p>
+</div>
+</div>
