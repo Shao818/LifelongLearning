@@ -18,6 +18,9 @@ description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如�
 
 <font face="思源宋体 CN" >
 
+[报告下载](https://gitee.com/shao818/CapitalMarketResearch/raw/master/005%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%A1%8C%E4%B8%9A/%E6%81%92%E5%A4%A7%E7%A0%94%E7%A9%B6%E9%99%A2-%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%A1%8C%E4%B8%9A%E4%B8%93%E9%A2%98%E6%8A%A5%E5%91%8A%EF%BC%9A%E5%BD%93%E5%89%8D%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%9E%8D%E8%B5%84%E6%B8%A0%E9%81%93%E5%92%8C%E5%BD%A2%E5%8A%BF-180813.pdf)
+
+
 >ggplot2是由Hadley Wickham开发的一个功能十分强大的R语言绘图程序包，它能够非常轻松的画出各种好看的统计图形。  关于ggplot2的教程有很多， Scherer博士的这篇[blog](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/)是我目前为止看到过的最棒的ggplot2教学，讲得非常全面且详细。因此，在自己学习的同时希望将它分享给更多相关专业的同学。  
 
 

@@ -20,6 +20,7 @@ description: 本期内容将会介绍 ggplot2 绘图语法的基础，以及如�
 
 
 <p><font face="思源宋体 CN" ></p>
+<p><a href="https://gitee.com/shao818/CapitalMarketResearch/raw/master/005%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%A1%8C%E4%B8%9A/%E6%81%92%E5%A4%A7%E7%A0%94%E7%A9%B6%E9%99%A2-%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%A1%8C%E4%B8%9A%E4%B8%93%E9%A2%98%E6%8A%A5%E5%91%8A%EF%BC%9A%E5%BD%93%E5%89%8D%E6%88%BF%E5%9C%B0%E4%BA%A7%E8%9E%8D%E8%B5%84%E6%B8%A0%E9%81%93%E5%92%8C%E5%BD%A2%E5%8A%BF-180813.pdf">报告下载</a></p>
 <blockquote>
 <p>ggplot2是由Hadley Wickham开发的一个功能十分强大的R语言绘图程序包，它能够非常轻松的画出各种好看的统计图形。 关于ggplot2的教程有很多， Scherer博士的这篇<a href="https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/">blog</a>是我目前为止看到过的最棒的ggplot2教学，讲得非常全面且详细。因此，在自己学习的同时希望将它分享给更多相关专业的同学。</p>
 </blockquote>
@@ -374,7 +375,7 @@ ggplot(chic_high, aes(x = temp, y = o3)) +
   labs(x = &quot;Temperature (°F)&quot;, y = &quot;Temperature (°F) + random noise&quot;) +
   xlim(c(0, 100)) + ylim(c(0, 150)) +
   coord_fixed()</code></pre>
-<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 58 rows containing missing values (geom_point).</code></pre>
 <p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>x 轴上的 0-50 与 y 轴的 0-50 长度是相同的，拥有相同的比例。</p>
 <p>而 ratio 大于 1 时 y 轴上的单位比 x 轴上的单位长，反之则短。</p>
@@ -383,7 +384,7 @@ ggplot(chic_high, aes(x = temp, y = o3)) +
   labs(x = &quot;Temperature (°F)&quot;, y = &quot;Temperature (°F) + random noise&quot;) +
   xlim(c(0, 100)) + ylim(c(0, 150)) +
   coord_fixed(ratio = 1/5)</code></pre>
-<pre><code>## Warning: Removed 54 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 49 rows containing missing values (geom_point).</code></pre>
 <p><img src="/ProgramR/R语言绘图系列（三）——ggolot绘图1——如何用ggplot2绘制漂亮的统计图形_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 </div>
 <div id="使用函数来改变标签" class="section level2">
