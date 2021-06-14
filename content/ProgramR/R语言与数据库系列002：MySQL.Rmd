@@ -1,16 +1,18 @@
 ---
 author:
   - 韭菜园
-title: 'RMySQL数据查询'
+title: 'R语言与数据库系列002：MySQL'
 date: 2021-05-11
 categories:
   - R
+  - 数据库
+  - 连接
   - MySQL
-  - 数据查询
 tags:
   - R
+  - 数据库
+  - 连接
   - MySQL
-  - 数据查询
 slug: MySQL
 weight: 0004
 description: 使用R语言链接Mysql数据库进行数据查询

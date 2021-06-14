@@ -1,0 +1,269 @@
+---
+author:
+  - 水滴
+title: 'R包学习系列0002:tinytex'
+date: 2021-06-14
+categories:
+  - R包
+  - 动态报告
+  - tinytex
+tags:
+  - R包
+  - 动态报告
+  - tinytex
+slug: tinytex
+weight: 0002
+description: R包学习系列用以记录自己的R包学习历程，方便在需要的时候温故知新和成为工作学习的有力工具。
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<blockquote>
+<p>简单的说<code>tinytex</code>就是为了管理谢大神开发的<code>TinyTex</code>(<a href="https://yihui.org/tinytex/cn/)的包" class="uri">https://yihui.org/tinytex/cn/)的包</a>。<code>TinyTex</code> 是一个瘦身版的<code>TinyTex</code>。TeX Live的庞大体型问题困扰我多年，在2018年之前我终于抽出一周时间来解决这个问题，其实方案很简单：把对普通用户毫无用处的源代码和文档去掉即可。具体技术细节参见常见问题，总体而言就是利用了 <code>TinyTex</code>的自动化安装方式，配置文件中设置不要安装源文件和文档。</p>
+</blockquote>
+<pre class="r"><code>pacman::p_load(tinytex,formatR)</code></pre>
+<div id="安装tinytex" class="section level1">
+<h1>安装TinyTex</h1>
+<pre><code>install_tinytex()</code></pre>
+<p>如果 TinyTeX 本身的下载安装就很慢，或在 R 里面下载不完整，那么可以用浏览器或其它下载工具直接下载：<a href="https://github.com/yihui/tinytex-releases/releases" class="uri">https://github.com/yihui/tinytex-releases/releases</a> 然后把下载的文件路径传给安装函数，比如：</p>
+<pre><code>tinytex:::install_prebuilt(&#39;路径/TinyTeX.zip&#39;)</code></pre>
+</div>
+<div id="查看安装路径" class="section level1">
+<h1>查看安装路径</h1>
+<pre class="r"><code>tinytex_root()   # 默认安装路径</code></pre>
+<pre><code>## [1] &quot;D:\\soft\\TinyTeX&quot;</code></pre>
+</div>
+<div id="设置镜像" class="section level1">
+<h1>设置镜像</h1>
+<p>因为默认的 CTAN 镜像往往太慢了，所以建议在安装完 TinyTeX 之后设置国内的 CTAN 镜像，以方便将来更新或安装 LaTeX 包。比如清华镜像：</p>
+<pre class="r"><code>tinytex::tlmgr_repo(&#39;http://mirrors.tuna.tsinghua.edu.cn/CTAN/&#39;)</code></pre>
+<pre><code>## tlmgr option repository &quot;http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet&quot;</code></pre>
+</div>
+<div id="搜索包与安装包" class="section level1">
+<h1>搜索包与安装包</h1>
+<p>TinyTeX 的主要维护工作应该是安装 LaTeX 包以及更新。如果编译 PDF 时出现缺失 LaTeX 包的错误信息，可以用命令行 tlmgr search 根据缺失文件名搜索包名，并用 tlmgr install 安装缺失的包；命令 tlmgr update –self –all 可以更新整个 TeX Live 系统。R 用户可以使用 R 包 tinytex 中的相应函数，如：</p>
+<div id="查看已安装的包" class="section level2">
+<h2>查看已安装的包</h2>
+<pre class="r"><code>tl_pkgs()                     # 查看轻量级已包含哪些宏包</code></pre>
+<pre><code>##   [1] &quot;a4wide&quot;                   &quot;abstract&quot;                
+##   [3] &quot;achemso&quot;                  &quot;adforn&quot;                  
+##   [5] &quot;adjustbox&quot;                &quot;adobemapping&quot;            
+##   [7] &quot;ae&quot;                       &quot;algorithmicx&quot;            
+##   [9] &quot;algorithms&quot;               &quot;ametsoc&quot;                 
+##  [11] &quot;amscls&quot;                   &quot;amsfonts&quot;                
+##  [13] &quot;amsmath&quot;                  &quot;anyfontsize&quot;             
+##  [15] &quot;apacite&quot;                  &quot;appendix&quot;                
+##  [17] &quot;apptools&quot;                 &quot;arphic&quot;                  
+##  [19] &quot;atbegshi&quot;                 &quot;atveryend&quot;               
+##  [21] &quot;auxhook&quot;                  &quot;awesomebox&quot;              
+##  [23] &quot;babel&quot;                    &quot;babel-english&quot;           
+##  [25] &quot;babel-french&quot;             &quot;bbding&quot;                  
+##  [27] &quot;bbm-macros&quot;               &quot;beamer&quot;                  
+##  [29] &quot;biber&quot;                    &quot;biblatex&quot;                
+##  [31] &quot;biblatex-gb7714-2015&quot;     &quot;bibtex&quot;                  
+##  [33] &quot;bigintcalc&quot;               &quot;bitset&quot;                  
+##  [35] &quot;bookmark&quot;                 &quot;booktabs&quot;                
+##  [37] &quot;breakurl&quot;                 &quot;cancel&quot;                  
+##  [39] &quot;caption&quot;                  &quot;carlisle&quot;                
+##  [41] &quot;catoptions&quot;               &quot;ccicons&quot;                 
+##  [43] &quot;changepage&quot;               &quot;charter&quot;                 
+##  [45] &quot;chemfig&quot;                  &quot;chemgreek&quot;               
+##  [47] &quot;cite&quot;                     &quot;cjk&quot;                     
+##  [49] &quot;cjkpunct&quot;                 &quot;cleveref&quot;                
+##  [51] &quot;cm&quot;                       &quot;cns&quot;                     
+##  [53] &quot;collectbox&quot;               &quot;colortbl&quot;                
+##  [55] &quot;comment&quot;                  &quot;courier&quot;                 
+##  [57] &quot;crop&quot;                     &quot;csquotes&quot;                
+##  [59] &quot;ctablestack&quot;              &quot;ctex&quot;                    
+##  [61] &quot;datetime&quot;                 &quot;dblfloatfix&quot;             
+##  [63] &quot;dehyph&quot;                   &quot;doclicense&quot;              
+##  [65] &quot;draftwatermark&quot;           &quot;dvipdfmx&quot;                
+##  [67] &quot;dvips&quot;                    &quot;ec&quot;                      
+##  [69] &quot;eepic&quot;                    &quot;elegantbook&quot;             
+##  [71] &quot;endfloat&quot;                 &quot;endnotes&quot;                
+##  [73] &quot;enumitem&quot;                 &quot;environ&quot;                 
+##  [75] &quot;epsf&quot;                     &quot;epstopdf&quot;                
+##  [77] &quot;epstopdf-pkg&quot;             &quot;esint&quot;                   
+##  [79] &quot;eso-pic&quot;                  &quot;esvect&quot;                  
+##  [81] &quot;etex&quot;                     &quot;etex-pkg&quot;                
+##  [83] &quot;etexcmds&quot;                 &quot;etoolbox&quot;                
+##  [85] &quot;euenc&quot;                    &quot;eurosym&quot;                 
+##  [87] &quot;everyhook&quot;                &quot;everysel&quot;                
+##  [89] &quot;everyshi&quot;                 &quot;expex&quot;                   
+##  [91] &quot;extsizes&quot;                 &quot;fancyhdr&quot;                
+##  [93] &quot;fancyvrb&quot;                 &quot;fandol&quot;                  
+##  [95] &quot;filehook&quot;                 &quot;firstaid&quot;                
+##  [97] &quot;float&quot;                    &quot;floatflt&quot;                
+##  [99] &quot;floatrow&quot;                 &quot;fmtcount&quot;                
+## [101] &quot;fontawesome5&quot;             &quot;fontaxes&quot;                
+## [103] &quot;fonts-tlwg&quot;               &quot;fontspec&quot;                
+## [105] &quot;footmisc&quot;                 &quot;forarray&quot;                
+## [107] &quot;fp&quot;                       &quot;fpl&quot;                     
+## [109] &quot;framed&quot;                   &quot;garuda-c90&quot;              
+## [111] &quot;gbt7714&quot;                  &quot;geometry&quot;                
+## [113] &quot;gettitlestring&quot;           &quot;glyphlist&quot;               
+## [115] &quot;graphics&quot;                 &quot;graphics-cfg&quot;            
+## [117] &quot;graphics-def&quot;             &quot;grfext&quot;                  
+## [119] &quot;grffile&quot;                  &quot;hardwrap&quot;                
+## [121] &quot;helvetic&quot;                 &quot;hologo&quot;                  
+## [123] &quot;hycolor&quot;                  &quot;hyperref&quot;                
+## [125] &quot;hyperxmp&quot;                 &quot;hyph-utf8&quot;               
+## [127] &quot;hyphen-base&quot;              &quot;hyphen-french&quot;           
+## [129] &quot;hyphenat&quot;                 &quot;ifmtarg&quot;                 
+## [131] &quot;iftex&quot;                    &quot;inconsolata&quot;             
+## [133] &quot;infwarerr&quot;                &quot;intcalc&quot;                 
+## [135] &quot;jknapltx&quot;                 &quot;kastrup&quot;                 
+## [137] &quot;knuth-lib&quot;                &quot;koma-script&quot;             
+## [139] &quot;kpathsea&quot;                 &quot;kvdefinekeys&quot;            
+## [141] &quot;kvoptions&quot;                &quot;kvsetkeys&quot;               
+## [143] &quot;l3backend&quot;                &quot;l3kernel&quot;                
+## [145] &quot;l3packages&quot;               &quot;langsci&quot;                 
+## [147] &quot;lastpage&quot;                 &quot;latex&quot;                   
+## [149] &quot;latex-amsmath-dev&quot;        &quot;latex-base-dev&quot;          
+## [151] &quot;latex-bin&quot;                &quot;latex-firstaid-dev&quot;      
+## [153] &quot;latex-fonts&quot;              &quot;latex-tools-dev&quot;         
+## [155] &quot;latexconfig&quot;              &quot;latexmk&quot;                 
+## [157] &quot;letltxmacro&quot;              &quot;lettrine&quot;                
+## [159] &quot;libertine&quot;                &quot;lineno&quot;                  
+## [161] &quot;lipsum&quot;                   &quot;listings&quot;                
+## [163] &quot;lm&quot;                       &quot;lm-math&quot;                 
+## [165] &quot;logreq&quot;                   &quot;ltxcmds&quot;                 
+## [167] &quot;ltxkeys&quot;                  &quot;lua-alt-getopt&quot;          
+## [169] &quot;luahbtex&quot;                 &quot;lualatex-math&quot;           
+## [171] &quot;lualibs&quot;                  &quot;luaotfload&quot;              
+## [173] &quot;luatex&quot;                   &quot;luatexbase&quot;              
+## [175] &quot;luatexja&quot;                 &quot;ly1&quot;                     
+## [177] &quot;makecell&quot;                 &quot;makecmds&quot;                
+## [179] &quot;makeindex&quot;                &quot;manfnt&quot;                  
+## [181] &quot;marginnote&quot;               &quot;marvosym&quot;                
+## [183] &quot;mathalpha&quot;                &quot;mathpazo&quot;                
+## [185] &quot;mathspec&quot;                 &quot;mathtools&quot;               
+## [187] &quot;mdframed&quot;                 &quot;mdwtools&quot;                
+## [189] &quot;memoir&quot;                   &quot;metafont&quot;                
+## [191] &quot;metalogo&quot;                 &quot;mfware&quot;                  
+## [193] &quot;mhchem&quot;                   &quot;microtype&quot;               
+## [195] &quot;minifp&quot;                   &quot;mnras&quot;                   
+## [197] &quot;modes&quot;                    &quot;morefloats&quot;              
+## [199] &quot;moreverb&quot;                 &quot;mptopdf&quot;                 
+## [201] &quot;ms&quot;                       &quot;multirow&quot;                
+## [203] &quot;mwe&quot;                      &quot;mweights&quot;                
+## [205] &quot;natbib&quot;                   &quot;ncntrsbk&quot;                
+## [207] &quot;needspace&quot;                &quot;newfloat&quot;                
+## [209] &quot;newtx&quot;                    &quot;norasi-c90&quot;              
+## [211] &quot;ntgclass&quot;                 &quot;oberdiek&quot;                
+## [213] &quot;palatino&quot;                 &quot;paralist&quot;                
+## [215] &quot;parskip&quot;                  &quot;pbox&quot;                    
+## [217] &quot;pdfescape&quot;                &quot;pdflscape&quot;               
+## [219] &quot;pdfpages&quot;                 &quot;pdfsync&quot;                 
+## [221] &quot;pdftex&quot;                   &quot;pdftexcmds&quot;              
+## [223] &quot;pgf&quot;                      &quot;picinpar&quot;                
+## [225] &quot;pkuthss&quot;                  &quot;placeins&quot;                
+## [227] &quot;plain&quot;                    &quot;platex&quot;                  
+## [229] &quot;platex-tools&quot;             &quot;polyglossia&quot;             
+## [231] &quot;preprint&quot;                 &quot;preview&quot;                 
+## [233] &quot;psfrag&quot;                   &quot;psnfss&quot;                  
+## [235] &quot;ptex&quot;                     &quot;ptex-base&quot;               
+## [237] &quot;ptex-fonts&quot;               &quot;ragged2e&quot;                
+## [239] &quot;realscripts&quot;              &quot;refcount&quot;                
+## [241] &quot;rerunfilecheck&quot;           &quot;revtex4-1&quot;               
+## [243] &quot;roboto&quot;                   &quot;rsfs&quot;                    
+## [245] &quot;sauerj&quot;                   &quot;scheme-infraonly&quot;        
+## [247] &quot;sectsty&quot;                  &quot;seqsplit&quot;                
+## [249] &quot;setspace&quot;                 &quot;sidecap&quot;                 
+## [251] &quot;siunitx&quot;                  &quot;soul&quot;                    
+## [253] &quot;soulutf8&quot;                 &quot;sourcecodepro&quot;           
+## [255] &quot;srcltx&quot;                   &quot;standalone&quot;              
+## [257] &quot;stix&quot;                     &quot;stmaryrd&quot;                
+## [259] &quot;stringenc&quot;                &quot;sttools&quot;                 
+## [261] &quot;subfig&quot;                   &quot;subfigure&quot;               
+## [263] &quot;svn-prov&quot;                 &quot;symbol&quot;                  
+## [265] &quot;tabto-ltx&quot;                &quot;tabu&quot;                    
+## [267] &quot;tcolorbox&quot;                &quot;tex&quot;                     
+## [269] &quot;tex-gyre&quot;                 &quot;tex-ini-files&quot;           
+## [271] &quot;texlive-msg-translations&quot; &quot;texlive-scripts&quot;         
+## [273] &quot;texlive.infra&quot;            &quot;textcase&quot;                
+## [275] &quot;thmtools&quot;                 &quot;threeparttable&quot;          
+## [277] &quot;threeparttablex&quot;          &quot;thumbpdf&quot;                
+## [279] &quot;times&quot;                    &quot;tipa&quot;                    
+## [281] &quot;titlesec&quot;                 &quot;tlgs&quot;                    
+## [283] &quot;tlperl&quot;                   &quot;tocbibind&quot;               
+## [285] &quot;tocloft&quot;                  &quot;tools&quot;                   
+## [287] &quot;totcount&quot;                 &quot;totpages&quot;                
+## [289] &quot;translator&quot;               &quot;trimspaces&quot;              
+## [291] &quot;ttfutils&quot;                 &quot;tufte-latex&quot;             
+## [293] &quot;type1cm&quot;                  &quot;ucs&quot;                     
+## [295] &quot;uhc&quot;                      &quot;ulem&quot;                    
+## [297] &quot;unicode-data&quot;             &quot;unicode-math&quot;            
+## [299] &quot;uniquecounter&quot;            &quot;units&quot;                   
+## [301] &quot;uplatex&quot;                  &quot;upquote&quot;                 
+## [303] &quot;uptex&quot;                    &quot;uptex-base&quot;              
+## [305] &quot;uptex-fonts&quot;              &quot;url&quot;                     
+## [307] &quot;urlbst&quot;                   &quot;varwidth&quot;                
+## [309] &quot;vmargin&quot;                  &quot;vruler&quot;                  
+## [311] &quot;wadalab&quot;                  &quot;wallpaper&quot;               
+## [313] &quot;wrapfig&quot;                  &quot;xargs&quot;                   
+## [315] &quot;xcjk2uni&quot;                 &quot;xcolor&quot;                  
+## [317] &quot;xecjk&quot;                    &quot;xetex&quot;                   
+## [319] &quot;xetexconfig&quot;              &quot;xifthen&quot;                 
+## [321] &quot;xkeyval&quot;                  &quot;xltxtra&quot;                 
+## [323] &quot;xpinyin&quot;                  &quot;xstring&quot;                 
+## [325] &quot;xunicode&quot;                 &quot;xwatermark&quot;              
+## [327] &quot;xypic&quot;                    &quot;zapfchan&quot;                
+## [329] &quot;zapfding&quot;                 &quot;zhmetrics&quot;               
+## [331] &quot;zhmetrics-uptex&quot;          &quot;zhnumber&quot;                
+## [333] &quot;zref&quot;</code></pre>
+</div>
+<div id="搜索包" class="section level2">
+<h2>搜索包</h2>
+<pre class="r"><code>tlmgr_search(&#39;framed.sty&#39;)  # 搜索包含 framed.sty 文件的 LaTeX 包</code></pre>
+<pre><code>## tlmgr search --file --global &quot;framed.sty&quot;</code></pre>
+</div>
+<div id="安装包" class="section level2">
+<h2>安装包</h2>
+<pre><code>tlmgr_install(&#39;framed&#39;)     # 安装 framed 包</code></pre>
+</div>
+<div id="更新包" class="section level2">
+<h2>更新包</h2>
+<pre><code>tlmgr_update(&#39;framed&#39;)     # 安装 framed 包</code></pre>
+</div>
+<div id="移除包" class="section level2">
+<h2>移除包</h2>
+<pre><code>tlmgr_remove(&#39;framed&#39;)     # 安装 framed 包</code></pre>
+</div>
+<div id="自动安装包" class="section level2">
+<h2>自动安装包</h2>
+<pre><code># 避免出现警告, 再安装宏包
+tlmgr_install(&quot;texlive-msg-translations&quot;)</code></pre>
+</div>
+<div id="查找缺少的包" class="section level2">
+<h2>查找缺少的包</h2>
+<pre><code>parse_packages(&quot;test.log&quot;)</code></pre>
+</div>
+<div id="查看缺少的包并安装" class="section level2">
+<h2>查看缺少的包并安装</h2>
+<pre><code>parse_install(&quot;test.log&quot;)</code></pre>
+</div>
+</div>
+<div id="更新texlive" class="section level1">
+<h1>更新TexLive</h1>
+<pre><code>tlmgr_update()              # 更新 TeX Live</code></pre>
+</div>
+<div id="编译tex" class="section level1">
+<h1>编译tex</h1>
+<p>在 tinytex 包中还有一系列函数用来编译 LaTeX 文档，核心函数是 latexmk()，它主要是为了模拟 LaTeX 工具 latexmk，即：重要的 LaTeX 文档默认编三遍。如果你不懂这句话，那么恭喜你，不懂更好，不要在它上面浪费时间。还有另一个非常有用的功能，就是模拟 Windows 上 MiKTeX（当然现在 MikTeX 似乎并不局限于 Windows 了）：编译 LaTeX 文档过程中默认自动检测并安装缺失的 LaTeX 包。能自动化的都自动化，不必费劲去跑 tlmgr search 或 tlmgr install 之类的命令。</p>
+<div id="latexmk的用法" class="section level2">
+<h2><code>latexmk</code>的用法</h2>
+<pre class="r"><code>usage(latexmk)</code></pre>
+<pre><code>## latexmk(file,
+##     engine = c(&quot;pdflatex&quot;, &quot;xelatex&quot;, &quot;lualatex&quot;, &quot;latex&quot;, &quot;tectonic&quot;),
+##     bib_engine = c(&quot;bibtex&quot;, &quot;biber&quot;), engine_args = NULL, emulation = TRUE,
+##     min_times = 1, max_times = 10,
+##     install_packages = emulation &amp;&amp; tlmgr_writable(),
+##     pdf_file = gsub(&quot;tex$&quot;, &quot;pdf&quot;, file), clean = TRUE)</code></pre>
+</div>
+<div id="编译-elegantbook-cn.tex" class="section level2">
+<h2>编译 <code>elegantbook-cn.tex</code></h2>
+<pre><code>xelatex(&quot;elegantbook-cn.tex&quot;)</code></pre>
+</div>
+</div>

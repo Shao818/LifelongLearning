@@ -1,0 +1,139 @@
+---
+author:
+  - 水滴
+title: 'R包学习系列0002:tinytex'
+date: 2021-06-14
+categories:
+  - R包
+  - 动态报告
+  - tinytex
+tags:
+  - R包
+  - 动态报告
+  - tinytex
+slug: tinytex
+weight: 0002
+description: R包学习系列用以记录自己的R包学习历程，方便在需要的时候温故知新和成为工作学习的有力工具。
+---
+
+    
+    
+    
+
+
+>简单的说`tinytex`就是为了管理谢大神开发的`TinyTex`(https://yihui.org/tinytex/cn/)的包。`TinyTex` 是一个瘦身版的`TinyTex`。TeX Live的庞大体型问题困扰我多年，在2018年之前我终于抽出一周时间来解决这个问题，其实方案很简单：把对普通用户毫无用处的源代码和文档去掉即可。具体技术细节参见常见问题，总体而言就是利用了 `TinyTex`的自动化安装方式，配置文件中设置不要安装源文件和文档。
+
+```{r}
+pacman::p_load(tinytex,formatR)
+```
+
+# 安装TinyTex
+
+```
+install_tinytex()
+```
+
+如果 TinyTeX 本身的下载安装就很慢，或在 R 里面下载不完整，那么可以用浏览器或其它下载工具直接下载：https://github.com/yihui/tinytex-releases/releases 然后把下载的文件路径传给安装函数，比如：
+
+
+```
+tinytex:::install_prebuilt('路径/TinyTeX.zip')
+```
+
+# 查看安装路径
+
+```{r}
+tinytex_root()   # 默认安装路径
+```
+
+
+# 设置镜像
+
+因为默认的 CTAN 镜像往往太慢了，所以建议在安装完 TinyTeX 之后设置国内的 CTAN 镜像，以方便将来更新或安装 LaTeX 包。比如清华镜像：
+
+```{r echo=TRUE}
+tinytex::tlmgr_repo('http://mirrors.tuna.tsinghua.edu.cn/CTAN/')
+```
+
+# 搜索包与安装包
+
+TinyTeX 的主要维护工作应该是安装 LaTeX 包以及更新。如果编译 PDF 时出现缺失 LaTeX 包的错误信息，可以用命令行 tlmgr search 根据缺失文件名搜索包名，并用 tlmgr install 安装缺失的包；命令 tlmgr update --self --all 可以更新整个 TeX Live 系统。R 用户可以使用 R 包 tinytex 中的相应函数，如：
+
+## 查看已安装的包
+
+```{r}
+tl_pkgs()                     # 查看轻量级已包含哪些宏包
+```
+
+
+## 搜索包
+
+```{r}
+tlmgr_search('framed.sty')  # 搜索包含 framed.sty 文件的 LaTeX 包
+```
+
+## 安装包
+
+```
+tlmgr_install('framed')     # 安装 framed 包
+```
+
+
+## 更新包
+
+```
+tlmgr_update('framed')     # 安装 framed 包
+```
+
+
+## 移除包
+
+```
+tlmgr_remove('framed')     # 安装 framed 包
+```
+
+## 自动安装包
+
+```
+# 避免出现警告, 再安装宏包
+tlmgr_install("texlive-msg-translations")
+```
+
+## 查找缺少的包
+
+```
+parse_packages("test.log")
+```
+
+## 查看缺少的包并安装
+
+```
+parse_install("test.log")
+```
+
+
+# 更新TexLive
+
+```
+tlmgr_update()              # 更新 TeX Live
+```
+
+# 编译tex
+
+在 tinytex 包中还有一系列函数用来编译 LaTeX 文档，核心函数是 latexmk()，它主要是为了模拟 LaTeX 工具 latexmk，即：重要的 LaTeX 文档默认编三遍。如果你不懂这句话，那么恭喜你，不懂更好，不要在它上面浪费时间。还有另一个非常有用的功能，就是模拟 Windows 上 MiKTeX（当然现在 MikTeX 似乎并不局限于 Windows 了）：编译 LaTeX 文档过程中默认自动检测并安装缺失的 LaTeX 包。能自动化的都自动化，不必费劲去跑 tlmgr search 或 tlmgr install 之类的命令。
+
+## `latexmk`的用法
+
+```{r}
+usage(latexmk)
+```
+
+## 编译 `elegantbook-cn.tex`
+
+```
+xelatex("elegantbook-cn.tex")
+```
+
+
+
+

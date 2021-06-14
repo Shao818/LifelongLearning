@@ -1,16 +1,18 @@
 ---
 author:
   - 韭菜园
-title: 'RMySQL数据查询'
+title: 'R语言与数据库系列002：MySQL'
 date: 2021-05-11
 categories:
   - R
+  - 数据库
+  - 连接
   - MySQL
-  - 数据查询
 tags:
   - R
+  - 数据库
+  - 连接
   - MySQL
-  - 数据查询
 slug: MySQL
 weight: 0004
 description: 使用R语言链接Mysql数据库进行数据查询
@@ -34,7 +36,7 @@ summary(con)</code></pre>
 ## db.version = 8.0.24 
 ## port = NA 
 ## protocol.version = 10 
-## thread.id = 406</code></pre>
+## thread.id = 45</code></pre>
 <pre class="r"><code>#查看数据库信息
 dbGetInfo(con)</code></pre>
 <pre><code>## $host
@@ -59,10 +61,10 @@ dbGetInfo(con)</code></pre>
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 406</code></pre>
+## [1] 45</code></pre>
 <pre class="r"><code>#查看数据库中的表
 dbListTables(con)</code></pre>
-<pre><code>## [1] &quot;dept&quot;   &quot;person&quot;</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;mtcars2&quot; &quot;mtcars4&quot; &quot;person&quot;</code></pre>
 </div>
 <div id="查询表中的所有字段信息" class="section level2">
 <h2>查询表中的所有字段信息</h2>
@@ -129,8 +131,10 @@ dbGetQuery(con,&quot;select * from person&quot;)</code></pre>
 ##   SQL  SELECT * FROM person
 ##   ROWS Fetched: 0 [incomplete]
 ##        Changed: 0</code></pre>
-<pre class="r"><code>res &lt;- dbSendQuery(con, &quot;SELECT * FROM person&quot;)  
-data &lt;- dbFetch(res,n=-1) #取前2条数据，n=-1时是获取所有数据  
+<pre class="r"><code>res &lt;- dbSendQuery(con, &quot;SELECT * FROM person&quot;)  </code></pre>
+<pre><code>## Warning in result_create(conn@ptr, statement, is_statement): Cancelling previous
+## query</code></pre>
+<pre class="r"><code>data &lt;- dbFetch(res,n=-1) #取前2条数据，n=-1时是获取所有数据  
 print(data)</code></pre>
 <pre><code>##    id       name age  sex  salary  hire_date dept_id
 ## 1   1       alex  28 人妖   53000 2010-06-21       1

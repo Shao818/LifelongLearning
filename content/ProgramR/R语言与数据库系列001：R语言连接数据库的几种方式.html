@@ -1,0 +1,419 @@
+---
+author:
+  - 水滴
+title: 'R语言与数据库系列001：R语言连接数据库的几种方式'
+date: 2021-06-14
+categories:
+  - R
+  - 数据库
+  - 连接
+  - Mysql
+tags:
+  - R
+  - 数据库
+  - 连接
+  - Mysql
+slug: connection_database
+weight: 0004
+description: 比较R语言连接数据库的几种方式。
+--- 
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>R连接数据库的方式不止一种，梳理清楚每种连接方式的异同，选择最方便的一种方式，不失为一种提高工作效率的有效途径。本篇总结了R连接数据库几种方式的异同。</p>
+<ul>
+<li><p>第一种方式（依赖DBI +RMariaDB包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；<br />
+</p></li>
+<li><p>第二种方式（依赖odbc包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；第二种方式：其优点在于可以在Rstudio IDE中形成连接，便于查看数据库的内部结构和预览数据，通常是我的第二选择；</p></li>
+<li><p>第三种方式（依赖DBI +RMySQL包）：与第一种方式相类似，但重大缺陷是无法写入数据；</p></li>
+<li><p>第四种方式（依赖RODBC包）：十分不推荐的一种方式。原因在于：其一，需要事前配置数据源；其二；读取中文乱码。</p></li>
+</ul>
+<div id="第一种方式依赖dbi-rmariadb包" class="section level1">
+<h1>第一种方式（依赖DBI +RMariaDB包）</h1>
+<div id="加载需要的包并创建连接" class="section level2">
+<h2>加载需要的包并创建连接</h2>
+<pre><code>pacman::p_load(DBI ,RMariaDB) zeallot,odbc, RMySQL,
+con &lt;- dbConnect(MariaDB(), host = &quot;&quot;, dbname = &quot;数据库名字&quot;,
+                 user = &quot;账户名&quot;, password = &quot;账户密码&quot;)</code></pre>
+</div>
+<div id="查看链接信息" class="section level2">
+<h2>查看链接信息</h2>
+<pre class="r"><code>summary(con)</code></pre>
+<pre><code>##            Length             Class              Mode 
+##                 1 MariaDBConnection                S4</code></pre>
+</div>
+<div id="查看数据库信息" class="section level2">
+<h2>查看数据库信息</h2>
+<pre class="r"><code>dbGetInfo(con)</code></pre>
+<pre><code>## $host
+## [1] &quot;localhost&quot;
+## 
+## $username
+## [1] &quot;root&quot;
+## 
+## $dbname
+## [1] &quot;learning&quot;
+## 
+## $con.type
+## [1] &quot;localhost via TCP/IP&quot;
+## 
+## $db.version
+## [1] &quot;8.0.24&quot;
+## 
+## $port
+## [1] NA
+## 
+## $protocol.version
+## [1] 10
+## 
+## $thread.id
+## [1] 40</code></pre>
+</div>
+<div id="查看数据库中的表" class="section level2">
+<h2>查看数据库中的表</h2>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;   &quot;mtcars&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="查看数据" class="section level2">
+<h2>查看数据</h2>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from mtcars limit 5&quot;)</code></pre>
+<pre><code>##    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from dept&quot;)</code></pre>
+<pre><code>##   did  dname
+## 1   1 教学部
+## 2   2 销售部
+## 3   3 市场部
+## 4   4 人事部
+## 5   5 鼓励部</code></pre>
+</div>
+<div id="写入数据表" class="section level2">
+<h2>写入数据表</h2>
+<pre class="r"><code>dbWriteTable(con, &quot;mtcars1&quot;, mtcars)</code></pre>
+<ul>
+<li>查看是否写入</li>
+</ul>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="断开连接" class="section level2">
+<h2>断开连接</h2>
+<pre class="r"><code>dbDisconnect(con)</code></pre>
+</div>
+<div id="移除依赖的r包" class="section level2">
+<h2>移除依赖的R包</h2>
+<pre class="r"><code>pacman::p_unload(DBI ,RMariaDB)</code></pre>
+<pre><code>## The following packages have been unloaded:
+## DBI, RMariaDB</code></pre>
+</div>
+</div>
+<div id="第二种方式依赖odbc包" class="section level1">
+<h1>第二种方式（依赖odbc包）</h1>
+<div id="加载需要的包并创建连接-1" class="section level2">
+<h2>加载需要的包并创建连接</h2>
+<pre class="r"><code>pacman::p_load(odbc)
+con &lt;- dbConnect(odbc(),
+                 .connection_string = &quot;Driver={MySQL ODBC 8.0 Unicode Driver};&quot;,
+                 timeout = 10,
+                 database=&quot;数据库名字&quot;, uid=&quot;账户名&quot;, pwd=&quot;账户密码&quot;)</code></pre>
+<blockquote>
+<p>RStudio IDE 对上面的连接方式有加持，一旦连接上，会出现一个 Connections 窗口，见下图，可以点击图中圈住的小三角一层层展开 demo 数据库的每个表、字段，非常方便查看</p>
+</blockquote>
+<p><img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20211914091931.png" alt="Connections 窗口" />
+。</p>
+<div class="figure">
+<img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20212014092052.png" alt="" />
+<p class="caption">预览数据</p>
+</div>
+</div>
+<div id="查看连接信息" class="section level2">
+<h2>查看连接信息</h2>
+<pre class="r"><code>summary(con)</code></pre>
+<pre><code>## Length  Class   Mode 
+##      1  MySQL     S4</code></pre>
+</div>
+<div id="查看数据库信息-1" class="section level2">
+<h2>查看数据库信息</h2>
+<pre class="r"><code>dbGetInfo(con)</code></pre>
+<pre><code>## $dbname
+## [1] &quot;learning&quot;
+## 
+## $dbms.name
+## [1] &quot;MySQL&quot;
+## 
+## $db.version
+## [1] &quot;8.0.24&quot;
+## 
+## $username
+## [1] &quot;root&quot;
+## 
+## $host
+## [1] &quot;&quot;
+## 
+## $port
+## [1] &quot;&quot;
+## 
+## $sourcename
+## [1] &quot;&quot;
+## 
+## $servername
+## [1] &quot;localhost via TCP/IP&quot;
+## 
+## $drivername
+## [1] &quot;myodbc8w.dll&quot;
+## 
+## $odbc.version
+## [1] &quot;03.80.0000&quot;
+## 
+## $driver.version
+## [1] &quot;08.00.0025&quot;
+## 
+## $odbcdriver.version
+## [1] &quot;03.80&quot;
+## 
+## $supports.transactions
+## [1] TRUE
+## 
+## $getdata.extensions.any_column
+## [1] TRUE
+## 
+## $getdata.extensions.any_order
+## [1] TRUE
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;MySQL&quot;       &quot;driver_info&quot; &quot;list&quot;</code></pre>
+</div>
+<div id="查看数据库中的表-1" class="section level2">
+<h2>查看数据库中的表</h2>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="查看数据-1" class="section level2">
+<h2>查看数据</h2>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from mtcars limit 5&quot;)</code></pre>
+<pre><code>##    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from dept&quot;)  </code></pre>
+<pre><code>##   did  dname
+## 1   1 教学部
+## 2   2 销售部
+## 3   3 市场部
+## 4   4 人事部
+## 5   5 鼓励部</code></pre>
+</div>
+<div id="写入数据" class="section level2">
+<h2>写入数据</h2>
+<pre class="r"><code>dbWriteTable(con, &quot;mtcars2&quot;, mtcars)</code></pre>
+<ul>
+<li>查看是否写入</li>
+</ul>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;mtcars2&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="断开连接-1" class="section level2">
+<h2>断开连接</h2>
+<pre class="r"><code>dbDisconnect(con)</code></pre>
+</div>
+<div id="移除依赖的r包-1" class="section level2">
+<h2>移除依赖的R包</h2>
+<pre class="r"><code>pacman::p_unload(odbc)</code></pre>
+<pre><code>## The following packages have been unloaded:
+## odbc</code></pre>
+</div>
+</div>
+<div id="第三种方式依赖dbi-rmysql包" class="section level1">
+<h1>第三种方式（依赖DBI +RMySQL包）</h1>
+<div id="加载需要的包并创建连接-2" class="section level2">
+<h2>加载需要的包并创建连接</h2>
+<pre><code>pacman::p_load(DBI,RMySQL) zeallot,odbc,,RMariaDB
+con &lt;- dbConnect(MySQL(), dbname = &#39;数据库名字&#39;,
+                      host = &quot;localhost&quot;,
+                      port = 3306,
+                      user = &quot;账户名&quot;,
+                      password = &quot;账户密码&quot;)</code></pre>
+</div>
+<div id="查看连接信息-1" class="section level2">
+<h2>查看连接信息</h2>
+<pre class="r"><code>summary(con)</code></pre>
+<pre><code>## &lt;MySQLConnection:0,0&gt;
+##   User:   root 
+##   Host:   localhost 
+##   Dbname: learning 
+##   Connection type: localhost via TCP/IP 
+## 
+## Results:</code></pre>
+</div>
+<div id="查看数据库信息-2" class="section level2">
+<h2>查看数据库信息</h2>
+<pre class="r"><code>dbGetInfo(con)</code></pre>
+<pre><code>## $host
+## [1] &quot;localhost&quot;
+## 
+## $user
+## [1] &quot;root&quot;
+## 
+## $dbname
+## [1] &quot;learning&quot;
+## 
+## $conType
+## [1] &quot;localhost via TCP/IP&quot;
+## 
+## $serverVersion
+## [1] &quot;8.0.24&quot;
+## 
+## $protocolVersion
+## [1] 10
+## 
+## $threadId
+## [1] 42
+## 
+## $rsId
+## list()</code></pre>
+</div>
+<div id="查看数据库中的表-2" class="section level2">
+<h2>查看数据库中的表</h2>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;mtcars2&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="查看数据-2" class="section level2">
+<h2>查看数据</h2>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from mtcars limit 5&quot;)</code></pre>
+<pre><code>##    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
+<pre><code>dbGetQuery(con,&quot;select *  from dept&quot;)</code></pre>
+<blockquote>
+<p>中文乱码</p>
+</blockquote>
+</div>
+<div id="写入表" class="section level2">
+<h2>写入表</h2>
+<pre><code>dbWriteTable(con, &quot;mtcars3&quot;, mtcars)</code></pre>
+<blockquote>
+<p>无法写入数据</p>
+</blockquote>
+<ul>
+<li>查看是否写入</li>
+</ul>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;dept&quot;    &quot;mtcars&quot;  &quot;mtcars1&quot; &quot;mtcars2&quot; &quot;person&quot;</code></pre>
+</div>
+<div id="断开连接-2" class="section level2">
+<h2>断开连接</h2>
+<pre class="r"><code>dbDisconnect(con)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="移除依赖的r包-2" class="section level2">
+<h2>移除依赖的R包</h2>
+<pre class="r"><code>pacman::p_unload(DBI,RMySQL)</code></pre>
+<pre><code>## The following packages have been unloaded:
+## DBI, RMySQL</code></pre>
+</div>
+</div>
+<div id="第四种方式依赖rodbc包" class="section level1">
+<h1>第四种方式（依赖RODBC包）</h1>
+<ul>
+<li>需要在管理工具中添加数据库。</li>
+</ul>
+<div class="figure">
+<img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20212814092809.png" alt="" />
+<p class="caption">配置ODBC数据源</p>
+</div>
+<div id="加载需要的包并创建连接-3" class="section level2">
+<h2>加载需要的包并创建连接</h2>
+<pre><code>pacman::p_load(RODBC)
+con=odbcConnect(&quot;数据库名称&quot;, uid=&quot;账户名&quot;, pwd=&quot;账户密码&quot;)</code></pre>
+</div>
+<div id="查询表中的信息" class="section level2">
+<h2>查询表中的信息</h2>
+<pre class="r"><code>sqlTables(con)</code></pre>
+<pre><code>##   TABLE_CAT TABLE_SCHEM TABLE_NAME TABLE_TYPE REMARKS
+## 1  learning                   dept      TABLE        
+## 2  learning                 mtcars      TABLE        
+## 3  learning                mtcars1      TABLE        
+## 4  learning                mtcars2      TABLE        
+## 5  learning                 person      TABLE</code></pre>
+</div>
+<div id="写入表-1" class="section level2">
+<h2>写入表</h2>
+<pre class="r"><code>sqlSave(con, mtcars, tablename = &quot;mtcars4&quot;)</code></pre>
+<ul>
+<li>查看是否写入</li>
+</ul>
+<pre class="r"><code>sqlTables(con)</code></pre>
+<pre><code>##   TABLE_CAT TABLE_SCHEM TABLE_NAME TABLE_TYPE REMARKS
+## 1  learning                   dept      TABLE        
+## 2  learning                 mtcars      TABLE        
+## 3  learning                mtcars1      TABLE        
+## 4  learning                mtcars2      TABLE        
+## 5  learning                mtcars4      TABLE        
+## 6  learning                 person      TABLE</code></pre>
+</div>
+<div id="查询数据" class="section level2">
+<h2>查询数据</h2>
+<pre class="r"><code>sqlQuery(con,&quot;select * from mtcars4 limit5&quot;) </code></pre>
+<pre><code>##               rownames  mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## 1            Mazda RX4 21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## 2        Mazda RX4 Wag 21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## 3           Datsun 710 22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## 4       Hornet 4 Drive 21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## 5    Hornet Sportabout 18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## 6              Valiant 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## 7           Duster 360 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## 8            Merc 240D 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## 9             Merc 230 22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## 10            Merc 280 19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## 11           Merc 280C 17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## 12          Merc 450SE 16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## 13          Merc 450SL 17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## 14         Merc 450SLC 15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## 15  Cadillac Fleetwood 10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## 16 Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+## 17   Chrysler Imperial 14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## 18            Fiat 128 32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## 19         Honda Civic 30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## 20      Toyota Corolla 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## 21       Toyota Corona 21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## 22    Dodge Challenger 15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## 23         AMC Javelin 15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## 24          Camaro Z28 13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## 25    Pontiac Firebird 19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## 26           Fiat X1-9 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## 27       Porsche 914-2 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## 28        Lotus Europa 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## 29      Ford Pantera L 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## 30        Ferrari Dino 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## 31       Maserati Bora 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## 32          Volvo 142E 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
+<pre class="r"><code>sqlQuery(con,&quot;select *  from dept&quot;)</code></pre>
+<pre><code>##   did dname
+## 1   1   ???
+## 2   2   ???
+## 3   3   ???
+## 4   4   ???
+## 5   5   ???</code></pre>
+<blockquote>
+<p>中文乱码</p>
+</blockquote>
+</div>
+<div id="关闭连接" class="section level2">
+<h2>关闭连接</h2>
+<pre class="r"><code>odbcClose(con)</code></pre>
+</div>
+<div id="移除依赖的r包-3" class="section level2">
+<h2>移除依赖的R包</h2>
+<pre class="r"><code>pacman::p_load(RODBC)</code></pre>
+</div>
+</div>

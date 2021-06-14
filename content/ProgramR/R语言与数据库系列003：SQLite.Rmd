@@ -1,15 +1,19 @@
 ---
 author:
   - 水滴
-title: 'RSQLite'
+title: 'R语言与数据库系列003：SQLite'
 date: 2021-06-03
 categories:
-  - Rmarkdwon
-  - RSQLite
+  - R
+  - 数据库
+  - 连接
+  - SQLite
 tags:
-  - Rmarkdwon
-  - RSQLite
-slug: Rmarkdwon_RSQLite
+  - R
+  - 数据库
+  - 连接
+  - SQLite
+slug: SQLite
 weight: 0004
 description: RSQLite 可以在R中方便的创建sqlite数据库，并进行检索， 这个R包依赖于DBI包。
 --- 
