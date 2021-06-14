@@ -17,15 +17,16 @@ slug: connection_database
 weight: 0004
 description: 比较R语言连接数据库的几种方式。
 --- 
+<font face="思源宋体 CN" >
 
-R连接数据库的方式不止一种，梳理清楚每种连接方式的异同，选择最方便的一种方式，不失为一种提高工作效率的有效途径。本篇总结了R连接数据库几种方式的异同。  
+　　R连接数据库的方式不止一种，梳理清楚每种连接方式的异同，选择最方便的一种方式，是提高工作效率的有效途径。本篇总结了R连接数据库几种方式的异同。  
 
-- 第一种方式（依赖DBI +RMariaDB包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；  
-- 第二种方式（依赖odbc包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；第二种方式：其优点在于可以在Rstudio IDE中形成连接，便于查看数据库的内部结构和预览数据，通常是我的第二选择；  
+- 第一种方式（依赖DBI +RMariaDB包）：不需要事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；  
+- 第二种方式（依赖odbc包）：与第一种方式相比，其优点在于可以在Rstudio IDE中形成连接，便于查看数据库的内部结构和预览数据，通常是我的第二选择；  
 
-- 第三种方式（依赖DBI +RMySQL包）：与第一种方式相类似，但重大缺陷是无法写入数据；   
+- 第三种方式（依赖DBI +RMySQL包）：与第一种方式相类似，但存在两个问题：其一，最大缺陷是无法写入数据；其二，读取时中文会出现乱码问题。   
 
-- 第四种方式（依赖RODBC包）：十分不推荐的一种方式。原因在于：其一，需要事前配置数据源；其二；读取中文乱码。
+- 第四种方式（依赖RODBC包）：十分不推荐的一种方式。原因在于：其一，需要事前配置数据源；其二，读取时中文会出现乱码问题；其三，写入数据时非常慢。
 
 
 # 第一种方式（依赖DBI +RMariaDB包）
@@ -120,13 +121,19 @@ con <- dbConnect(odbc(),
                  database="数据库名字", uid="账户名", pwd="账户密码")
 ```  
 
->RStudio IDE 对上面的连接方式有加持，一旦连接上，会出现一个 Connections 窗口，见下图，可以点击图中圈住的小三角一层层展开 demo 数据库的每个表、字段，非常方便查看  
+>RStudio IDE 对上面的连接方式有加持，一旦连接上，会出现一个 Connections 窗口，见下图，可以点击图中圈住的小三角一层层展开 learning 数据库的每个表、字段，非常方便查看。
 
+- Connections 窗口
 
+<center>
 ![Connections 窗口](https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20211914091931.png)
-。
+</center>
 
+- 预览数据
+
+<center>
 ![预览数据](https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20212014092052.png)
+</center>
 
 ## 查看连接信息    
 
@@ -156,7 +163,7 @@ dbGetQuery(con,"select *  from mtcars limit 5")
 dbGetQuery(con,"select *  from dept")  
 ```
 
-## 写入数据 
+## 写入数据表
 ```{r}
 dbWriteTable(con, "mtcars2", mtcars)
 ```
@@ -227,13 +234,13 @@ dbListTables(con)
 dbGetQuery(con,"select *  from mtcars limit 5")
 ```
 
-```
+```{r}
 dbGetQuery(con,"select *  from dept")
 ```
 
 >中文乱码
 
-## 写入表
+## 写入数据表
 
 
 ```
@@ -285,7 +292,8 @@ sqlTables(con)
 ```
 
 
-## 写入表
+## 写入数据表
+
 ```{r}
 sqlSave(con, mtcars, tablename = "mtcars4")
 ```
@@ -319,3 +327,5 @@ odbcClose(con)
 ```{r}
 pacman::p_load(RODBC)
 ```
+
+</font>

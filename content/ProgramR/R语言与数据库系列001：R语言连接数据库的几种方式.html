@@ -21,13 +21,14 @@ description: 比较R语言连接数据库的几种方式。
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>R连接数据库的方式不止一种，梳理清楚每种连接方式的异同，选择最方便的一种方式，不失为一种提高工作效率的有效途径。本篇总结了R连接数据库几种方式的异同。</p>
+<p><font face="思源宋体 CN" ></p>
+<p>　　R连接数据库的方式不止一种，梳理清楚每种连接方式的异同，选择最方便的一种方式，是提高工作效率的有效途径。本篇总结了R连接数据库几种方式的异同。</p>
 <ul>
-<li><p>第一种方式（依赖DBI +RMariaDB包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；<br />
+<li><p>第一种方式（依赖DBI +RMariaDB包）：不需要事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；<br />
 </p></li>
-<li><p>第二种方式（依赖odbc包）：不许事前在系统中配置数据源，不存在中文乱码、写入速度较快，是我通常的首选；第二种方式：其优点在于可以在Rstudio IDE中形成连接，便于查看数据库的内部结构和预览数据，通常是我的第二选择；</p></li>
-<li><p>第三种方式（依赖DBI +RMySQL包）：与第一种方式相类似，但重大缺陷是无法写入数据；</p></li>
-<li><p>第四种方式（依赖RODBC包）：十分不推荐的一种方式。原因在于：其一，需要事前配置数据源；其二；读取中文乱码。</p></li>
+<li><p>第二种方式（依赖odbc包）：与第一种方式相比，其优点在于可以在Rstudio IDE中形成连接，便于查看数据库的内部结构和预览数据，通常是我的第二选择；</p></li>
+<li><p>第三种方式（依赖DBI +RMySQL包）：与第一种方式相类似，但存在两个问题：其一，最大缺陷是无法写入数据；其二，读取时中文会出现乱码问题。</p></li>
+<li><p>第四种方式（依赖RODBC包）：十分不推荐的一种方式。原因在于：其一，需要事前配置数据源；其二，读取时中文会出现乱码问题；其三，写入数据时非常慢。</p></li>
 </ul>
 <div id="第一种方式依赖dbi-rmariadb包" class="section level1">
 <h1>第一种方式（依赖DBI +RMariaDB包）</h1>
@@ -68,7 +69,7 @@ con &lt;- dbConnect(MariaDB(), host = &quot;&quot;, dbname = &quot;数据库名�
 ## [1] 10
 ## 
 ## $thread.id
-## [1] 40</code></pre>
+## [1] 46</code></pre>
 </div>
 <div id="查看数据库中的表" class="section level2">
 <h2>查看数据库中的表</h2>
@@ -122,14 +123,20 @@ con &lt;- dbConnect(odbc(),
                  timeout = 10,
                  database=&quot;数据库名字&quot;, uid=&quot;账户名&quot;, pwd=&quot;账户密码&quot;)</code></pre>
 <blockquote>
-<p>RStudio IDE 对上面的连接方式有加持，一旦连接上，会出现一个 Connections 窗口，见下图，可以点击图中圈住的小三角一层层展开 demo 数据库的每个表、字段，非常方便查看</p>
+<p>RStudio IDE 对上面的连接方式有加持，一旦连接上，会出现一个 Connections 窗口，见下图，可以点击图中圈住的小三角一层层展开 learning 数据库的每个表、字段，非常方便查看。</p>
 </blockquote>
-<p><img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20211914091931.png" alt="Connections 窗口" />
-。</p>
-<div class="figure">
-<img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20212014092052.png" alt="" />
-<p class="caption">预览数据</p>
-</div>
+<ul>
+<li>Connections 窗口</li>
+</ul>
+<center>
+<img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20211914091931.png" title="fig:" alt="Connections 窗口" />
+</center>
+<ul>
+<li>预览数据</li>
+</ul>
+<center>
+<img src="https://gitee.com/shao818/Figure/raw/master/%E6%88%AA%E5%9B%BE_20212014092052.png" title="fig:" alt="预览数据" />
+</center>
 </div>
 <div id="查看连接信息" class="section level2">
 <h2>查看连接信息</h2>
@@ -159,7 +166,7 @@ con &lt;- dbConnect(odbc(),
 ## [1] &quot;&quot;
 ## 
 ## $sourcename
-## [1] &quot;&quot;
+## [1] &quot;`&quot;
 ## 
 ## $servername
 ## [1] &quot;localhost via TCP/IP&quot;
@@ -210,8 +217,8 @@ con &lt;- dbConnect(odbc(),
 ## 4   4 人事部
 ## 5   5 鼓励部</code></pre>
 </div>
-<div id="写入数据" class="section level2">
-<h2>写入数据</h2>
+<div id="写入数据表-1" class="section level2">
+<h2>写入数据表</h2>
 <pre class="r"><code>dbWriteTable(con, &quot;mtcars2&quot;, mtcars)</code></pre>
 <ul>
 <li>查看是否写入</li>
@@ -274,7 +281,7 @@ con &lt;- dbConnect(MySQL(), dbname = &#39;数据库名字&#39;,
 ## [1] 10
 ## 
 ## $threadId
-## [1] 42
+## [1] 48
 ## 
 ## $rsId
 ## list()</code></pre>
@@ -293,13 +300,19 @@ con &lt;- dbConnect(MySQL(), dbname = &#39;数据库名字&#39;,
 ## 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
 ## 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
 ## 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
-<pre><code>dbGetQuery(con,&quot;select *  from dept&quot;)</code></pre>
+<pre class="r"><code>dbGetQuery(con,&quot;select *  from dept&quot;)</code></pre>
+<pre><code>##   did dname
+## 1   1   ???
+## 2   2   ???
+## 3   3   ???
+## 4   4   ???
+## 5   5   ???</code></pre>
 <blockquote>
 <p>中文乱码</p>
 </blockquote>
 </div>
-<div id="写入表" class="section level2">
-<h2>写入表</h2>
+<div id="写入数据表-2" class="section level2">
+<h2>写入数据表</h2>
 <pre><code>dbWriteTable(con, &quot;mtcars3&quot;, mtcars)</code></pre>
 <blockquote>
 <p>无法写入数据</p>
@@ -346,8 +359,8 @@ con=odbcConnect(&quot;数据库名称&quot;, uid=&quot;账户名&quot;, pwd=&quo
 ## 4  learning                mtcars2      TABLE        
 ## 5  learning                 person      TABLE</code></pre>
 </div>
-<div id="写入表-1" class="section level2">
-<h2>写入表</h2>
+<div id="写入数据表-3" class="section level2">
+<h2>写入数据表</h2>
 <pre class="r"><code>sqlSave(con, mtcars, tablename = &quot;mtcars4&quot;)</code></pre>
 <ul>
 <li>查看是否写入</li>
@@ -415,5 +428,6 @@ con=odbcConnect(&quot;数据库名称&quot;, uid=&quot;账户名&quot;, pwd=&quo
 <div id="移除依赖的r包-3" class="section level2">
 <h2>移除依赖的R包</h2>
 <pre class="r"><code>pacman::p_load(RODBC)</code></pre>
+<p></font></p>
 </div>
 </div>
