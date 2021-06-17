@@ -1,0 +1,1223 @@
+---
+author:
+  - 韭菜
+title: 'R语言编程：基于tidyverse：数据操作'
+categories:
+  - R
+  - tidyverse
+  - 数据操作
+  - 修改列
+  - 缺失值填充
+  - 重新编码
+  - 分组汇总
+  - 按行汇总
+  - 窗口函数
+tags:
+  - R
+  - tidyverse
+  - 数据操作
+  - 修改列
+  - 缺失值填充
+  - 重新编码
+  - 分组汇总
+  - 按行汇总
+  - 窗口函数
+date: 2021-06-17
+slug: tidyverse001
+weight: 001
+description: <font face="思源宋体 CN" >此系列为学习哈尔滨商业大学张敬信老师所编写的R语言编程：基于tidyverse的学习笔记。</font>
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p><font face="思源宋体 CN" ></p>
+<div id="修改列" class="section level1">
+<h1>修改列</h1>
+<div id="数据预览" class="section level2">
+<h2>数据预览</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.3     v purrr   0.3.4
+## v tibble  3.1.2     v dplyr   1.0.6
+## v tidyr   1.1.3     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>df = readr::read_csv(&quot;https://raw.githubusercontent.com/Shao818/PublicData/main/ExamDatas.csv&quot;) </code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   class = col_character(),
+##   name = col_character(),
+##   sex = col_character(),
+##   chinese = col_double(),
+##   math = col_double(),
+##   english = col_double(),
+##   moral = col_double(),
+##   science = col_double()
+## )</code></pre>
+<pre class="r"><code>df</code></pre>
+<pre><code>## # A tibble: 50 x 8
+##    class name   sex   chinese  math english moral science
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10
+##  2 六1班 黄才菊 女         95    77      75     8       9
+##  3 六1班 陈芳妹 女         79    87      66     9      10
+##  4 六1班 陈学勤 男         82    79      66     9      10
+##  5 六1班 陈祝贞 女         76    79      67     8      10
+##  6 六1班 何小薇 女         83    73      65     8       9
+##  7 六1班 雷旺   男         56    80      68     8       9
+##  8 六1班 陈欣越 男         57    80      60     9       9
+##  9 六1班 黄亦婷 女         77    63      54     8      10
+## 10 六1班 陈媚   女         68    55      66     8       9
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="创建新列" class="section level2">
+<h2>创建新列</h2>
+<ul>
+<li><p>用 dplyr 包中的 mutate() 创建或修改列；若 transmute() 则只返回增加的
+新列。</p></li>
+<li><p>若只给新列 1 个值，则循环使用得到值相同的一列:</p></li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ mutate(new_col = 5)</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science new_col
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10       5
+##  2 六1班 黄才菊 女         95    77      75     8       9       5
+##  3 六1班 陈芳妹 女         79    87      66     9      10       5
+##  4 六1班 陈学勤 男         82    79      66     9      10       5
+##  5 六1班 陈祝贞 女         76    79      67     8      10       5
+##  6 六1班 何小薇 女         83    73      65     8       9       5
+##  7 六1班 雷旺   男         56    80      68     8       9       5
+##  8 六1班 陈欣越 男         57    80      60     9       9       5
+##  9 六1班 黄亦婷 女         77    63      54     8      10       5
+## 10 六1班 陈媚   女         68    55      66     8       9       5
+## # ... with 40 more rows</code></pre>
+<ul>
+<li>正常是以长度等于行数的向量赋值：</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ mutate(new_col = 1:n())</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science new_col
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;int&gt;
+##  1 六1班 何娜   女         87    92      79     9      10       1
+##  2 六1班 黄才菊 女         95    77      75     8       9       2
+##  3 六1班 陈芳妹 女         79    87      66     9      10       3
+##  4 六1班 陈学勤 男         82    79      66     9      10       4
+##  5 六1班 陈祝贞 女         76    79      67     8      10       5
+##  6 六1班 何小薇 女         83    73      65     8       9       6
+##  7 六1班 雷旺   男         56    80      68     8       9       7
+##  8 六1班 陈欣越 男         57    80      60     9       9       8
+##  9 六1班 黄亦婷 女         77    63      54     8      10       9
+## 10 六1班 陈媚   女         68    55      66     8       9      10
+## # ... with 40 more rows</code></pre>
+<blockquote>
+<p>注： n() 返回当前分组的样本数, 未分组则为总行数。</p>
+</blockquote>
+</div>
+<div id="计算新列" class="section level2">
+<h2>计算新列</h2>
+<ul>
+<li>用数据框的列计算新列，若修改当前列，只需要赋值给原列名。</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ mutate(total = chinese + math + english + moral + science)</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science total
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10   277
+##  2 六1班 黄才菊 女         95    77      75     8       9   264
+##  3 六1班 陈芳妹 女         79    87      66     9      10   251
+##  4 六1班 陈学勤 男         82    79      66     9      10   246
+##  5 六1班 陈祝贞 女         76    79      67     8      10   240
+##  6 六1班 何小薇 女         83    73      65     8       9   238
+##  7 六1班 雷旺   男         56    80      68     8       9   221
+##  8 六1班 陈欣越 男         57    80      60     9       9   215
+##  9 六1班 黄亦婷 女         77    63      54     8      10   212
+## 10 六1班 陈媚   女         68    55      66     8       9   206
+## # ... with 40 more rows</code></pre>
+<blockquote>
+<p>注意： 不能用 sum(), 它会将整个列的内容都加起来，类似的还有 mean()。</p>
+</blockquote>
+<p>在同一个 mutate() 中可以同时创建或计算多个列，它们是从前往后依次计算，
+所以可以使用前面新创建的列：</p>
+<ul>
+<li>计算 df 中 math 列的中位数；</li>
+<li>创建标记 math 是否大于中位数的逻辑值列；</li>
+<li>用 as.numeric() 将 TRUE/FALSE 转化为 1/0</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ mutate(med_math = median(math),
+ label = math &gt; med_math,
+ label = as.numeric(label))</code></pre>
+<pre><code>## # A tibble: 50 x 10
+##    class name   sex   chinese  math english moral science med_math label
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10     72.5     1
+##  2 六1班 黄才菊 女         95    77      75     8       9     72.5     1
+##  3 六1班 陈芳妹 女         79    87      66     9      10     72.5     1
+##  4 六1班 陈学勤 男         82    79      66     9      10     72.5     1
+##  5 六1班 陈祝贞 女         76    79      67     8      10     72.5     1
+##  6 六1班 何小薇 女         83    73      65     8       9     72.5     1
+##  7 六1班 雷旺   男         56    80      68     8       9     72.5     1
+##  8 六1班 陈欣越 男         57    80      60     9       9     72.5     1
+##  9 六1班 黄亦婷 女         77    63      54     8      10     72.5     0
+## 10 六1班 陈媚   女         68    55      66     8       9     72.5     0
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="修改多列" class="section level2">
+<h2>修改多列</h2>
+<ul>
+<li>结合 across() 和选择列语法可以应用函数到多列，从而实现同时修改多列。</li>
+</ul>
+<div id="应用函数到所有列" class="section level3">
+<h3>应用函数到所有列</h3>
+<ul>
+<li>将所有列转化为字符型：</li>
+</ul>
+<pre class="r"><code>df %&gt;% 
+ mutate(across(everything(), as.character))</code></pre>
+<pre><code>## # A tibble: 50 x 8
+##    class name   sex   chinese math  english moral science
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  
+##  1 六1班 何娜   女    87      92    79      9     10     
+##  2 六1班 黄才菊 女    95      77    75      8     9      
+##  3 六1班 陈芳妹 女    79      87    66      9     10     
+##  4 六1班 陈学勤 男    82      79    66      9     10     
+##  5 六1班 陈祝贞 女    76      79    67      8     10     
+##  6 六1班 何小薇 女    83      73    65      8     9      
+##  7 六1班 雷旺   男    56      80    68      8     9      
+##  8 六1班 陈欣越 男    57      80    60      9     9      
+##  9 六1班 黄亦婷 女    77      63    54      8     10     
+## 10 六1班 陈媚   女    68      55    66      8     9      
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="应用函数到满足条件的列" class="section level3">
+<h3>应用函数到满足条件的列</h3>
+<ul>
+<li>对数值列做归一化：</li>
+</ul>
+<pre class="r"><code>rescale &lt;- function(x) {
+ rng &lt;- range(x, na.rm = TRUE)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+df %&gt;% 
+ mutate(across(where(is.numeric), rescale))</code></pre>
+<pre><code>## # A tibble: 50 x 8
+##    class name   sex   chinese  math english moral science
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 六1班 何娜   女      0.843 0.974   1     0.875   1    
+##  2 六1班 黄才菊 女      1     0.776   0.926 0.75    0.833
+##  3 六1班 陈芳妹 女      0.686 0.908   0.759 0.875   1    
+##  4 六1班 陈学勤 男      0.745 0.803   0.759 0.875   1    
+##  5 六1班 陈祝贞 女      0.627 0.803   0.778 0.75    1    
+##  6 六1班 何小薇 女      0.765 0.724   0.741 0.75    0.833
+##  7 六1班 雷旺   男      0.235 0.816   0.796 0.75    0.833
+##  8 六1班 陈欣越 男      0.255 0.816   0.648 0.875   0.833
+##  9 六1班 黄亦婷 女      0.647 0.592   0.537 0.75    1    
+## 10 六1班 陈媚   女      0.471 0.487   0.759 0.75    0.833
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="应用函数到指定的列" class="section level3">
+<h3>应用函数到指定的列</h3>
+<ul>
+<li>在不影响其它数值列的情况下，将 iris 中的 length 和 width 测量单位从厘米变成
+毫米：</li>
+</ul>
+<pre class="r"><code>iris %&gt;% as_tibble() %&gt;% 
+ mutate(across(contains(&quot;Length&quot;) | contains(&quot;Width&quot;), ~ .*10))</code></pre>
+<pre><code>## # A tibble: 150 x 5
+##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+##  1           51          35           14           2 setosa 
+##  2           49          30           14           2 setosa 
+##  3           47          32           13           2 setosa 
+##  4           46          31           15           2 setosa 
+##  5           50          36           14           2 setosa 
+##  6           54          39           17           4 setosa 
+##  7           46          34           14           3 setosa 
+##  8           50          34           15           2 setosa 
+##  9           44          29           14           2 setosa 
+## 10           49          31           15           1 setosa 
+## # ... with 140 more rows</code></pre>
+</div>
+</div>
+</div>
+<div id="替换-na" class="section level1">
+<h1>替换 NA</h1>
+<div id="replace_na" class="section level2">
+<h2><code>replace_na()</code></h2>
+<ul>
+<li>实现用同一个值替换一列中的所有 NA 值，该函数接受一个命名列表，其成分为
+“列名=替换值”：</li>
+</ul>
+<pre class="r"><code>starwars %&gt;%
+ replace_na(list(hair_color = &quot;UNKNOWN&quot;,
+ birth_year = 99999))</code></pre>
+<pre><code>## # A tibble: 87 x 14
+##    name    height  mass hair_color  skin_color eye_color birth_year sex   gender
+##    &lt;chr&gt;    &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+##  1 Luke S~    172    77 blond       fair       blue            19   male  mascu~
+##  2 C-3PO      167    75 UNKNOWN     gold       yellow         112   none  mascu~
+##  3 R2-D2       96    32 UNKNOWN     white, bl~ red             33   none  mascu~
+##  4 Darth ~    202   136 none        white      yellow          41.9 male  mascu~
+##  5 Leia O~    150    49 brown       light      brown           19   fema~ femin~
+##  6 Owen L~    178   120 brown, grey light      blue            52   male  mascu~
+##  7 Beru W~    165    75 brown       light      blue            47   fema~ femin~
+##  8 R5-D4       97    32 UNKNOWN     white, red red          99999   none  mascu~
+##  9 Biggs ~    183    84 black       light      brown           24   male  mascu~
+## 10 Obi-Wa~    182    77 auburn, wh~ fair       blue-gray       57   male  mascu~
+## # ... with 77 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
+## #   films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
+</div>
+<div id="fill" class="section level2">
+<h2><code>fill()</code></h2>
+<ul>
+<li>用前一个（或后一个）非缺失值填充 NA。有些表在记录时，会省略与上一条记
+录相同的内容，如下表</li>
+</ul>
+<pre class="r"><code>library(tidyverse)
+gap_data= readr::read_csv(&quot;https://raw.githubusercontent.com/Shao818/WebData/master/introR-master/datas/gap_data.csv&quot;) </code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1]</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   X1 = col_double(),
+##   site = col_character(),
+##   species = col_character(),
+##   sample_num = col_double(),
+##   bees_present = col_logical()
+## )</code></pre>
+<pre class="r"><code>knitr::kable(gap_data, &quot;html&quot;, align=&quot;c&quot;,caption =&quot;原始数据&quot;)</code></pre>
+<table>
+<caption>
+<span id="tab:unnamed-chunk-10">Table 1: </span>原始数据
+</caption>
+<thead>
+<tr>
+<th style="text-align:center;">
+X1
+</th>
+<th style="text-align:center;">
+site
+</th>
+<th style="text-align:center;">
+species
+</th>
+<th style="text-align:center;">
+sample_num
+</th>
+<th style="text-align:center;">
+bees_present
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. longiforlia
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+A. elongata
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+5
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+6
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+7
+</td>
+<td style="text-align:center;">
+Grose Vale
+</td>
+<td style="text-align:center;">
+A. terminalis
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+8
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+9
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+NA
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Tidyr 包中的 fill() 适合处理这种结构的 NAs, 默认是向下填充，用上一个非
+缺失值填充这些 NAs：</li>
+</ul>
+<pre class="r"><code>gap_data %&gt;% 
+ fill(site, species)%&gt;% 
+ knitr::kable( &quot;html&quot;, align=&quot;c&quot;,caption =&quot;fill填充后的数据&quot;)</code></pre>
+<table>
+<caption>
+<span id="tab:unnamed-chunk-11">Table 2: </span>fill填充后的数据
+</caption>
+<thead>
+<tr>
+<th style="text-align:center;">
+X1
+</th>
+<th style="text-align:center;">
+site
+</th>
+<th style="text-align:center;">
+species
+</th>
+<th style="text-align:center;">
+sample_num
+</th>
+<th style="text-align:center;">
+bees_present
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. longiforlia
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. longiforlia
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. longiforlia
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+4
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. elongata
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+5
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. elongata
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+6
+</td>
+<td style="text-align:center;">
+Bilpin
+</td>
+<td style="text-align:center;">
+A. elongata
+</td>
+<td style="text-align:center;">
+3
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+7
+</td>
+<td style="text-align:center;">
+Grose Vale
+</td>
+<td style="text-align:center;">
+A. terminalis
+</td>
+<td style="text-align:center;">
+1
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+8
+</td>
+<td style="text-align:center;">
+Grose Vale
+</td>
+<td style="text-align:center;">
+A. terminalis
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+FALSE
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+9
+</td>
+<td style="text-align:center;">
+Grose Vale
+</td>
+<td style="text-align:center;">
+A. terminalis
+</td>
+<td style="text-align:center;">
+2
+</td>
+<td style="text-align:center;">
+TRUE
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="重新编码" class="section level1">
+<h1>重新编码</h1>
+<ul>
+<li>经常需要对列中的值进行重新编码。</li>
+</ul>
+<div id="两类别情形if_else" class="section level2">
+<h2>两类别情形：if_else()</h2>
+<p>用 if_else() 作 yes / no 决策以确定用哪个值做替换：</p>
+<pre class="r"><code>df %&gt;%
+ mutate(sex = if_else(sex == &quot;男&quot;, &quot;M&quot;, &quot;F&quot;)) %&gt;%
+ slice_sample(prop = 0.15)</code></pre>
+<pre><code>## # A tibble: 7 x 8
+##   class name   sex   chinese  math english moral science
+##   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+## 1 六1班 何小薇 F          83    73      65     8       9
+## 2 六3班 何诗婷 F          76    53      72     9      10
+## 3 六2班 何深润 M          66    63      37    10      10
+## 4 六4班 陈丽丽 F          87    93      61     8       6
+## 5 六4班 杨昌晟 M          84    85      64     8      10
+## 6 六5班 容唐   F          83    71      56     9       7
+## 7 六5班 符苡榕 F          85    89      76     9      10</code></pre>
+</div>
+<div id="多类别情形case_when" class="section level2">
+<h2>多类别情形：case_when()</h2>
+<ul>
+<li>用 case_when() 做更多条件下的替换，避免使用很多 if_else() 嵌套</li>
+</ul>
+<pre class="r"><code>warpbreaks %&gt;%
+ mutate(tension=case_when(tension == &quot;H&quot; ~ &quot;High&quot;,
+ tension == &quot;M&quot; ~ &quot;Medium&quot;,
+ tension == &quot;L&quot; ~ &quot;Low&quot;,
+ TRUE ~ NA_character_)) %&gt;%
+ slice_sample(prop = 0.15)</code></pre>
+<pre><code>##   breaks wool tension
+## 1     24    B    High
+## 2     27    B     Low
+## 3     43    A    High
+## 4     12    A  Medium
+## 5     41    B     Low
+## 6     28    A    High
+## 7     35    A  Medium
+## 8     15    B    High</code></pre>
+<blockquote>
+<p>说明： case_when() 中用的是公式形式:<br />
+- 左边是返回 TRUE 或 FALSE 的表达式或函数<br />
+- 右边是若左边表达式为 TRUE，则重新编码的值，也可以是表达式或函数<br />
+- 每个分支条件将从上到下的计算，并接受第一个 TURE 条件；<br />
+- 一个好的策略是，用最后一个分支决定若其它条件都不为 TRUE 时该怎么做。本
+例最后一个分支直接用 TRUE 作为公式左边，若某行的 tension 值不是 H/M/L，
+将被重新编码为 NA_character_。</p>
+</blockquote>
+</div>
+<div id="更强大的重新编码函数" class="section level2">
+<h2>更强大的重新编码函数</h2>
+<ul>
+<li><p>基于 tidyverse 设计哲学，sjmisc包实现了对变量做数据变换，如重新编码、二分或分组变量、设置与替换缺失值等；　　</p></li>
+<li><p>sjmisc 包也支持标签化数据，这对操作 SPSS 或 Stata 数据集特别有用。</p></li>
+<li><p>只介绍重编码函数：rec() —— 可以将变量的旧值重新编码为新值，基本格式
+为：</p></li>
+</ul>
+<pre><code>rec(x, rec, append, ...)</code></pre>
+<ul>
+<li><p>x：为数据框（或向量）；</p></li>
+<li><p>append：默认为 TRUE, 则返回包含重编码新列的数据框， FALSE 则只返回重编码的新列；</p></li>
+<li><p>rec：设置重编码模式，即哪些旧值被哪些新值取代，具体如下：</p></li>
+<li><p>重编码对：每个重编码对用 “;” 隔开，例如 rec=“1=1; 2=4; 3=2; 4=3”</p></li>
+<li><p>多值：多个旧值（逗号分隔）重编码为一个新值，例如 rec=“1,2=1; 3,4=2”</p></li>
+<li><p>值范围：用冒号表示值范围，例如 rec=“1:4=1; 5:8=2”</p></li>
+<li><p>数值型值范围：带小数部分的数值向量，值范围内的所有值将被重新编码，例如
+rec=“1:2.5=1; 2.6:3=2”（注意 2.55 因未包含在值范围将不被重新编码）</p></li>
+<li><p>“min” 和 “max”：最小值和最大值分别用 min 和 max 表示，例如
+rec=“min:4=1; 5:max=2”（min 和 max 也可以作为新值，如 5:7=max, 表
+示将 5~7 编码为 max(x)）</p></li>
+<li><p>“else”：所有未设定的其它值，用 else 表示，例如 rec=“3=1; 1=2; else=3”</p></li>
+<li><p>“copy”：else 可以结合 copy 一起使用，表示所有未设定的其它值保持原样（从
+原数值 copy），例如 rec=“3=1; 1=2; else=copy”</p></li>
+<li><p>NAs：NA 既可以作为旧值，也可以作为新值，例如 rec=“NA=1; 3:5=NA”</p></li>
+<li><p>“rev”：设置反转值顺序</p></li>
+<li><p>非捕获值：不匹配的值将设置为 NA, 除非使 用 else 和 copy.</p></li>
+</ul>
+<pre class="r"><code>pacman::p_load(sjmisc)
+df_dum &lt;- df %&gt;% 
+ rec(math, 
+ rec = &quot;min:59=不及格; 60:74=中; 75:85=良; 85:max=优&quot;,
+ append = FALSE)
+frq(df_dum)</code></pre>
+<pre><code>## 
+## math_r &lt;character&gt;
+## # total N=50  valid N=50  mean=2.42  sd=1.16
+## 
+## Value  |  N | Raw % | Valid % | Cum. %
+## --------------------------------------
+## 不及格 | 15 |    30 |      30 |     30
+## 良     | 11 |    22 |      22 |     52
+## 优     | 12 |    24 |      24 |     76
+## 中     | 12 |    24 |      24 |    100
+## &lt;NA&gt;   |  0 |     0 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+<blockquote>
+<p>注： 新值的值标签可以在重新编码时一起设置，只需要在每个重编码对后接上中括号标签。</p>
+</blockquote>
+</div>
+</div>
+<div id="分组汇总" class="section level1">
+<h1>分组汇总</h1>
+<ul>
+<li><p>分组汇总，相当于 Excel 的透视表功能</p></li>
+<li><p>对未分组的数据框，一些操作如 mutate() 是在所有行上执行——或者说，整个
+数据框是一个分组，所有行都属于它。</p></li>
+<li><p>若数据框被分组，则这些操作是分别在每个分组上独立执行。可以认为是，将数
+据框拆分为更小的多个数据框。在每个更小的数据框上执行操作，最后再将结果
+合并回来。</p></li>
+</ul>
+<div id="创建分组" class="section level2">
+<h2>创建分组</h2>
+<ul>
+<li>用 group_by() 创建分组，只是对数据框增加了分组信息（用group_keys()
+查看），并不是真的将数据分割为多个数据框。</li>
+</ul>
+<pre class="r"><code>df_grp &lt;- df %&gt;%
+ group_by(sex) 
+df_grp %&gt;% 
+ group_keys()</code></pre>
+<pre><code>## # A tibble: 2 x 1
+##   sex  
+##   &lt;chr&gt;
+## 1 男   
+## 2 女</code></pre>
+<ul>
+<li>查看每一行属于哪一组：</li>
+</ul>
+<pre class="r"><code>df_grp %&gt;% 
+ group_indices()</code></pre>
+<pre><code>##  [1] 2 2 2 1 2 2 1 1 2 2 2 2 1 1 2 1 1 1 2 1 2 2 2 1 1 1 2 1 1 2 2 1 2 1 1 1 1 2
+## [39] 1 2 2 2 2 2 1 1 2 1 1 2</code></pre>
+<ul>
+<li>查看每一组包含哪些行：</li>
+</ul>
+<pre class="r"><code>df_grp %&gt;% 
+ group_rows()</code></pre>
+<pre><code>## &lt;list_of&lt;integer&gt;[2]&gt;
+## [[1]]
+##  [1]  4  7  8 13 14 16 17 18 20 24 25 26 28 29 32 34 35 36 37 39 45 46 48 49
+## 
+## [[2]]
+##  [1]  1  2  3  5  6  9 10 11 12 15 19 21 22 23 27 30 31 33 38 40 41 42 43 44 47
+## [26] 50</code></pre>
+<ul>
+<li>用 ungroup() 解除分组。</li>
+</ul>
+</div>
+<div id="分组汇总-1" class="section level2">
+<h2>分组汇总</h2>
+<p>对数据框做分组最主要的目的就是做分组汇总，汇总就是以某种方式组合行，用
+dplyr 包中的 summarise() 实现，结果只保留分组列（来自 `group_keys()）和
+新创建的汇总列。</p>
+<div id="summarise" class="section level3">
+<h3>summarise()</h3>
+<ul>
+<li>可以与很多自带或自定义的汇总函数连用，常用的汇总函数有：<br />
+</li>
+<li>n() —— 观测数<br />
+</li>
+<li>n_distinct(var) —— 变量 var 的唯一值数目<br />
+</li>
+<li>sum(var), max(var), min(var), …<br />
+</li>
+<li>mean(var), median(var), sd(var), IQR(var), …</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ group_by(sex) %&gt;%
+ summarise(n = n(),
+ math_avg = mean(math, na.rm = TRUE),
+ math_med = median(math))</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   sex       n math_avg math_med
+##   &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1 男       24     65.2     71.5
+## 2 女       26     69.1     72.5</code></pre>
+<ul>
+<li>函数 summarise() ，配合across()可以对所选择的列做汇总：<br />
+</li>
+<li>across(where(), .fns)：对满足条件的列，做一个或多个汇总<br />
+</li>
+<li>across(vars, .fns)：对选定的变量列，做一个或多个汇总<br />
+</li>
+<li>across(everything(), .fns)：对所有列，做一个或多个汇总</li>
+<li>使用它们的好处是，可以借助辅助选择器或判断条件选择多列，还能在这些列上
+执行多个函数，只需要将它们放入一个列表。</li>
+</ul>
+</div>
+<div id="对满足条件的列做多种汇总" class="section level3">
+<h3>对满足条件的列做多种汇总</h3>
+<pre class="r"><code>df_grp &lt;- df %&gt;%
+ group_by(class) %&gt;%
+ summarise(across(where(is.numeric), 
+ list(sum=sum, mean=mean, min=min)))
+df_grp</code></pre>
+<pre><code>## # A tibble: 5 x 16
+##   class chinese_sum chinese_mean chinese_min math_sum math_mean math_min
+##   &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 六1班         760         76            56      765      76.5       55
+## 2 六2班         836         83.6          66      736      73.6       41
+## 3 六3班         685         68.5          44      370      37         18
+## 4 六4班         850         85            72      771      77.1       54
+## 5 六5班         726         72.6          58      720      72         59
+## # ... with 9 more variables: english_sum &lt;dbl&gt;, english_mean &lt;dbl&gt;,
+## #   english_min &lt;dbl&gt;, moral_sum &lt;dbl&gt;, moral_mean &lt;dbl&gt;, moral_min &lt;dbl&gt;,
+## #   science_sum &lt;dbl&gt;, science_mean &lt;dbl&gt;, science_min &lt;dbl&gt;</code></pre>
+<ul>
+<li>重塑为更具可读性的长表：</li>
+</ul>
+<pre class="r"><code>df_grp %&gt;% pivot_longer(-class, 
+ names_to = c(&quot;Vars&quot;, &quot;.value&quot;), 
+ names_sep = &quot;_&quot;)</code></pre>
+<pre><code>## # A tibble: 25 x 5
+##    class Vars      sum  mean   min
+##    &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 chinese   760  76      56
+##  2 六1班 math      765  76.5    55
+##  3 六1班 english   666  66.6    54
+##  4 六1班 moral      84   8.4     8
+##  5 六1班 science    95   9.5     9
+##  6 六2班 chinese   836  83.6    66
+##  7 六2班 math      736  73.6    41
+##  8 六2班 english   540  54      25
+##  9 六2班 moral      88   8.8     6
+## 10 六2班 science    93   9.3     7
+## # ... with 15 more rows</code></pre>
+</div>
+<div id="对某些列做汇总" class="section level3">
+<h3>对某些列做汇总</h3>
+<pre class="r"><code>df %&gt;%
+ group_by(class, sex) %&gt;%
+ summarise(across(contains(&quot;h&quot;), mean))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;class&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 10 x 5
+## # Groups:   class [5]
+##    class sex   chinese  math english
+##    &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 六1班 男       65    79.7    64.7
+##  2 六1班 女       80.7  75.1    67.4
+##  3 六2班 男       77.8  73.5    47.5
+##  4 六2班 女       92.2  73.8    63.8
+##  5 六3班 男       68.6  30.4    67.6
+##  6 六3班 女       68.4  43.6    69.2
+##  7 六4班 男       84.8  79.2    55.7
+##  8 六4班 女       85.2  74      63  
+##  9 六5班 男       66.5  64.5    63.5
+## 10 六5班 女       76.7  77      60.8</code></pre>
+</div>
+<div id="对所有列做汇总" class="section level3">
+<h3>对所有列做汇总</h3>
+<pre class="r"><code>df %&gt;%
+ select(-name) %&gt;% 
+ group_by(class, sex) %&gt;%
+ summarise(across(everything(), mean))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;class&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 10 x 7
+## # Groups:   class [5]
+##    class sex   chinese  math english moral science
+##    &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 六1班 男       65    79.7    64.7  8.67    9.33
+##  2 六1班 女       80.7  75.1    67.4  8.29    9.57
+##  3 六2班 男       77.8  73.5    47.5  8.83    9.5 
+##  4 六2班 女       92.2  73.8    63.8  8.75    9   
+##  5 六3班 男       68.6  30.4    67.6  4.6     5.2 
+##  6 六3班 女       68.4  43.6    69.2  6.8     7.2 
+##  7 六4班 男       84.8  79.2    55.7  8.5     8.5 
+##  8 六4班 女       85.2  74      63    8.75    7.75
+##  9 六5班 男       66.5  64.5    63.5  8.25    8.25
+## 10 六5班 女       76.7  77      60.8  8.67    8.83</code></pre>
+</div>
+<div id="支持多返回值的汇总函数" class="section level3">
+<h3>支持多返回值的汇总函数</h3>
+<p>summarise() 以前只支持一个返回值的汇总函数，如 sum, mean 等。现在也支
+持多返回值（返回向量值、甚至是数据框）的汇总函数，如 range(), quantile()
+等。</p>
+<pre class="r"><code>qs = c(0.25, 0.5, 0.75)
+df_q = df %&gt;% drop_na() %&gt;% 
+ group_by(sex) %&gt;%
+ summarise(math_qs = quantile(math, qs), q = qs) </code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;sex&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>df_q</code></pre>
+<pre><code>## # A tibble: 6 x 3
+## # Groups:   sex [2]
+##   sex   math_qs     q
+##   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
+## 1 男       58.2  0.25
+## 2 男       71.5  0.5 
+## 3 男       80    0.75
+## 4 女       55    0.25
+## 5 女       72.5  0.5 
+## 6 女       85.8  0.75</code></pre>
+<ul>
+<li>可读性不好，再来个长变宽：</li>
+</ul>
+<pre class="r"><code>df_q %&gt;% 
+ pivot_wider(everything(), names_from = q, 
+ values_from = math_qs, names_prefix = &quot;q_&quot;)</code></pre>
+<pre><code>## # A tibble: 2 x 4
+## # Groups:   sex [2]
+##   sex   q_0.25 q_0.5 q_0.75
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1 男      58.2  71.5   80  
+## 2 女      55    72.5   85.8</code></pre>
+</div>
+</div>
+<div id="分组计数" class="section level2">
+<h2>分组计数</h2>
+<ul>
+<li>用count() 按分类变量 order 和 vore 分组，并按分组大小排序：</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ count(class, sex, sort = TRUE)</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##    class sex       n
+##    &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+##  1 六1班 女        7
+##  2 六2班 男        6
+##  3 六4班 男        6
+##  4 六5班 女        6
+##  5 六3班 男        5
+##  6 六3班 女        5
+##  7 六2班 女        4
+##  8 六4班 女        4
+##  9 六5班 男        4
+## 10 六1班 男        3</code></pre>
+<ul>
+<li>对已分组的数据框，用 tally()计数：</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ group_by(math_level = cut(math, 
+ breaks = c(0, 60, 75, 80, 100),
+ right = FALSE)) %&gt;%
+ tally()</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   math_level     n
+##   &lt;fct&gt;      &lt;int&gt;
+## 1 [0,60)        15
+## 2 [60,75)       12
+## 3 [75,80)        5
+## 4 [80,100)      18</code></pre>
+<ul>
+<li>用 add_count()和 add_tally() 可为数据集增加一列按 … 分组的计数：</li>
+</ul>
+<pre class="r"><code>df %&gt;%
+ add_count(class, sex)</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science     n
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+##  1 六1班 何娜   女         87    92      79     9      10     7
+##  2 六1班 黄才菊 女         95    77      75     8       9     7
+##  3 六1班 陈芳妹 女         79    87      66     9      10     7
+##  4 六1班 陈学勤 男         82    79      66     9      10     3
+##  5 六1班 陈祝贞 女         76    79      67     8      10     7
+##  6 六1班 何小薇 女         83    73      65     8       9     7
+##  7 六1班 雷旺   男         56    80      68     8       9     3
+##  8 六1班 陈欣越 男         57    80      60     9       9     3
+##  9 六1班 黄亦婷 女         77    63      54     8      10     7
+## 10 六1班 陈媚   女         68    55      66     8       9     7
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="按行汇总" class="section level2">
+<h2>按行汇总</h2>
+<ul>
+<li><p>通常的数据操作逻辑都是按列方式（colwise），这使得按行汇总很困难。</p></li>
+<li><p>dplyr 包提供了 rowwise() 函数为数据框创建按行方式（rowwise），它不是
+真的改变数据框，只是创建了按行信息。</p></li>
+<li><p>使用 rowwise() 后，就会改变数据框的操作逻辑：</p></li>
+</ul>
+<pre class="r"><code>rf = df %&gt;% 
+ rowwise()
+rf %&gt;% 
+ mutate(total = sum(c(chinese, math, english)))</code></pre>
+<pre><code>## # A tibble: 50 x 9
+## # Rowwise: 
+##    class name   sex   chinese  math english moral science total
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10   258
+##  2 六1班 黄才菊 女         95    77      75     8       9   247
+##  3 六1班 陈芳妹 女         79    87      66     9      10   232
+##  4 六1班 陈学勤 男         82    79      66     9      10   227
+##  5 六1班 陈祝贞 女         76    79      67     8      10   222
+##  6 六1班 何小薇 女         83    73      65     8       9   221
+##  7 六1班 雷旺   男         56    80      68     8       9   204
+##  8 六1班 陈欣越 男         57    80      60     9       9   197
+##  9 六1班 黄亦婷 女         77    63      54     8      10   194
+## 10 六1班 陈媚   女         68    55      66     8       9   189
+## # ... with 40 more rows</code></pre>
+<ul>
+<li>函数 c_across() 是为按行方式（rowwise）在选定的列范围汇总数据而设计
+的，它没有提供 .fns 参数，只能选择列</li>
+</ul>
+<pre class="r"><code>rf %&gt;% 
+ mutate(total = sum(c_across(where(is.numeric))))</code></pre>
+<pre><code>## # A tibble: 50 x 9
+## # Rowwise: 
+##    class name   sex   chinese  math english moral science total
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10   277
+##  2 六1班 黄才菊 女         95    77      75     8       9   264
+##  3 六1班 陈芳妹 女         79    87      66     9      10   251
+##  4 六1班 陈学勤 男         82    79      66     9      10   246
+##  5 六1班 陈祝贞 女         76    79      67     8      10   240
+##  6 六1班 何小薇 女         83    73      65     8       9   238
+##  7 六1班 雷旺   男         56    80      68     8       9   221
+##  8 六1班 陈欣越 男         57    80      60     9       9   215
+##  9 六1班 黄亦婷 女         77    63      54     8      10   212
+## 10 六1班 陈媚   女         68    55      66     8       9   206
+## # ... with 40 more rows</code></pre>
+<ul>
+<li>若只是做按行求和或均值，直接用 rowSums() / rowMeans() 速度更快（不
+需要分割-汇总-合并），这里的 rowwise 行化后提供可以做更多的按行汇总的可
+能。</li>
+</ul>
+<pre class="r"><code>df %&gt;% 
+ mutate(total = rowSums(across(where(is.numeric))))</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science total
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+##  1 六1班 何娜   女         87    92      79     9      10   277
+##  2 六1班 黄才菊 女         95    77      75     8       9   264
+##  3 六1班 陈芳妹 女         79    87      66     9      10   251
+##  4 六1班 陈学勤 男         82    79      66     9      10   246
+##  5 六1班 陈祝贞 女         76    79      67     8      10   240
+##  6 六1班 何小薇 女         83    73      65     8       9   238
+##  7 六1班 雷旺   男         56    80      68     8       9   221
+##  8 六1班 陈欣越 男         57    80      60     9       9   215
+##  9 六1班 黄亦婷 女         77    63      54     8      10   212
+## 10 六1班 陈媚   女         68    55      66     8       9   206
+## # ... with 40 more rows</code></pre>
+<ul>
+<li>按行方式（rowwise）可以理解为一种特殊的分组：每一行作为一组。为
+rowwise() 提供行 ID，用 summarise() 做汇总更能体会这一点：</li>
+</ul>
+<pre class="r"><code>df %&gt;% 
+ rowwise(name) %&gt;% 
+ summarise(total = sum(c_across(where(is.numeric))))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 50 x 2
+## # Groups:   name [50]
+##    name   total
+##    &lt;chr&gt;  &lt;dbl&gt;
+##  1 何娜     277
+##  2 黄才菊   264
+##  3 陈芳妹   251
+##  4 陈学勤   246
+##  5 陈祝贞   240
+##  6 何小薇   238
+##  7 雷旺     221
+##  8 陈欣越   215
+##  9 黄亦婷   212
+## 10 陈媚     206
+## # ... with 40 more rows</code></pre>
+<ul>
+<li>rowwise 行化更让人惊喜的是：它的逐行处理的逻辑 + 嵌套数据框可以更好地实
+现批量建模，在 rowwise 行化模式下，批量建模就像计算新列一样自然。批量建
+模可以用嵌套数据框 + purrr map_*() 实现，但这种 rowwise 技术，具有异曲同
+工之妙 [具体见统计建模技术篇]。</li>
+</ul>
+</div>
+</div>
+<div id="窗口函数" class="section level1">
+<h1>窗口函数</h1>
+<ul>
+<li><p>聚合函数如 sum() 和 mean() 接受 n 个输入，返回一个值。窗口函数是聚合函
+数的变体：接受 n 个输入，返回 n 个值。</p></li>
+<li><p>例如，cumsum()、cummean()、rank()、lead()、lag()等。</p></li>
+</ul>
+<div id="排名和排序函数" class="section level2">
+<h2>排名和排序函数</h2>
+<ul>
+<li>共有 6 个函数，只介绍 min_rank()：从小到大排名（ties.method=“min”)，若
+要从大到小排名需要套一个 desc()。</li>
+</ul>
+<pre class="r"><code>df %&gt;% 
+ mutate(ranks = min_rank(desc(math))) %&gt;% 
+ arrange(ranks)</code></pre>
+<pre><code>## # A tibble: 50 x 9
+##    class name   sex   chinese  math english moral science ranks
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+##  1 六4班 周婵   女         92    94      77    10       9     1
+##  2 六4班 陈丽丽 女         87    93      61     8       6     2
+##  3 六1班 何娜   女         87    92      79     9      10     3
+##  4 六5班 符苡榕 女         85    89      76     9      10     4
+##  5 六2班 黄祖娜 女         94    88      75    10      10     5
+##  6 六1班 陈芳妹 女         79    87      66     9      10     6
+##  7 六4班 李小龄 男         90    87      69    10      10     6
+##  8 六2班 徐雅琦 女         92    86      72    10       9     8
+##  9 六2班 徐达政 男         90    86      72     9      10     8
+## 10 六4班 杨昌晟 男         84    85      64     8      10    10
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="移位lag-和-lead" class="section level2">
+<h2>移位：lag() 和 lead()</h2>
+<pre class="r"><code>df %&gt;% 
+ mutate(math_lag = lag(math), math_delta = math - lag(math)) %&gt;% 
+ select(math, math_lag, math_delta)</code></pre>
+<pre><code>## # A tibble: 50 x 3
+##     math math_lag math_delta
+##    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+##  1    92       NA         NA
+##  2    77       92        -15
+##  3    87       77         10
+##  4    79       87         -8
+##  5    79       79          0
+##  6    73       79         -6
+##  7    80       73          7
+##  8    80       80          0
+##  9    63       80        -17
+## 10    55       63         -8
+## # ... with 40 more rows</code></pre>
+</div>
+<div id="累计汇总" class="section level2">
+<h2>累计汇总</h2>
+<ul>
+<li><p>R base 已经提供了 cumsum()、cummin()、cummax()、cumprod()</p></li>
+<li><p>dplyr包又提供了 cummean()、cumany()、cumall()，后两者可与
+filter() 连用选择行：<br />
+</p></li>
+<li><p>cumany(x): 用来选择遇到第一个满足条件之后的所有行<br />
+</p></li>
+<li><p>cumany(!x): 用来选择遇到第一个不满足条件之后的所有行<br />
+</p></li>
+<li><p>cumall(x): 用来选择所有行直到遇到第一个不满足条件的行<br />
+</p></li>
+<li><p>cumall(!x): 用来选择所有行直到遇到第一个满足条件的行</p></li>
+</ul>
+<pre class="r"><code>dt &lt;- tibble(
+ date = as.Date(&quot;2020-01-01&quot;) + 0:6,
+ balance = c(100, 50, 25, -25, -50, 30, 120))
+dt %&gt;% 
+ filter(cumany(balance &lt; 0)) # 选择第一次透支之后的所有行</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   date       balance
+##   &lt;date&gt;       &lt;dbl&gt;
+## 1 2020-01-04     -25
+## 2 2020-01-05     -50
+## 3 2020-01-06      30
+## 4 2020-01-07     120</code></pre>
+<pre class="r"><code>dt %&gt;% 
+ filter(cumall(!(balance &lt; 0))) # 选择所有行直到第一次透支</code></pre>
+<pre><code>## # A tibble: 3 x 2
+##   date       balance
+##   &lt;date&gt;       &lt;dbl&gt;
+## 1 2020-01-01     100
+## 2 2020-01-02      50
+## 3 2020-01-03      25</code></pre>
+</div>
+<div id="移动平均" class="section level2">
+<h2>移动平均</h2>
+<ul>
+<li>时间序列数据常需要计算移动平均，可用 tsibble 包实现</li>
+</ul>
+<pre><code>pacman::p_load(tsibble)
+df %&gt;%
+ mutate(avg_5 = slide_tsibble(math, mean, .size = 5))</code></pre>
+<p></font></p>
+</div>
+</div>

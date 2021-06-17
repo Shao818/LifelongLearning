@@ -1,0 +1,518 @@
+---
+author:
+  - 韭菜
+title: 'R语言编程：基于tidyverse：数据操作'
+categories:
+  - R
+  - tidyverse
+  - 数据操作
+  - 修改列
+  - 缺失值填充
+  - 重新编码
+  - 分组汇总
+  - 按行汇总
+  - 窗口函数
+tags:
+  - R
+  - tidyverse
+  - 数据操作
+  - 修改列
+  - 缺失值填充
+  - 重新编码
+  - 分组汇总
+  - 按行汇总
+  - 窗口函数
+date: 2021-06-17
+slug: tidyverse001
+weight: 001
+description: <font face="思源宋体 CN" >此系列为学习哈尔滨商业大学张敬信老师所编写的R语言编程：基于tidyverse的学习笔记。</font>
+---
+<font face="思源宋体 CN" >
+
+# 修改列
+
+## 数据预览
+
+```{r}
+library(tidyverse)
+df = readr::read_csv("https://raw.githubusercontent.com/Shao818/PublicData/main/ExamDatas.csv") 
+df
+```
+
+## 创建新列
+
+- 用 dplyr 包中的 mutate() 创建或修改列；若 transmute() 则只返回增加的
+新列。  
+
+- 若只给新列 1 个值，则循环使用得到值相同的一列:  
+
+
+```{r}
+df %>%
+ mutate(new_col = 5)
+```
+
+- 正常是以长度等于行数的向量赋值：
+
+```{r}
+df %>%
+ mutate(new_col = 1:n())
+```
+
+> 注： n() 返回当前分组的样本数, 未分组则为总行数。
+
+## 计算新列
+
+- 用数据框的列计算新列，若修改当前列，只需要赋值给原列名。
+```{r}
+df %>%
+ mutate(total = chinese + math + english + moral + science)
+```
+
+
+> 注意： 不能用 sum(), 它会将整个列的内容都加起来，类似的还有 mean()。   
+
+在同一个 mutate() 中可以同时创建或计算多个列，它们是从前往后依次计算，
+所以可以使用前面新创建的列：     
+
+- 计算 df 中 math 列的中位数；
+- 创建标记 math 是否大于中位数的逻辑值列；
+- 用 as.numeric() 将 TRUE/FALSE 转化为 1/0
+
+```{r}
+df %>%
+ mutate(med_math = median(math),
+ label = math > med_math,
+ label = as.numeric(label))
+```
+
+## 修改多列
+
+- 结合 across() 和选择列语法可以应用函数到多列，从而实现同时修改多列。  
+
+### 应用函数到所有列  
+
+- 将所有列转化为字符型：
+
+```{r}
+df %>% 
+ mutate(across(everything(), as.character))
+```
+
+### 应用函数到满足条件的列  
+
+- 对数值列做归一化：
+
+```{r}
+rescale <- function(x) {
+ rng <- range(x, na.rm = TRUE)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+df %>% 
+ mutate(across(where(is.numeric), rescale))
+```
+
+### 应用函数到指定的列 
+
+- 在不影响其它数值列的情况下，将 iris 中的 length 和 width 测量单位从厘米变成
+毫米：
+
+```{r}
+iris %>% as_tibble() %>% 
+ mutate(across(contains("Length") | contains("Width"), ~ .*10))
+```
+
+# 替换 NA
+
+## `replace_na()`
+
+- 实现用同一个值替换一列中的所有 NA 值，该函数接受一个命名列表，其成分为
+"列名=替换值"：
+
+
+```{r}
+starwars %>%
+ replace_na(list(hair_color = "UNKNOWN",
+ birth_year = 99999))
+```
+
+## `fill()`
+
+- 用前一个（或后一个）非缺失值填充 NA。有些表在记录时，会省略与上一条记
+录相同的内容，如下表
+
+```{r}
+library(tidyverse)
+gap_data= readr::read_csv("https://raw.githubusercontent.com/Shao818/WebData/master/introR-master/datas/gap_data.csv") 
+knitr::kable(gap_data, "html", align="c",caption ="原始数据")
+```
+
+
+- Tidyr 包中的 fill() 适合处理这种结构的 NAs, 默认是向下填充，用上一个非
+缺失值填充这些 NAs：
+
+```{r}
+gap_data %>% 
+ fill(site, species)%>% 
+ knitr::kable( "html", align="c",caption ="fill填充后的数据")
+```
+
+# 重新编码  
+
+- 经常需要对列中的值进行重新编码。  
+
+## 两类别情形：if_else()
+
+用 if_else() 作 yes / no 决策以确定用哪个值做替换：
+
+
+```{r}
+df %>%
+ mutate(sex = if_else(sex == "男", "M", "F")) %>%
+ slice_sample(prop = 0.15)
+```
+
+
+## 多类别情形：case_when()
+
+- 用 case_when() 做更多条件下的替换，避免使用很多 if_else() 嵌套
+
+```{r}
+warpbreaks %>%
+ mutate(tension=case_when(tension == "H" ~ "High",
+ tension == "M" ~ "Medium",
+ tension == "L" ~ "Low",
+ TRUE ~ NA_character_)) %>%
+ slice_sample(prop = 0.15)
+```
+
+> 说明： case_when() 中用的是公式形式:     
+  - 左边是返回 TRUE 或 FALSE 的表达式或函数       
+  - 右边是若左边表达式为 TRUE，则重新编码的值，也可以是表达式或函数    
+  - 每个分支条件将从上到下的计算，并接受第一个 TURE 条件；        
+  - 一个好的策略是，用最后一个分支决定若其它条件都不为 TRUE 时该怎么做。本
+例最后一个分支直接用 TRUE 作为公式左边，若某行的 tension 值不是 H/M/L，
+将被重新编码为 NA_character_。
+
+
+## 更强大的重新编码函数
+
+- 基于 tidyverse 设计哲学，sjmisc包实现了对变量做数据变换，如重新编码、二分或分组变量、设置与替换缺失值等；　　
+
+- sjmisc 包也支持标签化数据，这对操作 SPSS 或 Stata 数据集特别有用。  
+
+- 只介绍重编码函数：rec() —— 可以将变量的旧值重新编码为新值，基本格式
+为：  
+
+
+```
+rec(x, rec, append, ...)
+```
+
+- x：为数据框（或向量）；  
+
+- append：默认为 TRUE, 则返回包含重编码新列的数据框， FALSE 则只返回重编码的新列；  
+
+- rec：设置重编码模式，即哪些旧值被哪些新值取代，具体如下：
+
+- 重编码对：每个重编码对用 ";" 隔开，例如 rec="1=1; 2=4; 3=2; 4=3"  
+
+- 多值：多个旧值（逗号分隔）重编码为一个新值，例如 rec="1,2=1; 3,4=2"  
+
+- 值范围：用冒号表示值范围，例如 rec="1:4=1; 5:8=2"  
+
+- 数值型值范围：带小数部分的数值向量，值范围内的所有值将被重新编码，例如
+rec="1:2.5=1; 2.6:3=2"（注意 2.55 因未包含在值范围将不被重新编码）
+
+
+- "min" 和 "max"：最小值和最大值分别用 min 和 max 表示，例如
+rec="min:4=1; 5:max=2"（min 和 max 也可以作为新值，如 5:7=max, 表
+示将 5~7 编码为 max(x)）  
+
+- "else"：所有未设定的其它值，用 else 表示，例如 rec="3=1; 1=2; else=3"
+- "copy"：else 可以结合 copy 一起使用，表示所有未设定的其它值保持原样（从
+原数值 copy），例如 rec="3=1; 1=2; else=copy"  
+
+- NAs：NA 既可以作为旧值，也可以作为新值，例如 rec="NA=1; 3:5=NA"  
+
+- "rev"：设置反转值顺序  
+
+- 非捕获值：不匹配的值将设置为 NA, 除非使 用 else 和 copy.  
+
+
+```{r}
+pacman::p_load(sjmisc)
+df_dum <- df %>% 
+ rec(math, 
+ rec = "min:59=不及格; 60:74=中; 75:85=良; 85:max=优",
+ append = FALSE)
+frq(df_dum)
+
+```
+
+> 注： 新值的值标签可以在重新编码时一起设置，只需要在每个重编码对后接上中括号标签。
+
+# 分组汇总  
+
+- 分组汇总，相当于 Excel 的透视表功能  
+
+- 对未分组的数据框，一些操作如 mutate() 是在所有行上执行——或者说，整个
+数据框是一个分组，所有行都属于它。  
+
+- 若数据框被分组，则这些操作是分别在每个分组上独立执行。可以认为是，将数
+据框拆分为更小的多个数据框。在每个更小的数据框上执行操作，最后再将结果
+合并回来。  
+
+
+## 创建分组
+
+- 用 group_by() 创建分组，只是对数据框增加了分组信息（用group_keys()
+查看），并不是真的将数据分割为多个数据框。    
+
+```{r}
+df_grp <- df %>%
+ group_by(sex) 
+df_grp %>% 
+ group_keys()
+```
+
+- 查看每一行属于哪一组：
+
+```{r}
+df_grp %>% 
+ group_indices()
+```
+- 查看每一组包含哪些行：
+```{r}
+df_grp %>% 
+ group_rows()
+```
+
+- 用 ungroup() 解除分组。
+
+## 分组汇总  
+
+对数据框做分组最主要的目的就是做分组汇总，汇总就是以某种方式组合行，用
+dplyr 包中的 summarise() 实现，结果只保留分组列（来自 `group_keys()）和
+新创建的汇总列。
+
+### summarise()   
+
+- 可以与很多自带或自定义的汇总函数连用，常用的汇总函数有：  
+ - n() —— 观测数  
+ - n_distinct(var) —— 变量 var 的唯一值数目    
+ - sum(var), max(var), min(var), ...   
+ - mean(var), median(var), sd(var), IQR(var), ...   
+```{r}
+df %>%
+ group_by(sex) %>%
+ summarise(n = n(),
+ math_avg = mean(math, na.rm = TRUE),
+ math_med = median(math))
+```
+ 
+- 函数 summarise() ，配合across()可以对所选择的列做汇总：   
+ - across(where(), .fns)：对满足条件的列，做一个或多个汇总   
+ - across(vars, .fns)：对选定的变量列，做一个或多个汇总   
+ - across(everything(), .fns)：对所有列，做一个或多个汇总
+- 使用它们的好处是，可以借助辅助选择器或判断条件选择多列，还能在这些列上
+执行多个函数，只需要将它们放入一个列表。  
+
+### 对满足条件的列做多种汇总
+
+```{r}
+df_grp <- df %>%
+ group_by(class) %>%
+ summarise(across(where(is.numeric), 
+ list(sum=sum, mean=mean, min=min)))
+df_grp
+```
+
+- 重塑为更具可读性的长表：
+
+```{r}
+df_grp %>% pivot_longer(-class, 
+ names_to = c("Vars", ".value"), 
+ names_sep = "_")
+```
+
+### 对某些列做汇总
+
+```{r}
+df %>%
+ group_by(class, sex) %>%
+ summarise(across(contains("h"), mean))
+```
+
+### 对所有列做汇总
+
+```{r}
+df %>%
+ select(-name) %>% 
+ group_by(class, sex) %>%
+ summarise(across(everything(), mean))
+```
+
+### 支持多返回值的汇总函数
+
+summarise() 以前只支持一个返回值的汇总函数，如 sum, mean 等。现在也支
+持多返回值（返回向量值、甚至是数据框）的汇总函数，如 range(), quantile()
+等。
+
+```{r}
+qs = c(0.25, 0.5, 0.75)
+df_q = df %>% drop_na() %>% 
+ group_by(sex) %>%
+ summarise(math_qs = quantile(math, qs), q = qs) 
+df_q
+```
+
+- 可读性不好，再来个长变宽：
+
+
+```{r}
+df_q %>% 
+ pivot_wider(everything(), names_from = q, 
+ values_from = math_qs, names_prefix = "q_")
+```
+
+
+## 分组计数
+
+- 用count() 按分类变量 order 和 vore 分组，并按分组大小排序：  
+
+```{r}
+df %>%
+ count(class, sex, sort = TRUE)
+```
+
+- 对已分组的数据框，用 tally()计数：
+
+```{r}
+df %>%
+ group_by(math_level = cut(math, 
+ breaks = c(0, 60, 75, 80, 100),
+ right = FALSE)) %>%
+ tally()
+```
+
+- 用 add_count()和 add_tally() 可为数据集增加一列按 ... 分组的计数：
+
+
+```{r}
+df %>%
+ add_count(class, sex)
+```
+
+## 按行汇总
+
+- 通常的数据操作逻辑都是按列方式（colwise），这使得按行汇总很困难。  
+
+- dplyr 包提供了 rowwise() 函数为数据框创建按行方式（rowwise），它不是
+真的改变数据框，只是创建了按行信息。  
+
+- 使用 rowwise() 后，就会改变数据框的操作逻辑：
+
+
+```{r}
+rf = df %>% 
+ rowwise()
+rf %>% 
+ mutate(total = sum(c(chinese, math, english)))
+```
+
+- 函数 c_across() 是为按行方式（rowwise）在选定的列范围汇总数据而设计
+的，它没有提供 .fns 参数，只能选择列
+
+```{r}
+rf %>% 
+ mutate(total = sum(c_across(where(is.numeric))))
+```
+
+
+- 若只是做按行求和或均值，直接用 rowSums() / rowMeans() 速度更快（不
+需要分割-汇总-合并），这里的 rowwise 行化后提供可以做更多的按行汇总的可
+能。  
+
+
+```{r}
+df %>% 
+ mutate(total = rowSums(across(where(is.numeric))))
+```
+
+- 按行方式（rowwise）可以理解为一种特殊的分组：每一行作为一组。为
+rowwise() 提供行 ID，用 summarise() 做汇总更能体会这一点：  
+
+```{r}
+df %>% 
+ rowwise(name) %>% 
+ summarise(total = sum(c_across(where(is.numeric))))
+```
+
+- rowwise 行化更让人惊喜的是：它的逐行处理的逻辑 + 嵌套数据框可以更好地实
+现批量建模，在 rowwise 行化模式下，批量建模就像计算新列一样自然。批量建
+模可以用嵌套数据框 + purrr map_*() 实现，但这种 rowwise 技术，具有异曲同
+工之妙 [具体见统计建模技术篇]。  
+
+# 窗口函数
+
+- 聚合函数如 sum() 和 mean() 接受 n 个输入，返回一个值。窗口函数是聚合函
+数的变体：接受 n 个输入，返回 n 个值。  
+
+- 例如，cumsum()、cummean()、rank()、lead()、lag()等。
+
+##  排名和排序函数  
+
+- 共有 6 个函数，只介绍 min_rank()：从小到大排名（ties.method="min")，若
+要从大到小排名需要套一个 desc()。
+
+```{r}
+df %>% 
+ mutate(ranks = min_rank(desc(math))) %>% 
+ arrange(ranks)
+```
+
+## 移位：lag() 和 lead()
+
+```{r}
+df %>% 
+ mutate(math_lag = lag(math), math_delta = math - lag(math)) %>% 
+ select(math, math_lag, math_delta)
+```
+
+## 累计汇总
+
+- R base 已经提供了 cumsum()、cummin()、cummax()、cumprod()  
+
+- dplyr包又提供了 cummean()、cumany()、cumall()，后两者可与
+filter() 连用选择行：  
+ - cumany(x): 用来选择遇到第一个满足条件之后的所有行  
+ - cumany(!x): 用来选择遇到第一个不满足条件之后的所有行  
+ - cumall(x): 用来选择所有行直到遇到第一个不满足条件的行  
+ - cumall(!x): 用来选择所有行直到遇到第一个满足条件的行  
+ 
+ 
+```{r}
+dt <- tibble(
+ date = as.Date("2020-01-01") + 0:6,
+ balance = c(100, 50, 25, -25, -50, 30, 120))
+dt %>% 
+ filter(cumany(balance < 0)) # 选择第一次透支之后的所有行
+```
+
+```{r}
+dt %>% 
+ filter(cumall(!(balance < 0))) # 选择所有行直到第一次透支
+```
+
+## 移动平均
+
+- 时间序列数据常需要计算移动平均，可用 tsibble 包实现  
+
+```
+pacman::p_load(tsibble)
+df %>%
+ mutate(avg_5 = slide_tsibble(math, mean, .size = 5))
+```
+
+</font>
