@@ -1,0 +1,165 @@
+---
+author:
+  - 图说经济
+title: '图说经济'
+categories:
+  - 图说经济
+tags:
+  - 图说经济
+date: 2021-07-13
+slug: figure_economic
+weight: 001
+description: <font face="思源宋体 CN" >根据关键词选择热点股票；查看市场情绪等</font>
+---
+
+
+```{r}
+pacman::p_load(httr, readr, rjson,tidyverse,reshape2,openxlsx,ggplot2,
+               magrittr,showtextdb,sysfonts,showtext,xts,reticulate,
+               RODBC,RMySQL,RMariaDB,zeallot,stringi,Cairo)
+```
+
+
+# 中美现价GDP同比增速之差
+
+```{r include=FALSE}
+setwd("E:/Mirror/芍哥的宏观经济分析报告/原始数据")
+mydata<-read.xlsx("宏观数据.xlsx",sheet = "中美经济增速之差",detectDates =TRUE)
+colnames(mydata)<-mydata[1,]
+mydata<-mydata[-c(1:3),]
+
+mydata1<-mydata %>% 
+  arrange(指标名称)%>%
+  mutate(美国GDP现价同比增长率=(as.numeric(`美国:GDP:支出法:当季值`)/lag(as.numeric(`美国:GDP:支出法:当季值`)))-1,
+         中美现价GDP同比增速之差=as.numeric(`GDP:现价:当季同比`)-美国GDP现价同比增长率,
+         指标名称=as.Date(指标名称))
+```
+
+
+```{r include=FALSE}
+mytheme<-theme_bw()+
+  theme(
+    text = element_text(family='F',size=10),
+    
+    #修改坐标轴格式
+    #修改坐标轴标题
+    axis.title.x = element_text(margin = margin(t =10), 
+                                size = 10,
+                                face = "bold"),
+    axis.title.y = element_text(margin = margin(t =10), 
+                                size = 10,
+                                face = "bold"),
+    #修改坐标轴刻度文本
+    axis.text.x = element_text(size = 10,angle = 90, vjust = 1, hjust = 1),
+    axis.text.y = element_text(size = 10,angle = 90, vjust = 1, hjust = 1),
+    #修改坐标线与刻度颜色
+    axis.line = element_line(colour = "black",size = 0.2, linetype = "solid"), 
+    axis.ticks = element_line(colour = "black"),
+    #axis.ticks.y = element_blank(),
+    #axis.ticks.x = element_blank(),
+    #修改坐标轴标签文本
+    #axis.text.y = element_blank(),
+    #axis.text.x = element_blank(color="red"),
+    
+    #网格线的修改
+    panel.grid.major.y =  element_line(colour = "gray38",
+                                       linetype = "dashed"),#修改y轴网格线为虚线
+    panel.grid.minor= element_blank(),#删除y轴次网格线
+    panel.grid.major.x = element_blank(), #去x轴所有掉垂直网格线
+    #panel.grid.major.y = element_blank(), #去掉垂直网格线
+    
+    #绘图区的背景颜色设定
+    panel.background = element_rect(fill = "gray98"),
+    plot.background = element_rect(fill = "gray98"),
+    
+    
+    #绘图区四周边界设定
+    plot.margin = margin(t = 1, r = 1, b = 1, l = 1, unit = "cm"),  
+    #删除绘图区边界线
+    panel.border=element_blank(),
+    
+    
+    #修改标题、副标题、备注、标签的格式
+    plot.title = element_text(hjust = 0.5, size = 10, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    plot.caption= element_text(size = 10, face = "italic"),
+    plot.tag= element_text(size = 10),
+    plot.tag.position = c(0.2,0.02),
+    #plot.caption.position = c(0.2,0),
+    
+    
+    #设置图例
+    legend.background = element_rect(fill = "transparent"),
+    legend.position="bottom",
+    legend.box = "horizontal",
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    #theme_bw() +  # 移除背景
+    #ggprism::theme_prism()+
+    #theme_bw()+
+  )
+
+```
+
+
+
+```{r}
+ggplot(data=mydata1,aes(x=指标名称,y=中美现价GDP同比增速之差))+
+  geom_line(size=1,color="blue")+
+  labs(title="中美现价GDP同比增速之差",
+       caption="数据来源：iFinD。"
+       )+
+  scale_y_continuous(limit=c(-10,30),expand=c(0,0))+
+  scale_x_date(limit=c(as.Date("2005-03-31"),
+                       as.Date("2021-03-31")),
+                       date_labels = "%Y-%m",
+                       date_breaks = "9 month",
+                       expand=c(0,0))+
+  geom_hline(aes(yintercept=0), colour="red", linetype="dashed")+
+  mytheme
+```
+
+# 中美十年期国债收益率
+
+
+```{r}
+setwd("E:/Mirror/芍哥的宏观经济分析报告/原始数据")
+mydata<-read.xlsx("宏观数据.xlsx",sheet = "中美十年期国债收益率",detectDates =TRUE)
+colnames(mydata)<-mydata[1,]
+mydata<-mydata[-c(1:3),]
+str(mydata)
+
+mydata1<-mydata%>% 
+  arrange(指标名称)%>%
+  mutate(美国十年期国债收益率=as.numeric(`美国:国债收益率:10年`),
+         中国十年期国债收益率=as.numeric(`国债收益率:10年`),
+         中美十年期国债收益率之差=美国十年期国债收益率-中国十年期国债收益率,
+         指标名称=as.Date(指标名称)) %>% 
+         drop_na()
+```
+
+```{r}
+ggplot(data=mydata1)+
+  geom_line(aes(x=指标名称,y=美国十年期国债收益率,color = "美国十年期国债收益率"),size=2)+
+  geom_line(aes(x=指标名称,y=中国十年期国债收益率,color = "中国十年期国债收益率"),size=2)+
+  geom_bar(aes(x=指标名称,y=中美十年期国债收益率之差,fill = "中美十年期国债收益率之差"),stat = "identity", width=1)+
+  
+  labs(title="中美十年期国债收益率",
+       caption="数据来源：iFinD。"
+  )+
+  scale_y_continuous(limit=c(-3,5),expand=c(0,0))+
+  scale_x_date(limit=c(as.Date("2015-01-01"),
+                       as.Date("2021-07-12")),
+               date_labels = "%Y-%m",
+               date_breaks = "3 month",
+               expand=c(0,0))+
+  #geom_hline(aes(yintercept=0), colour="red", linetype="dashed")+
+  scale_fill_brewer(palette="Set1")+
+  mytheme+
+  scale_color_manual(name = NULL,  guide = "legend",
+                     values = c("美国十年期国债收益率" = "blue", 
+                                "中国十年期国债收益率" = "red")) +
+  scale_fill_manual(name = NULL,  guide = "legend",
+                    values = c("中美十年期国债收益率之差" = "gray"))
+```
+

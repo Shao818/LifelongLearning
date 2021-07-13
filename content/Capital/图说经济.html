@@ -1,0 +1,502 @@
+---
+author:
+  - 图说经济
+title: '图说经济'
+categories:
+  - 图说经济
+tags:
+  - 图说经济
+date: 2021-07-13
+slug: figure_economic
+weight: 001
+description: <font face="思源宋体 CN" >根据关键词选择热点股票；查看市场情绪等</font>
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<pre class="r"><code>pacman::p_load(httr, readr, rjson,tidyverse,reshape2,openxlsx,ggplot2,
+               magrittr,showtextdb,sysfonts,showtext,xts,reticulate,
+               RODBC,RMySQL,RMariaDB,zeallot,stringi,Cairo)</code></pre>
+<div id="中美现价gdp同比增速之差" class="section level1">
+<h1>中美现价GDP同比增速之差</h1>
+<pre class="r"><code>ggplot(data=mydata1,aes(x=指标名称,y=中美现价GDP同比增速之差))+
+  geom_line(size=1,color=&quot;blue&quot;)+
+  labs(title=&quot;中美现价GDP同比增速之差&quot;,
+       caption=&quot;数据来源：iFinD。&quot;
+       )+
+  scale_y_continuous(limit=c(-10,30),expand=c(0,0))+
+  scale_x_date(limit=c(as.Date(&quot;2005-03-31&quot;),
+                       as.Date(&quot;2021-03-31&quot;)),
+                       date_labels = &quot;%Y-%m&quot;,
+                       date_breaks = &quot;9 month&quot;,
+                       expand=c(0,0))+
+  geom_hline(aes(yintercept=0), colour=&quot;red&quot;, linetype=&quot;dashed&quot;)+
+  mytheme</code></pre>
+<pre><code>## Warning: Removed 232 row(s) containing missing values (geom_path).</code></pre>
+<pre><code>## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): Windows字体数据
+## 库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<p><img src="/Capital/图说经济_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="中美十年期国债收益率" class="section level1">
+<h1>中美十年期国债收益率</h1>
+<pre class="r"><code>setwd(&quot;E:/Mirror/芍哥的宏观经济分析报告/原始数据&quot;)
+mydata&lt;-read.xlsx(&quot;宏观数据.xlsx&quot;,sheet = &quot;中美十年期国债收益率&quot;,detectDates =TRUE)
+colnames(mydata)&lt;-mydata[1,]
+mydata&lt;-mydata[-c(1:3),]
+str(mydata)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    14968 obs. of  3 variables:
+##  $ 指标名称            : chr  &quot;2021-07-13&quot; &quot;2021-07-12&quot; &quot;2021-07-09&quot; &quot;2021-07-08&quot; ...
+##  $ 美国:国债收益率:10年: chr  NA &quot;1.38&quot; &quot;1.37&quot; &quot;1.3&quot; ...
+##  $ 国债收益率:10年     : chr  &quot;3.0272000000000001&quot; &quot;3.0491000000000001&quot; &quot;3.0602999999999998&quot; &quot;3.0659000000000001&quot; ...</code></pre>
+<pre class="r"><code>mydata1&lt;-mydata%&gt;% 
+  arrange(指标名称)%&gt;%
+  mutate(美国十年期国债收益率=as.numeric(`美国:国债收益率:10年`),
+         中国十年期国债收益率=as.numeric(`国债收益率:10年`),
+         中美十年期国债收益率之差=美国十年期国债收益率-中国十年期国债收益率,
+         指标名称=as.Date(指标名称)) %&gt;% 
+         drop_na()</code></pre>
+<pre class="r"><code>ggplot(data=mydata1)+
+  geom_line(aes(x=指标名称,y=美国十年期国债收益率,color = &quot;美国十年期国债收益率&quot;),size=2)+
+  geom_line(aes(x=指标名称,y=中国十年期国债收益率,color = &quot;中国十年期国债收益率&quot;),size=2)+
+  geom_bar(aes(x=指标名称,y=中美十年期国债收益率之差,fill = &quot;中美十年期国债收益率之差&quot;),stat = &quot;identity&quot;, width=1)+
+  
+  labs(title=&quot;中美十年期国债收益率&quot;,
+       caption=&quot;数据来源：iFinD。&quot;
+  )+
+  scale_y_continuous(limit=c(-3,5),expand=c(0,0))+
+  scale_x_date(limit=c(as.Date(&quot;2015-01-01&quot;),
+                       as.Date(&quot;2021-07-12&quot;)),
+               date_labels = &quot;%Y-%m&quot;,
+               date_breaks = &quot;3 month&quot;,
+               expand=c(0,0))+
+  #geom_hline(aes(yintercept=0), colour=&quot;red&quot;, linetype=&quot;dashed&quot;)+
+  scale_fill_brewer(palette=&quot;Set1&quot;)+
+  mytheme+
+  scale_color_manual(name = NULL,  guide = &quot;legend&quot;,
+                     values = c(&quot;美国十年期国债收益率&quot; = &quot;blue&quot;, 
+                                &quot;中国十年期国债收益率&quot; = &quot;red&quot;)) +
+  scale_fill_manual(name = NULL,  guide = &quot;legend&quot;,
+                    values = c(&quot;中美十年期国债收益率之差&quot; = &quot;gray&quot;))</code></pre>
+<pre><code>## Scale for &#39;fill&#39; is already present. Adding another scale for &#39;fill&#39;, which
+## will replace the existing scale.</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_bar).</code></pre>
+<pre><code>## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): Windows字体数据
+## 库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列
+
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+## Windows字体数据库里没有这样的字体系列</code></pre>
+<p><img src="/Capital/图说经济_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
