@@ -36,10 +36,12 @@ mydata1<-mydata %>%
 ```
 
 
-```{r include=FALSE}
+
+```{r include=FALSE, fig.showtext=TRUE,fig.align="center"}
+font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
 mytheme<-theme_bw()+
   theme(
-    text = element_text(family='F',size=10),
+    text = element_text(family='SourceHanSerifCN-Light',size=10),
     
     #修改坐标轴格式
     #修改坐标轴标题
@@ -82,10 +84,10 @@ mytheme<-theme_bw()+
     #修改标题、副标题、备注、标签的格式
     plot.title = element_text(hjust = 0.5, size = 10, face = "bold"),
     plot.subtitle = element_text(hjust = 0.5, size = 10),
-    plot.caption= element_text(size = 10, face = "italic"),
+    plot.caption= element_text(hjust =-0.1,size = 10, face = "italic"),
     plot.tag= element_text(size = 10),
     plot.tag.position = c(0.2,0.02),
-    #plot.caption.position = c(0.2,0),
+    #plot.caption.position = c(0.2,0.02),
     
     
     #设置图例
@@ -103,7 +105,8 @@ mytheme<-theme_bw()+
 
 
 
-```{r}
+```{r, fig.showtext=TRUE,fig.align="center"}
+font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
 ggplot(data=mydata1,aes(x=指标名称,y=中美现价GDP同比增速之差))+
   geom_line(size=1,color="blue")+
   labs(title="中美现价GDP同比增速之差",
@@ -138,10 +141,12 @@ mydata1<-mydata%>%
          drop_na()
 ```
 
-```{r}
+
+```{r, fig.showtext=TRUE,fig.align="center"}
+font_add("SourceHanSerifCN-Light", "SourceHanSerifCN-Light.otf")
 ggplot(data=mydata1)+
-  geom_line(aes(x=指标名称,y=美国十年期国债收益率,color = "美国十年期国债收益率"),size=2)+
-  geom_line(aes(x=指标名称,y=中国十年期国债收益率,color = "中国十年期国债收益率"),size=2)+
+  geom_line(aes(x=指标名称,y=美国十年期国债收益率,color = "美国十年期国债收益率"),size=1)+
+  geom_line(aes(x=指标名称,y=中国十年期国债收益率,color = "中国十年期国债收益率"),size=1)+
   geom_bar(aes(x=指标名称,y=中美十年期国债收益率之差,fill = "中美十年期国债收益率之差"),stat = "identity", width=1)+
   
   labs(title="中美十年期国债收益率",
@@ -162,4 +167,3 @@ ggplot(data=mydata1)+
   scale_fill_manual(name = NULL,  guide = "legend",
                     values = c("中美十年期国债收益率之差" = "gray"))
 ```
-
