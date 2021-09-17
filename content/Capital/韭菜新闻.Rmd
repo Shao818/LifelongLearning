@@ -1,15 +1,13 @@
 ---
 author:
   - 韭菜
-title: '韭菜新闻'
+title: '市场新闻'
 categories:
-  - R
-  - Stata
-  - 控制变量
+  - 资本市场
+  - 新闻
 tags:
-  - R
-  - Stata
-  - 控制变量
+  - 资本市场
+  - 新闻
 date: 2021-04-21
 slug: RStata
 weight: 001
@@ -60,7 +58,7 @@ Firm_code<-"华闻集团"
 ```{r include=FALSE}
 #转换公司名称为公司代码
 if (is.na(as.numeric(Firm_code))){
-  QueryCondition<-paste("select 公司代码 from ifind_firm_basic_information where 股票简称='",Firm_code,"'",sep="")
+  QueryCondition<-paste("select 公司代码 from ifind公司基本信息 where 股票简称='",Firm_code,"'",sep="")
   Firm_code<-dbGetQuery(con,QueryCondition)
 }
 ```
@@ -69,7 +67,7 @@ if (is.na(as.numeric(Firm_code))){
 ```{r include=FALSE}
 #提取公司股票简称
 
-QueryCondition<-paste("select 股票简称 from ifind_firm_basic_information where 公司代码='",Firm_code,"'",sep="")
+QueryCondition<-paste("select 股票简称 from ifind公司基本信息 where 公司代码='",Firm_code,"'",sep="")
 Firm_abbreviation <-dbGetQuery(con,QueryCondition)
 
 ```
@@ -91,7 +89,7 @@ library('Tushare')
 api <- Tushare::pro_api(token = 'c4cbc3b98311c39bf32997953d8db4b1ffb43d66236273554a63692d')
 #新浪新闻数据库的维护
 #设置字段的字符编码
-#dbSendQuery(con,'SET NAMES gbk')
+#dbSendQuery(con,'SET NAMES gbk') 
 dbSendQuery(con, "SET NAMES utf8")
 #读取特定表中的数据
 #dbReadTable(con,"test") 
@@ -259,7 +257,7 @@ dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 
 
 ```{r}
-Keywords<-c("二胎")
+Keywords<-c("光刻胶")
 ```
 
 # 关键词选股:`r Keywords`
