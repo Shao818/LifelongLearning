@@ -257,7 +257,7 @@ dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 
 
 ```{r}
-Keywords<-c("光刻胶")
+Keywords<-c("软控股份")
 ```
 
 # 关键词选股:`r Keywords`
@@ -266,8 +266,6 @@ Keywords<-c("光刻胶")
 ## 新浪财经
 
 >　筛选出包含特定关键词的新闻
-
-
 
 ```{r}
 Tushare_News_sina_Query<-paste("select 时间,内容 from Tushare_News_sina WHERE 内容 LIKE '%",Keywords,"%' order by 时间 desc ",sep="")
