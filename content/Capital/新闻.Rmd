@@ -351,7 +351,7 @@ Tushare_News_sina<-dbGetQuery(con,Tushare_News_sina_Query)
 `r Tushare_News_sina[26,'时间']`：`r Tushare_News_sina[26,'内容']`
 
 
-`r Tushare_News_sina[27,'时间']`：`r Tushare_News_sina[27,'内容']`
+`r Tushare_News_sina[27,'时间']`：`r Tushare_News_sina[27,'内容']` 
 
 
 `r Tushare_News_sina[28,'时间']`：`r Tushare_News_sina[28,'内容']`
