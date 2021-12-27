@@ -257,7 +257,7 @@ dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 
 
 ```{r}
-Keywords<-c("中药")
+Keywords<-c("华仁药业")
 ```
 
 # 关键词选股:`r Keywords`
