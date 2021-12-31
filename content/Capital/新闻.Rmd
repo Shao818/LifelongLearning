@@ -1,14 +1,14 @@
 ---
 author:
   - 韭菜
-title: '新闻'
+title: '市场新闻'
 categories:
   - 资本市场
   - 新闻
 tags:
   - 资本市场
   - 新闻
-date: 2021-04-21
+date: 2021-12-31
 slug: Market_News
 weight: 001
 description: <font face="思源宋体 CN" >根据关键词选择热点股票；查看市场情绪等</font>
@@ -253,11 +253,11 @@ dbWriteTable(con,"Tushare_News_iFind",Tushare_News_iFind,append = TRUE)
 # 选股框架
 
 
-![](https://gitee.com/shao818/Figure/raw/master/%E9%80%89%E8%82%A1%E6%A1%86%E6%9E%B6.png)
+
 
 
 ```{r}
-Keywords<-c("华仁药业")
+Keywords<-c("润建股份")
 ```
 
 # 关键词选股:`r Keywords`
