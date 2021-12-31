@@ -14,11 +14,13 @@ weight: 001
 description: <font face="思源宋体 CN" >通达信公式研究系列</font>
 ---
 
-<font face="思源宋体 CN" >
+
 
 # 关键概念
 
 ## 公式编辑器
+
+<font face="思源宋体 CN" >
 
 “ 公式编辑器 ” 好比是一个工作母床，通过这个工作母床可以制造出所需要的各式各样的零件，同样，在指标分析的工作中，利用编辑器可以编写出相应的分析条件，这种方法是在技术分析当中最为常用的方法之一。例如，指标 KD 、指标 MA 等等，通过对这些指标的观察、分析，找出一些合适的条件作为买入卖出点。当然，我们也许需要的是一些自己的指标，一些自己的准确的指标，更多的 MB 、 MC 、 MD 等等，这一切我们通过 “ 公式编辑器 ” 可以实现。
 
@@ -76,7 +78,7 @@ REF （ X ， M ）
 `X AND Y `就表示条件 X 和条件 Y
 
 
-### 注意事项  
+### 注意事项
 
 
 - 1 、如果选择： “ 主图叠加 ” ，我们的指标线会与 K 线图显示在同一个图形框中，现在我们的指标线显示在其下方，即 “ 副图 ” 中；
@@ -84,14 +86,14 @@ REF （ X ， M ）
 - 3 、一个句子完了，别忘了以分号结尾；
 你的公式写得对不对，可以通过 “ 测试公式 ” 来检查，如果错了，它会告诉你错在哪里。
 
-### 条件选股总结  
+### 条件选股总结
 
 1 、指标和条件选股在结构上没有差别，只是在内容上，条件选股要多加上我们的条件，比如大于 10 ，或者交叉等等！
 
 2 、中间表达式可以帮助我们清晰的表达我们的公式，不至于使公式的结构特别的混乱！
 
 
-##　画线指标公式编辑器
+## 画线指标公式编辑器
 
 - ［公式名称］用于识别指标公式，不能重名，最多可以有16个字符。键盘精灵也用该名称来选择公式。
 - ［公式描述］简单描述该指标的用途。
@@ -129,8 +131,285 @@ REF （ X ， M ）
 ［空头卖出］做空时的卖出条件在此输入，卖出点指示的颜色及式样也请在此选定。
 
 ##　五彩K线公式编辑器
+
+
+
+
 　　 与指标公式编辑器的使用相似
 
 # 选股公式
 
+
+## RPS强势个股
+
+```
+{根据最近10日的RPS进行筛选强势个股}
+
+{计算50日RPS}
+K10 := EXTDATA_USER(3, 0);
+RPSK10 := K10/10;
+
+
+{计算120日RPS}
+K20 := EXTDATA_USER(4, 0);
+RPSK20 :=K20/10;
+
+
+
+{筛选近10日RPSK120>90;RPSK250>90;}
+RPSK10 > 0 AND RPSK20 > 0 AND COUNT(RPSK10 < R, D) = 0 AND COUNT(RPSK20 < R, D) = 0;
+```
+
+- COUNT 统计
+
+统计满足条件的周期数.
+用法:
+  COUNT(X,N),统计N周期中满足X条件的周期数,若N<0则从第一个有效值开始.
+例如:
+  COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20214831094828.png)
+
+筛选出的个股示例如下：
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20211131101152.png)
+>请注意，如果是交易日的交易时间，需要将引用的数据滞后一天，因为当天的RPS指标尚未计算。
+
+## RPS强势板块
+
+```
+{强势板块分析，最近5日，10日RPS，交易日数据之后一天取值}
+
+{计算板块10日RPS}
+K10 := REF(EXTDATA_USER(6, 0),1);
+
+RPSK10 := K10/10;
+{计算板块20日RPS}
+K20 := REF(EXTDATA_USER(7, 0),1);
+
+RPSK20 :=K20/10;
+
+{筛选近10日RPSK120>90;RPSK250>90;}
+RPSK10 > 0 AND RPSK20 > 0 AND COUNT(RPSK10 < R, D) = 0 AND COUNT(RPSK20 < R, D) = 0; = 0;
+```
+![](https://gitee.com/shao818/Figure/raw/master/截图_20211931101911.png)
+
+筛选结果示例：
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20212031102013.png)
+
+## 底部横盘突破
+
+```
+V1 := MA(VOL, 5); {5日均量}
+V2 := VOL / REF(V1, 1) > 2; {今日成交量大于昨日的5日均量的2倍}
+
+PZ1 := MA(CLOSE, M); {今日的M日收盘均价}
+PZ2 := HHV(HIGH, M); {M日最高价}
+PZ3 := LLV(LOW, M); {M日最低价}
+PZ4 := (PZ2 - PZ1) / PZ1; {PZ2和PZ1价格差的百分比}
+PZ5 := (PZ1 - PZ3) / PZ1; {PZ1和PZ3价格差的百分比}
+PZ := REF(PZ4, 1) < 0.15 AND REF(PZ5, 1) < 0.15; {昨日的PZ4小于0.15且昨日的PZ5小于0.15}
+
+TP1 := HHV(HIGH, M); {M日最高价}
+TP := HIGH = TP1; {今日最高价是M日最高价}
+
+
+V2 AND PZ AND TP; {同时满足V2、PZ、TP三个条件};
+```
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20212131102151.png)
+
+>不要在交易日的交易时间筛选，因为受当天数据限制，筛选结果可能为空。
+
+## 成长性突破
+
+```
+{根据近两年营业收入与净利润增长率筛选}
+
+{近两年营业收入和扣非净利润同比增长率大于5%且小于30%}
+
+{近两年营业总收入}
+
+INCOME1 := FINONE(183,Y-1,1231) > 5; {Y年年报净利润增速大于5%}
+INCOME11 := FINONE(183,Y-1,1231) < 30; {Y年年报净利润增速小于30%,确保小幅增加}
+
+INCOME2 := FINONE(183,Y-2,1231) > 5; {Y-1年年报净利润增速大于5%}
+INCOME22 := FINONE(183,Y-2,1231) < 30; {Y-1年年报净利润增速小于30%}
+
+{近两年扣非净利润}
+
+PROFIT1 := FINONE(191,Y-1,1231) >5; {Y年年报净利润增速大于5%}
+PROFIT11 := FINONE(191,Y-1,1231) < 30; {Y年年报净利润增速小于30%}
+
+PROFIT2 := FINONE(191,Y-2,1231) >5; {Y-1年年报净利润增速大于5%}
+
+PROFIT22 := FINONE(191,Y-2,1231) <30; {Y-1年年报净利润增速小于30%}
+
+{最近一期季报：营业收入与扣非净利润均大于30%}
+
+INCOME3 := FINONE(183,K,Z) > 30; {近期财报营业收入大于30，Z和K为0表示最近一期}
+PROFIT3 := FINONE(191,K,Z) >30;  {近期财报扣非净利润增速大于30%，Z和K为0表示最近一期}
+
+
+PROFIT4 :=FINONE(2,K,Z) >0;  {近期财报扣非每股收益大于零，Z和K为0表示最近一期}
+
+INCOME1 AND INCOME11 AND  INCOME2 AND INCOME22 AND PROFIT1 AND PROFIT11 AND PROFIT2 AND PROFIT22 AND INCOME3 AND  PROFIT3 AND PROFIT4; {同时符合四个条件};
+```
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20213131103136.png)
+
+## 收盘价创一年新高
+
+```
+{VOL1 :=V/REF(V,1)>Y;相对昨天放量1.5倍}
+
+COL1 :=CLOSE=HHV(HIGH,D);{收盘价创新高}
+
+COL1;
+```
+
+## 翻倍高成长
+
+```
+{动量因子：成交量翻倍}
+VOL1 :=V/REF(V,1)>D;{相对上一周期成交量上涨50%}
+{上涨幅度较前一周期翻倍}
+COL1 :=(CLOSE/REF(CLOSE,1)-1)>ABS(REF(CLOSE,1)/REF(CLOSE,2)-1)*K;{本周期涨幅是上一周期涨幅的2倍}
+
+
+
+
+{成长因子：最近一期季报营业收入与扣非净利润均大于30%}
+
+INCOME3 := FINONE(183,Y,Z) > 30; {近期财报营业收入大于30%}
+PROFIT3 := FINONE(191,Y,Z) >30;  {近期财报扣非净利润增速大于30%}
+
+
+PROFIT4 :=FINONE(2,Y,Z) >0;  {近期财报扣非每股收益大于零}
+
+
+VOL1 AND COL1 AND INCOME3 AND PROFIT3 AND PROFIT4;
+```
+
+## 口袋支点
+
+```
+{高开有缺口}
+OPEN1 := OPEN>REF(CLOSE,1);
+{涨停}
+CLOSE1:= CLOSE>1.095*REF(CLOSE,1);
+
+
+OPEN1 AND CLOSE1;
+```
+
+
 # 指标公式
+
+
+
+
+
+## RPS指标  
+ 
+ 
+
+### 第一步：建立指标计算年度个股涨幅
+
+```
+EXTRS:(C-REF(C,N))/REF(C,N);
+```
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20215531085534.png)
+
+
+### 第二步:创建扩展数据
+
+>扩展数据就是根据个股年度涨跌幅进行排名，并对排名按照0-10000作归一化处理,即涨幅最大的股票取值为1000，
+这也是为什么创建RPS指标公式时将数据指标除以10的原因所在。
+
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20215931085925.png)
+
+>个人的几个扩展数据如下：
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20215031095029.png)
+
+
+### 第三步:创建个股RPS指标
+
+此部分分为以下几点：
+
+- 首先，引用刚刚创建的扩展数据，需要注意不同周期的RPS曲线与引用的数据要一致。
+
+- 其次，绘制RPS虚线（请注意将对应扩展数据除以10，因为前边排名是0-1000的归一化处理）
+，命令说明如下：
+
+  - `:=`，表示赋值；
+
+  - `EXTDATA_USER(5,0)`，表示引用序号为5的扩展数据；参数5表示扩展数据序号，参数0表示是当天的数据，如果是昨天的就取值为1,前天的就取值为2；
+  -  `:`，表示输出，通常在创建技术指标时使用；
+
+  - `LINETHICK2`，表示线宽；
+
+  - `COLORGREEN`，表示线的颜色；
+
+  - `IF(RPS10>=M,RPS10,DRAWNULL),LINETHICK2,COLORRED`，表示如果RPS10大于等于M则画红线，否则不划线。`DRAWNULL`返回无效函数。
+
+
+```
+W:=EXTDATA_USER(5,0);{10天的}
+RPS10:W/10,LINETHICK2,COLORGREEN;
+IF(RPS10>=M,RPS10,DRAWNULL),LINETHICK2,COLORRED;
+
+U:=EXTDATA_USER(4,0);{20天的}
+RPS20:U/10,LINETHICK2,COLORWHITE;
+IF(RPS20>=M,RPS20,DRAWNULL),LINETHICK2,COLORRED;
+
+Z:=EXTDATA_USER(3,0);{50天的}
+RPS50:Z/10,LINETHICK2,COLORYELLOW;
+IF(RPS50>=M,RPS50,DRAWNULL),LINETHICK2,COLORRED;
+
+X:=EXTDATA_USER(1,0);{120天的}
+RPS120:X/10,LINETHICK2,COLORLICYAN;
+IF(RPS120>=M,RPS120,DRAWNULL),LINETHICK2,COLORRED;
+
+Y:=EXTDATA_USER(2,0);{250天的}
+RPS250:Y/10,LINETHICK2,COLORBROWN;
+IF(RPS250>=M,RPS250,DRAWNULL),LINETHICK2,COLORRED;
+```
+
+![](https://gitee.com/shao818/Figure/raw/master/截图_20212131092147.png)
+
+
+## 港资持股曲线指标
+
+```
+NOTEXT曲线:GPJYVALUE(6,1,1),COLORFFFF00;
+
+IF((GPJYVALUE(6,1,1)/FINANCE(7))>0.01,NOTEXT曲线,DRAWNULL),LINETHICK1,COLORRED;
+
+IF((GPJYVALUE(6,1,1)/FINANCE(7))=0,NOTEXT曲线,DRAWNULL),LINETHICK1,COLORWHITE;
+
+IF((GPJYVALUE(6,1,1)/FINANCE(7))>0 AND (GPJYVALUE(6,1,1)/FINANCE(7))<0.01,NOTEXT曲线,DRAWNULL),LINETHICK1,COLORCYAN;
+
+持股量:GPJYVALUE(6,1,1)/10000,COLORLIBLUE;
+
+万股:DRAWNULL;
+
+占流通比:(GPJYVALUE(6,1,1)/FINANCE(7))*100,NODRAW;
+
+占总股比:(GPJYVALUE(6,1,1)/FINANCE(1))*100,NODRAW;
+
+增减万股:(GPJYVALUE(6,1,1)-REF(GPJYVALUE(6,1,1),1))/10000;
+
+增减:=GPJYVALUE(6,1,1)-REF(GPJYVALUE(6,1,1),1);
+
+IF(增减<0,增减,DRAWNULL),STICK,LINETHICK4,COLORCYAN;
+
+IF(增减=0,增减,DRAWNULL),STICK,LINETHICK4,COLORWHITE;
+
+IF(增减>0,增减,DRAWNULL),STICK,LINETHICK4,COLORRED;
+
+```
