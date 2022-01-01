@@ -859,10 +859,34 @@ A  AND  B  AND  D  AND  AA>2  AND  AA<30  AND  AB;{刚刚站上年线小于30天
 # 指标公式
 
 
+## 主图指标：年线上下界
+
+　　公式的效果是在一年的区间内，分别在最高价点位画一条虚线，在最低价点位画一条虚线
 
 
 
-## RPS指标  
+> 特别说明：因为这个是主图指标，所以下面的公式是直接加在你当前正在使用的的主图指标公式里面的，不是和之前副图指标一样新建技术指标公式，这个要注意一下。
+
+
+```
+{周期数}
+
+MAXBARSCOUNT:=IF(TOTALBARSCOUNT>250,250,TOTALBARSCOUNT);
+
+
+
+{250日最高价}
+
+H250:DRAWLINE(CURRBARSCOUNT=MAXBARSCOUNT,CONST(HHV(H,MAXBARSCOUNT)),CURRBARSCOUNT=1,HHV(H,MAXBARSCOUNT),3)DOTLINE;
+
+
+
+{250最低价}
+
+L250:DRAWLINE(CURRBARSCOUNT=MAXBARSCOUNT,CONST(LLV(L,MAXBARSCOUNT)),CURRBARSCOUNT=1,LLV(L,MAXBARSCOUNT),3)DOTLINE;
+```
+
+## 副图指标：RPS指标  
  
  
 
