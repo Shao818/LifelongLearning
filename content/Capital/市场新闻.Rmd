@@ -51,7 +51,7 @@ channel <- odbcConnect("finance", uid="root", pwd="Zh_xq1234@")
 
 
 ```{r include=FALSE}
-Firm_code<-"华闻集团"
+Firm_code<-"海能实业"
 ```
 
 
